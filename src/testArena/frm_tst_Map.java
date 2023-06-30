@@ -72,9 +72,7 @@ public class frm_tst_Map extends javax.swing.JFrame {
         for(MyWaypoint point: waypoints){
             jXMapViewer.add(point.getButton()); 
         }
-        
-        //dont work repass lor tou ;]
-            
+                   
     }
     
     private void clearWaypoint(){
@@ -84,6 +82,17 @@ public class frm_tst_Map extends javax.swing.JFrame {
         }
         waypoints.clear();
         initWaypoint();
+    }
+    
+    public void addWaypoint(MyWaypoint waypoint){
+        
+        //first it remove to then add, meaning it will reset the list each time we add a waypoint, change that later
+        for(MyWaypoint point: waypoints){
+            jXMapViewer.remove(point.getButton()); 
+        }
+        waypoints.add(waypoint);
+        initWaypoint();
+        
     }
     /**
      * This method is called from within the constructor to initialize the form.
@@ -116,6 +125,11 @@ public class frm_tst_Map extends javax.swing.JFrame {
         });
 
         btnClearWaypoints.setText("Clear Waypoint");
+        btnClearWaypoints.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnClearWaypointsActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jXMapViewerLayout = new javax.swing.GroupLayout(jXMapViewer);
         jXMapViewer.setLayout(jXMapViewerLayout);
@@ -181,9 +195,13 @@ public class frm_tst_Map extends javax.swing.JFrame {
     }//GEN-LAST:event_cboMapTypeActionPerformed
 
     private void btnAddWaypointsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddWaypointsActionPerformed
-        waypoints.add(new MyWaypoint("Test 001",new GeoPosition(-20.240089, 57.514709)));
-        initWaypoint();
+        addWaypoint(new MyWaypoint("Test 001",new GeoPosition(-20.240089, 57.514709)));
+        addWaypoint(new MyWaypoint("Test 002",new GeoPosition(-20.22892482190348, 57.46517382802314)));
     }//GEN-LAST:event_btnAddWaypointsActionPerformed
+
+    private void btnClearWaypointsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClearWaypointsActionPerformed
+        clearWaypoint();
+    }//GEN-LAST:event_btnClearWaypointsActionPerformed
 
     /**
      * @param args the command line arguments

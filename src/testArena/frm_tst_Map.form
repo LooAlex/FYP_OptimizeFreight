@@ -97,6 +97,9 @@
           <Properties>
             <Property name="text" type="java.lang.String" value="Clear Waypoint"/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnClearWaypointsActionPerformed"/>
+          </Events>
         </Component>
       </SubComponents>
     </Container>

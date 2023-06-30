@@ -17,7 +17,7 @@ public class ButtonWaypoint extends JButton{
     public ButtonWaypoint (){
         setContentAreaFilled(false); //<<setContentAreaFilled(false) will make button fill area blank aka empty/transparent>>
         String strPathIcon = "./src/Icons/";
-        ImageIcon newImageIcon = new ImageIcon(new ImageIcon(getClass().getResource("/Icons/myPin.png")).getImage().getScaledInstance(24, 24, Image.SCALE_DEFAULT));
+        ImageIcon newImageIcon = new ImageIcon(new ImageIcon(getClass().getResource("/Icons/myPin.png")).getImage().getScaledInstance(24, 24, Image.SCALE_SMOOTH));
         setIcon(newImageIcon);
         
         setCursor(new Cursor(Cursor.HAND_CURSOR));//this change the cursor from arrow to hand cursor when on top of a waypoint>>
