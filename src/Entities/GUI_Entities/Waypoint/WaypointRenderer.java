@@ -1,4 +1,4 @@
-package GUI_Entities.Waypoint;
+package Entities.GUI_Entities.Waypoint;
 
 import java.awt.Graphics2D;
 import java.awt.Rectangle;

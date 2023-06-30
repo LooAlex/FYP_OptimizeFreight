@@ -1,6 +1,7 @@
 
-package FRM;
-import GUI_Entities.Waypoint.*; //for waypoints entities
+package testArena;
+import Entities.GUI_Entities.Waypoint.WaypointRenderer; //for waypoints entities
+import Entities.GUI_Entities.Waypoint.MyWaypoint;
 import java.util.HashSet; //for waypoint set
 import java.util.Set;//for waypoint set
 import org.jxmapviewer.OSMTileFactoryInfo; //for map type and layground to create maptiles to be visible
@@ -14,15 +15,19 @@ import org.jxmapviewer.VirtualEarthTileFactoryInfo;//for different map type
 import org.jxmapviewer.input.ZoomMouseWheelListenerCenter; //for zoom in out using mouse wheel
 import org.jxmapviewer.viewer.WaypointPainter;// for init waypoints set and allowing rendering etc when moving or zooming.
 
+import java.awt.Image;
+import javax.swing.ImageIcon;
+
 public class frm_tst_Map extends javax.swing.JFrame {
     //Var
     private final Set<MyWaypoint> waypoints = new HashSet<>();
     
     //main
     public frm_tst_Map() {
-        
-        initComponents();
+
+        initComponents(); // InitGUI
         init();
+       
     }
     
     //functions
@@ -116,7 +121,7 @@ public class frm_tst_Map extends javax.swing.JFrame {
         jXMapViewer.setLayout(jXMapViewerLayout);
         jXMapViewerLayout.setHorizontalGroup(
             jXMapViewerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jXMapViewerLayout.createSequentialGroup()
+            .addGroup(jXMapViewerLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(btnAddWaypoints)
                 .addGap(18, 18, 18)

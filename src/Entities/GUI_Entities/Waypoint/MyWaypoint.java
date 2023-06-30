@@ -1,5 +1,5 @@
 
-package GUI_Entities.Waypoint;
+package Entities.GUI_Entities.Waypoint;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
