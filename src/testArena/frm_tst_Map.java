@@ -1,5 +1,6 @@
 
 package testArena;
+import Entities.GUI_Entities.Waypoint.IEventWaypoint;
 import Entities.GUI_Entities.Waypoint.WaypointRenderer; //for waypoints entities
 import Entities.GUI_Entities.Waypoint.MyWaypoint;
 import java.util.HashSet; //for waypoint set
@@ -17,21 +18,23 @@ import org.jxmapviewer.viewer.WaypointPainter;// for init waypoints set and allo
 
 import java.awt.Image;
 import javax.swing.ImageIcon;
+import javax.swing.JOptionPane;
 
 public class frm_tst_Map extends javax.swing.JFrame {
     //Var
     private final Set<MyWaypoint> waypoints = new HashSet<>();
-    
+    private IEventWaypoint Ievent;
     //main
     public frm_tst_Map() {
 
         initComponents(); // InitGUI
-        init();
+        initMap();
        
     }
     
-    //functions
-    public void init(){
+    //-----Functions START
+    
+    public void initMap(){
         //<< OSMTileFactoryInfo has all the respective data, and attribute from API for the map
         // TileFactoryInfo contains info of 1 tilemap, the how much it zoom , how it change each tiles etc.>>
         TileFactoryInfo info = new OSMTileFactoryInfo(); 
@@ -59,6 +62,8 @@ public class frm_tst_Map extends javax.swing.JFrame {
         //addMouseWheelListener code allow the JxMapViewer to register the mousewheel movement and reflect the appropriate respond on the map
         jXMapViewer.addMouseWheelListener(new ZoomMouseWheelListenerCenter(jXMapViewer));
         
+        //
+        Ievent = getEvent();
     }
 
     public void initWaypoint(){
@@ -94,6 +99,23 @@ public class frm_tst_Map extends javax.swing.JFrame {
         initWaypoint();
         
     }
+    //this function is use upon init map
+    public IEventWaypoint getEvent (){
+        //overidden abstract functions selected from IEventWaypoint
+        //functions selected was defined here, and in short will initialize the "IEventWaypoint" abstract function with a defined function
+        //that when used later when creating MyWaypoints objects will show up that waypoint name.
+        return new IEventWaypoint() {
+            @Override
+            public void selected(MyWaypoint waypoint) {
+                JOptionPane.showMessageDialog(frm_tst_Map.this, waypoint.getName());
+            }
+        };
+        
+    }
+            
+    
+    //-----Functions END
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -195,14 +217,16 @@ public class frm_tst_Map extends javax.swing.JFrame {
     }//GEN-LAST:event_cboMapTypeActionPerformed
 
     private void btnAddWaypointsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddWaypointsActionPerformed
-        addWaypoint(new MyWaypoint("Test 001",new GeoPosition(-20.240089, 57.514709)));
-        addWaypoint(new MyWaypoint("Test 002",new GeoPosition(-20.22892482190348, 57.46517382802314)));
+        addWaypoint(new MyWaypoint("Test 001",Ievent,new GeoPosition(-20.240089, 57.514709)));
+        addWaypoint(new MyWaypoint("Test 002",Ievent,new GeoPosition(-20.22892482190348, 57.46517382802314)));
     }//GEN-LAST:event_btnAddWaypointsActionPerformed
 
     private void btnClearWaypointsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClearWaypointsActionPerformed
         clearWaypoint();
+        
     }//GEN-LAST:event_btnClearWaypointsActionPerformed
 
+    
     /**
      * @param args the command line arguments
      */

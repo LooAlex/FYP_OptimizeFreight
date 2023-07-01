@@ -33,21 +33,29 @@ public class MyWaypoint extends DefaultWaypoint{
         this.button = button;
     }
 
-    public MyWaypoint(String name, GeoPosition coord) {
+    public MyWaypoint(String name,IEventWaypoint Ievent, GeoPosition coord) {
         super(coord);
         this.name = name;
-        initButton();  //did not have this code before<-- 29/06/23
+        initButton(Ievent);  //did not have this code before<-- 29/06/23
     }
 
     public MyWaypoint() {
     }
     
-    private void initButton(){
-        button = new ButtonWaypoint();
+    //initButton is a funciton that prep the button for current waypoint being created, its icon and functions.
+    private void initButton( IEventWaypoint Ievent){
+        button = new ButtonWaypoint(); //takes care UI aspect, icon etc of the button waypoint
         button.addActionListener(new ActionListener() {
+            //add an eventlistener to to the button of the waypoint being created, so that when we click on waypoint, something happens
             @Override
             public void actionPerformed(ActionEvent e) {
-                System.out.println("Clicked: "+name);
+             //inate functions of any JButton for an addActionListener is the function actionPerformed, inside this function
+             //is all the things that the system will do once this button for this waypoint is clicked.
+                
+                // if this button is clicked :
+                Ievent.selected(MyWaypoint.this); //take argument the current waypoint and pass it.
+                //dont forget this Ievent object is obtained from main -inthiscase- <<frm_tst_map>>
+                
             }
         });
      
