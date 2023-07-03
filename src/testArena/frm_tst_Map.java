@@ -1,8 +1,14 @@
 
 package testArena;
-import Entities.GUI_Entities.Waypoint.IEventWaypoint;
-import Entities.GUI_Entities.Waypoint.WaypointRenderer; //for waypoints entities
-import Entities.GUI_Entities.Waypoint.MyWaypoint;
+
+import Entity.GUI_Entity.Waypoint.IEventWaypoint;
+import Entity.GUI_Entity.Waypoint.WaypointRenderer; //for waypoints entities
+import Entity.GUI_Entity.Waypoint.MyWaypoint;
+
+import Entity.DataMap_Entity.RoutingData;
+import BLL.RoutingService;
+        
+import java.awt.Point;
 import java.util.HashSet; //for waypoint set
 import java.util.Set;//for waypoint set
 import org.jxmapviewer.OSMTileFactoryInfo; //for map type and layground to create maptiles to be visible
@@ -16,14 +22,20 @@ import org.jxmapviewer.VirtualEarthTileFactoryInfo;//for different map type
 import org.jxmapviewer.input.ZoomMouseWheelListenerCenter; //for zoom in out using mouse wheel
 import org.jxmapviewer.viewer.WaypointPainter;// for init waypoints set and allowing rendering etc when moving or zooming.
 
-import java.awt.Image;
-import javax.swing.ImageIcon;
+// for list routing
+import java.util.ArrayList; 
+import java.util.Iterator;
+import java.util.List;
+
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 
 public class frm_tst_Map extends javax.swing.JFrame {
     //Var
-    private final Set<MyWaypoint> waypoints = new HashSet<>();
+    private final Set<MyWaypoint> waypoints = new HashSet<>(); //hashset does not allow any dupps
+    private List<RoutingData> routingData = new ArrayList<>();//added in Pt3// to have routes displayed
     private IEventWaypoint Ievent;
+    private Point mousePosition;  // get the current mouse position on gui
     //main
     public frm_tst_Map() {
 
@@ -33,6 +45,8 @@ public class frm_tst_Map extends javax.swing.JFrame {
     }
     
     //-----Functions START
+    //NOTE as from part 3 the jxMapViewer is not the same from org.jxmapviewer.JXMapViewer,
+    //we are using the JXMapViewerCustom that we created.
     
     public void initMap(){
         //<< OSMTileFactoryInfo has all the respective data, and attribute from API for the map
@@ -46,7 +60,7 @@ public class frm_tst_Map extends javax.swing.JFrame {
         
         //<<Next we will be taking the geoposition using google map to trial it out
         //<<Use GeoPosition to get  convert the lat and long of a  specific point then use the setAddressLocation to that point>>
-        GeoPosition geo = new GeoPosition(-20.2715747,57.4740515);
+        GeoPosition geo = new GeoPosition(12.943926, 105.036671);
         jXMapViewer.setAddressLocation(geo);
         
         //<<use set zoom to the appropriate size for my frame size, this shows how close we are to the geo location from satelite>>
@@ -77,6 +91,33 @@ public class frm_tst_Map extends javax.swing.JFrame {
         for(MyWaypoint point: waypoints){
             jXMapViewer.add(point.getButton()); 
         }
+        
+        //Routing Data.
+        if(waypoints.size() == 2){ //only has a START and an END
+            GeoPosition start = null;
+            GeoPosition end = null;
+            
+            for(MyWaypoint w : waypoints){
+                if(w.getPointType() == MyWaypoint.PointType.START){
+                    start = w.getPosition();
+                }else if (w.getPointType() == MyWaypoint.PointType.END){
+                    end = w.getPosition();
+                }
+            }
+            
+            if(start != null && end != null){
+                routingData = RoutingService.getInstance().routing(
+                        start.getLatitude(), start.getLongitude(), 
+                        end.getLatitude(), end.getLongitude(
+                        )); //its 1 LOC i broke it down to make it easier to read
+            }else{
+                //if start and end null, then clear the current RoutingData list
+                routingData.clear();
+            }
+            
+            jXMapViewer.setRoutingData(routingData); // by sending the routing data to setRoutingData, we draw it
+            
+        }
                    
     }
     
@@ -85,15 +126,30 @@ public class frm_tst_Map extends javax.swing.JFrame {
         for(MyWaypoint point: waypoints){
             jXMapViewer.remove(point.getButton()); 
         }
+        routingData.clear();
         waypoints.clear();
         initWaypoint();
     }
     
     public void addWaypoint(MyWaypoint waypoint){
         
-        //first it remove to then add, meaning it will reset the list each time we add a waypoint, change that later
-        for(MyWaypoint point: waypoints){
+        //each time we add, we remove all waypoint's waypointButton, we do not remove the waypoint, they remain, only there
+        //buttons are removed so that we dont see and click on them but their coordinates and etc remain on the map, invisible
+        for(MyWaypoint point: waypoints){ //remove all button (no visible waypoint)
             jXMapViewer.remove(point.getButton()); 
+        }
+        Iterator<MyWaypoint> iter = waypoints.iterator();
+        
+        while(iter.hasNext()){ //iterate through all the "invisible waypoints"
+           
+            //check if the to be added waypoint's pointType, matches any of the existing waypoints'pointType
+            //in the hashset. 
+            if(iter.next().getPointType() == waypoint.getPointType()){ 
+                //if it is then remove that waypoint, because if the current waypoint's pointType is START 
+                //and we have another different waypoint in the hashset with pointType "START" then it will create 
+                //problem, as there can be only 1 START and 1 END per route
+                iter.remove();
+            }
         }
         waypoints.add(waypoint);
         initWaypoint();
@@ -125,17 +181,35 @@ public class frm_tst_Map extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jXMapViewer = new org.jxmapviewer.JXMapViewer();
-        cboMapType = new javax.swing.JComboBox<>();
+        pmnChoosePointType = new javax.swing.JPopupMenu();
+        menuStart = new javax.swing.JMenuItem();
+        menuEnd = new javax.swing.JMenuItem();
+        jXMapViewer = new Entity.GUI_Entity.DataMap.JXMapViewerCustom();
         btnAddWaypoints = new javax.swing.JButton();
         btnClearWaypoints = new javax.swing.JButton();
+        cboMapType = new javax.swing.JComboBox<>();
+
+        menuStart.setText("Start");
+        menuStart.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuStartActionPerformed(evt);
+            }
+        });
+        pmnChoosePointType.add(menuStart);
+
+        menuEnd.setText("End");
+        menuEnd.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuEndActionPerformed(evt);
+            }
+        });
+        pmnChoosePointType.add(menuEnd);
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
-        cboMapType.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Open Street", "Virtual Earth", "Hybrid", "Satelite" }));
-        cboMapType.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cboMapTypeActionPerformed(evt);
+        jXMapViewer.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                jXMapViewerMouseReleased(evt);
             }
         });
 
@@ -153,6 +227,13 @@ public class frm_tst_Map extends javax.swing.JFrame {
             }
         });
 
+        cboMapType.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Open Street", "Virtual Earth", "Hybrid", "Satelite" }));
+        cboMapType.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cboMapTypeActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jXMapViewerLayout = new javax.swing.GroupLayout(jXMapViewer);
         jXMapViewer.setLayout(jXMapViewerLayout);
         jXMapViewerLayout.setHorizontalGroup(
@@ -160,9 +241,9 @@ public class frm_tst_Map extends javax.swing.JFrame {
             .addGroup(jXMapViewerLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(btnAddWaypoints)
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(btnClearWaypoints)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 521, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 645, Short.MAX_VALUE)
                 .addComponent(cboMapType, javax.swing.GroupLayout.PREFERRED_SIZE, 142, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
@@ -174,20 +255,20 @@ public class frm_tst_Map extends javax.swing.JFrame {
                     .addComponent(cboMapType, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnAddWaypoints)
                     .addComponent(btnClearWaypoints))
-                .addContainerGap(498, Short.MAX_VALUE))
+                .addContainerGap(518, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jXMapViewer, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jXMapViewer, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGap(0, 0, Short.MAX_VALUE)
-                .addComponent(jXMapViewer, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(jXMapViewer, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
         );
 
         pack();
@@ -217,14 +298,37 @@ public class frm_tst_Map extends javax.swing.JFrame {
     }//GEN-LAST:event_cboMapTypeActionPerformed
 
     private void btnAddWaypointsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddWaypointsActionPerformed
-        addWaypoint(new MyWaypoint("Test 001",Ievent,new GeoPosition(-20.240089, 57.514709)));
-        addWaypoint(new MyWaypoint("Test 002",Ievent,new GeoPosition(-20.22892482190348, 57.46517382802314)));
+        
     }//GEN-LAST:event_btnAddWaypointsActionPerformed
 
     private void btnClearWaypointsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClearWaypointsActionPerformed
         clearWaypoint();
         
     }//GEN-LAST:event_btnClearWaypointsActionPerformed
+
+    private void menuEndActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuEndActionPerformed
+        // MENUE: END Waypoint:
+        GeoPosition geop = jXMapViewer.convertPointToGeoPosition(mousePosition);
+        MyWaypoint waypoint  = new MyWaypoint("End Location", MyWaypoint.PointType.END, Ievent, new GeoPosition(geop.getLatitude(),geop.getLongitude()));
+        addWaypoint(waypoint);
+    }//GEN-LAST:event_menuEndActionPerformed
+
+    private void menuStartActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuStartActionPerformed
+        // MENUE: START Waypoint:
+        GeoPosition geop = jXMapViewer.convertPointToGeoPosition(mousePosition);
+        MyWaypoint waypoint  = new MyWaypoint("Start Location", MyWaypoint.PointType.START, Ievent, new GeoPosition(geop.getLatitude(),geop.getLongitude()));
+        addWaypoint(waypoint);
+    }//GEN-LAST:event_menuStartActionPerformed
+
+    //we did this by going design, click on the map, choose Event, mouse, MouseRelease
+    private void jXMapViewerMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jXMapViewerMouseReleased
+        if(SwingUtilities.isRightMouseButton(evt)){
+            mousePosition = evt.getPoint();
+            //jpopupMenuVar.show(whatPanelToInstantiateFrom,X-CoordinateToPopUp,Y-CoordinateToPopUp)
+            pmnChoosePointType.show(jXMapViewer, evt.getX(), evt.getY()); 
+            
+        }
+    }//GEN-LAST:event_jXMapViewerMouseReleased
 
     
     /**
@@ -266,6 +370,9 @@ public class frm_tst_Map extends javax.swing.JFrame {
     private javax.swing.JButton btnAddWaypoints;
     private javax.swing.JButton btnClearWaypoints;
     private javax.swing.JComboBox<String> cboMapType;
-    private org.jxmapviewer.JXMapViewer jXMapViewer;
+    private Entity.GUI_Entity.DataMap.JXMapViewerCustom jXMapViewer;
+    private javax.swing.JMenuItem menuEnd;
+    private javax.swing.JMenuItem menuStart;
+    private javax.swing.JPopupMenu pmnChoosePointType;
     // End of variables declaration//GEN-END:variables
 }
