@@ -38,9 +38,9 @@ public class RoutingService {
         hopper = createGraphHopperInstance("osm-file/cambodia-latest.osm.pbf");
     }
     
-    //use Graphhopper github @: https://github.com/graphhopper/graphhopper/blob/master/example/src/main/java/com/graphhopper/example/RoutingExample.java
-    //change function from static to private
-    //function below take a graph file directory location as string, pass it 
+    //this function create a graphhopper instance, with some metric that determines what kind of path the system will provide
+    //ex: vehicle "car" can only takes roads, while vehicle "foot" will takes any open path!
+    //more on: https://github.com/graphhopper/graphhopper/blob/master/docs/core/profiles.md
     private GraphHopper createGraphHopperInstance(String ghLoc) {
         GraphHopper grahHopper = new GraphHopper();
         grahHopper.setOSMFile(ghLoc); //get the file that has the osm map data with street etc, from directory
@@ -49,6 +49,7 @@ public class RoutingService {
         grahHopper.setGraphHopperLocation("target/routing-graph-cache");
 
         // see docs/core/profiles.md to learn more about profiles
+        //profile("anyName").setVehicle("vehicleTypeToChooseAvailablePaths").setWeighting("metricByWhichSystemDetermineFinalPath");
         grahHopper.setProfiles(new Profile("car").setVehicle("car").setWeighting("fastest").setTurnCosts(false));
 
         // this enables speed mode for the profile we called car
@@ -59,8 +60,10 @@ public class RoutingService {
         return grahHopper;
     }
     
-      public List<RoutingData> routing(double fromLat, double fromLon, double toLat, double toLon) {
-        //GHRequest take the fromPoint and toPoint lat and long
+    //This function simply take a graphHopper instance, feed it with the START and END location -> Return a routinglist of data.
+    //put your algo here?
+    public List<RoutingData> routing(double fromLat, double fromLon, double toLat, double toLon) {
+        //GHRequest take the fromPoint and toPoint lats and longs
         // simple configuration of the request object
         GHRequest req = new GHRequest(fromLat,fromLon,toLat,toLon).
                 // note that we have to specify which profile we are using even when there is only one like here

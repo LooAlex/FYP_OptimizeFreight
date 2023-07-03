@@ -23,7 +23,7 @@ public class ButtonWaypoint extends JButton{
         setCursor(new Cursor(Cursor.HAND_CURSOR));//this change the cursor from arrow to hand cursor when on top of a waypoint>>
         setSize(24, 24);//set the size of this button waypoint, it tuto it was 24,24
         
-        //remove border, working code
+        //remove border
         Border emptyBorder = BorderFactory.createEmptyBorder();
         setBorder(emptyBorder);
     }

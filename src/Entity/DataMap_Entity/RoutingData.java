@@ -4,7 +4,10 @@ import com.graphhopper.util.PointList; //import the graphhopper lib in part 3, u
 /**
  *
  * @author Loo Alex
- * RoutingData will hold the respective properties between 2 points, PointList is a class from Graphhopper that will 
+ * RoutingData will hold the properties between 2 specific points START and END that will allow the system to draw a path,
+ * Between 2 points there can be several points, such has turns etc, those are stored as PointList in a RoutingData.
+ * a PointList is an Iterable of class GHPoint3D + other properties.
+ * Hence a routingData holds various points between 2 specific points that will then allow to draw path in a specific way.
  */
 public class RoutingData {
         

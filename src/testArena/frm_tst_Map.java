@@ -82,10 +82,8 @@ public class frm_tst_Map extends javax.swing.JFrame {
 
     public void initWaypoint(){
         //Init WaypointSets 
-        WaypointPainter<MyWaypoint> wp = new WaypointRenderer(); //cuz WaypointRenderer extends to WaypointPainter.
-        wp.setWaypoints(waypoints); //the final static Hashset of Waypoint above
-        //<<means the WaypointPainter will act as if a panel component , hence the waypoints 
-        //in the HashSet are created on top of the jxMapViewer >>
+        WaypointPainter<MyWaypoint> wp = new WaypointRenderer();
+        wp.setWaypoints(waypoints);
         jXMapViewer.setOverlayPainter(wp); 
         
         for(MyWaypoint point: waypoints){
@@ -114,8 +112,8 @@ public class frm_tst_Map extends javax.swing.JFrame {
                 //if start and end null, then clear the current RoutingData list
                 routingData.clear();
             }
-            
-            jXMapViewer.setRoutingData(routingData); // by sending the routing data to setRoutingData, we draw it
+            // by sending the routing data to setRoutingData, we draw it.
+            jXMapViewer.setRoutingData(routingData); 
             
         }
                    
@@ -166,7 +164,7 @@ public class frm_tst_Map extends javax.swing.JFrame {
                 JOptionPane.showMessageDialog(frm_tst_Map.this, waypoint.getName());
             }
         };
-        
+            
     }
             
     

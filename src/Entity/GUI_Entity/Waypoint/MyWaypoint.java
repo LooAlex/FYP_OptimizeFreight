@@ -52,7 +52,7 @@ public class MyWaypoint extends DefaultWaypoint{
 
     public MyWaypoint() {
     }
-    
+        
     //initButton is a funciton that prep the button for current waypoint being created, its icon and functions.
     private void initButton( IEventWaypoint Ievent){
         button = new ButtonWaypoint(); //takes care UI aspect, icon etc of the button waypoint
