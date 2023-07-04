@@ -2,15 +2,17 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package Entity;
-
-import Core.*;
+package Core;
 
 /**
  *
  * @author Loo Alex
- * //Code,Description,IsActive,CreatedBy,CreatedDate,ModifiedBy,ModifiedDate inherited from BaseDTO
+ * 
+ * NOTE: NOT BEING USED
  */
-public class Ship extends BaseDTO{
+public class CoreEnum {
     
+    public static enum PointType{
+        START, END ;
+    }
 }
