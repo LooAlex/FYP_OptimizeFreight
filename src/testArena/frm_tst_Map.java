@@ -43,7 +43,7 @@ public class frm_tst_Map extends javax.swing.JFrame {
 
         initComponents(); // InitGUI
         initMap();
-        Port port = new Port();
+      
         
        
     }

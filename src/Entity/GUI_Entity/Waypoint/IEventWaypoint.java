@@ -12,5 +12,5 @@ import Entity.Port;
  */
 public interface IEventWaypoint {
     public void selected (MyWaypoint waypoint); //for frm_tst_map
-    public void selected (Port port);           //for optimization algo
+
 }

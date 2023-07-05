@@ -15,8 +15,12 @@ public class frm_GASimulation extends javax.swing.JFrame {
      */
     public frm_GASimulation() {
         initComponents();
+        initMap();
     }
-
+    
+    public void initMap(){
+        
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -28,6 +32,9 @@ public class frm_GASimulation extends javax.swing.JFrame {
 
         tabOutputDetail = new javax.swing.JTabbedPane();
         tabMap = new javax.swing.JPanel();
+        jXMapViewerCustom1 = new Entity.GUI_Entity.DataMap.JXMapViewerCustom();
+        jButton2 = new javax.swing.JButton();
+        jButton1 = new javax.swing.JButton();
         tabPortOutputDetail = new javax.swing.JPanel();
         tabShipRouteDetail = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
@@ -81,28 +88,71 @@ public class frm_GASimulation extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("frameGASimulation"); // NOI18N
-        setPreferredSize(new java.awt.Dimension(1450, 800));
+        setPreferredSize(new java.awt.Dimension(1500, 800));
 
         tabMap.setName(""); // NOI18N
+        tabMap.setPreferredSize(new java.awt.Dimension(800, 458));
+
+        jXMapViewerCustom1.setPreferredSize(new java.awt.Dimension(800, 452));
+
+        jButton2.setText("Add Port");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+
+        jButton1.setText("Clear Port");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jXMapViewerCustom1Layout = new javax.swing.GroupLayout(jXMapViewerCustom1);
+        jXMapViewerCustom1.setLayout(jXMapViewerCustom1Layout);
+        jXMapViewerCustom1Layout.setHorizontalGroup(
+            jXMapViewerCustom1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jXMapViewerCustom1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jButton2)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jButton1)
+                .addContainerGap(665, Short.MAX_VALUE))
+        );
+        jXMapViewerCustom1Layout.setVerticalGroup(
+            jXMapViewerCustom1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jXMapViewerCustom1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jXMapViewerCustom1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jButton2)
+                    .addComponent(jButton1))
+                .addContainerGap(425, Short.MAX_VALUE))
+        );
 
         javax.swing.GroupLayout tabMapLayout = new javax.swing.GroupLayout(tabMap);
         tabMap.setLayout(tabMapLayout);
         tabMapLayout.setHorizontalGroup(
             tabMapLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 860, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, tabMapLayout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jXMapViewerCustom1, javax.swing.GroupLayout.PREFERRED_SIZE, 850, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
         tabMapLayout.setVerticalGroup(
             tabMapLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 458, Short.MAX_VALUE)
+            .addComponent(jXMapViewerCustom1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 458, Short.MAX_VALUE)
         );
 
         tabOutputDetail.addTab("Map", tabMap);
+
+        tabPortOutputDetail.setPreferredSize(new java.awt.Dimension(800, 458));
 
         javax.swing.GroupLayout tabPortOutputDetailLayout = new javax.swing.GroupLayout(tabPortOutputDetail);
         tabPortOutputDetail.setLayout(tabPortOutputDetailLayout);
         tabPortOutputDetailLayout.setHorizontalGroup(
             tabPortOutputDetailLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 860, Short.MAX_VALUE)
+            .addGap(0, 850, Short.MAX_VALUE)
         );
         tabPortOutputDetailLayout.setVerticalGroup(
             tabPortOutputDetailLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -111,11 +161,13 @@ public class frm_GASimulation extends javax.swing.JFrame {
 
         tabOutputDetail.addTab("Ports Detail", tabPortOutputDetail);
 
+        tabShipRouteDetail.setPreferredSize(new java.awt.Dimension(800, 458));
+
         javax.swing.GroupLayout tabShipRouteDetailLayout = new javax.swing.GroupLayout(tabShipRouteDetail);
         tabShipRouteDetail.setLayout(tabShipRouteDetailLayout);
         tabShipRouteDetailLayout.setHorizontalGroup(
             tabShipRouteDetailLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 860, Short.MAX_VALUE)
+            .addGap(0, 850, Short.MAX_VALUE)
         );
         tabShipRouteDetailLayout.setVerticalGroup(
             tabShipRouteDetailLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -128,7 +180,7 @@ public class frm_GASimulation extends javax.swing.JFrame {
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
+            .addGap(0, 876, Short.MAX_VALUE)
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -355,7 +407,7 @@ public class frm_GASimulation extends javax.swing.JFrame {
                     .addComponent(jpDisplayStatus, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(jpShipSelectionLayout.createSequentialGroup()
                         .addComponent(jLabel10)
-                        .addGap(0, 388, Short.MAX_VALUE)))
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
             .addGroup(jpShipSelectionLayout.createSequentialGroup()
                 .addGap(43, 43, 43)
@@ -379,7 +431,7 @@ public class frm_GASimulation extends javax.swing.JFrame {
                     .addComponent(txtIdealSpeed)
                     .addComponent(txtMinSpeed)
                     .addComponent(txtMaxSpeed, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(89, Short.MAX_VALUE))
         );
         jpShipSelectionLayout.setVerticalGroup(
             jpShipSelectionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -487,11 +539,11 @@ public class frm_GASimulation extends javax.swing.JFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 522, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 56, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(tabOutputDetail)
-                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap())
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 76, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(tabOutputDetail, javax.swing.GroupLayout.PREFERRED_SIZE, 850, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -506,6 +558,14 @@ public class frm_GASimulation extends javax.swing.JFrame {
         pack();
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jButton2ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -546,9 +606,12 @@ public class frm_GASimulation extends javax.swing.JFrame {
     private javax.swing.JLabel TitlePortSelection;
     private javax.swing.JComboBox<String> cboPortFromSelected;
     private javax.swing.JComboBox<String> cboShipCode;
+    private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JTabbedPane jTabbedPane1;
+    private Entity.GUI_Entity.DataMap.JXMapViewerCustom jXMapViewerCustom1;
     private javax.swing.JPanel jpDisplayStatus;
     private javax.swing.JPanel jpPortComboArea;
     private javax.swing.JPanel jpPortSelection;
