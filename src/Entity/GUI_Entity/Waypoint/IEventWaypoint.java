@@ -1,6 +1,8 @@
 
 package Entity.GUI_Entity.Waypoint;
 
+import Entity.Port;
+
 /**
  *
  * @author Loo Alex
@@ -9,5 +11,6 @@ package Entity.GUI_Entity.Waypoint;
  * See frm_tst_map
  */
 public interface IEventWaypoint {
-    public void selected (MyWaypoint waypoint); 
+    public void selected (MyWaypoint waypoint); //for frm_tst_map
+    public void selected (Port port);           //for optimization algo
 }
