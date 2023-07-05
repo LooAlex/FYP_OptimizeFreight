@@ -97,7 +97,5 @@ public class BaseDTO {
         this.ModifiedDate = ModifiedDate;
     }
 
-    
-    
 
 }

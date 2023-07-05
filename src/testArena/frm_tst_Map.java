@@ -30,6 +30,8 @@ import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
+//my
+import Entity.*;
 public class frm_tst_Map extends javax.swing.JFrame {
     //Var
     private final Set<MyWaypoint> waypoints = new HashSet<>(); //hashset does not allow any dupps
@@ -41,6 +43,8 @@ public class frm_tst_Map extends javax.swing.JFrame {
 
         initComponents(); // InitGUI
         initMap();
+        Port port = new Port();
+        
        
     }
     
