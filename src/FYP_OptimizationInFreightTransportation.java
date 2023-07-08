@@ -3,6 +3,8 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Main.java to edit this template
  */
 import testArena.tuto_map.frm_tst_Map;
+import testArena.tuto_csv.*;
+
 import FRM.*;
 import javax.swing.UIManager;
 import javax.swing.UIManager.*;
@@ -21,8 +23,9 @@ public class FYP_OptimizationInFreightTransportation {
      */
     public static void main(String[] args) {    
         Scanner sc = new Scanner(System.in);
-        new frm_SimulationPanelMain2().setVisible(true);//main work
-        
+        new frm_SimulationPanelMain2().setVisible(true);//main work             
+               
+        System.out.println("Enter activationCode, it work once");
         String codeActi = sc.nextLine();
         callingTestArena(codeActi.toLowerCase());
 
@@ -39,6 +42,7 @@ public class FYP_OptimizationInFreightTransportation {
                break;
                
            case "csv":
+               new CSV_Reader();
                break;   
                
            case "abc":
