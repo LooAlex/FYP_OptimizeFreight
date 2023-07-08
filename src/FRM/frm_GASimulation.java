@@ -4,11 +4,37 @@
  */
 package FRM;
 
+import BLL.RoutingService;
+import Entity.DataMap_Entity.RoutingData;
+import Entity.GUI_Entity.GUI_Port.IEventPortWaypoint;
+import Entity.GUI_Entity.GUI_Port.PortRenderer;
+import testArena.tuto_map.GUI_Waypoint.WaypointRenderer;
+import Entity.Port;
+import java.awt.Point;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import javax.swing.JOptionPane;
+import javax.swing.event.MouseInputListener;
+import org.jxmapviewer.OSMTileFactoryInfo;
+import org.jxmapviewer.input.PanMouseInputListener;
+import org.jxmapviewer.input.ZoomMouseWheelListenerCenter;
+import org.jxmapviewer.viewer.DefaultTileFactory;
+import org.jxmapviewer.viewer.GeoPosition;
+import org.jxmapviewer.viewer.TileFactoryInfo;
+import org.jxmapviewer.viewer.WaypointPainter;
+
 /**
  *
  * @author Loo Alex
  */
 public class frm_GASimulation extends javax.swing.JFrame {
+    private final Set<Port> myPorts = new HashSet<>();
+    private List<RoutingData> myRoutingData = new ArrayList<>();
+    private IEventPortWaypoint IPEvent;
+    private Point mousePosition;
 
     /**
      * Creates new form frm_GASimulation
@@ -19,7 +45,102 @@ public class frm_GASimulation extends javax.swing.JFrame {
     }
     
     public void initMap(){
+        TileFactoryInfo info = new OSMTileFactoryInfo();
         
+        DefaultTileFactory tileFactory = new DefaultTileFactory(info);
+        jxMapViewer_Simulation.setTileFactory(tileFactory);
+        
+        //setting open position of the map
+        GeoPosition geo = new GeoPosition(-20.154097381559236, 57.498836018696394);
+        jxMapViewer_Simulation.setAddressLocation(geo);
+        
+        //Zoom [6:street] [8:part of MRU] [10: MRU] [12:reunion + MRU] 14[Madagascar] 16[the world]
+        jxMapViewer_Simulation.setZoom(15);
+        
+        //MouseEvent
+        MouseInputListener mn = new PanMouseInputListener(jxMapViewer_Simulation);
+        jxMapViewer_Simulation.addMouseListener(mn);
+        jxMapViewer_Simulation.addMouseMotionListener(mn);
+        jxMapViewer_Simulation.addMouseWheelListener(new ZoomMouseWheelListenerCenter(jxMapViewer_Simulation));
+        
+        //init EventPort
+        IPEvent = getEvent();
+    
+    }
+  
+    public void initPort(){
+    //Init Portset
+        //Init PortDisplayButton
+        WaypointPainter<Port> wp = new PortRenderer();
+        wp.setWaypoints(myPorts);
+        jxMapViewer_Simulation.setOverlayPainter(wp);
+        //Add PortButton to map
+        for(Port prt : myPorts){
+            jxMapViewer_Simulation.add(prt.getButton());
+        }
+        
+        //RoutingData
+        if(myPorts.size() == 2){//has START and END
+            GeoPosition start = null;
+            GeoPosition end = null;
+            
+            for (Port prt : myPorts){
+                if(prt.getPointType() == Port.PointType.START){
+                    start = prt.getPosition();
+                }else if (prt.getPointType() == Port.PointType.END){
+                    end = prt.getPosition();
+                }
+            }
+            
+            //Getting RoutingData here - call BLL.
+            if(start != null && end != null){
+                
+                myRoutingData = RoutingService.getInstance().routing(
+                        start.getLatitude(), start.getLongitude(), 
+                        end.getLatitude(), end.getLongitude());
+                
+            }else{
+                myRoutingData.clear();
+            }
+            
+            jxMapViewer_Simulation.setRoutingData(myRoutingData);
+            
+        }
+        
+    }
+    
+    public void clearPort(){
+        for(Port p : myPorts){
+            jxMapViewer_Simulation.remove(p.getButton());
+        }
+        myRoutingData.clear();
+        myPorts.clear();
+        initPort();
+    }
+    
+    public void addPort (Port port){
+        for(Port p : myPorts){
+            jxMapViewer_Simulation.remove(p.getButton());
+        }
+        
+        Iterator<Port> iter = myPorts.iterator();
+        while(iter.hasNext()){
+            if(iter.next().getPointType() == port.getPointType()){
+                iter.remove();
+            }
+        }
+        
+        myPorts.add(port);
+        initPort();
+    }
+    
+    public IEventPortWaypoint getEvent(){
+        return new IEventPortWaypoint(){
+            @Override
+            public void selected(Port port) {
+                JOptionPane.showMessageDialog(frm_GASimulation.this.tabMap,port.getDescription());
+            }
+        };
     }
     /**
      * This method is called from within the constructor to initialize the form.
@@ -32,9 +153,9 @@ public class frm_GASimulation extends javax.swing.JFrame {
 
         tabOutputDetail = new javax.swing.JTabbedPane();
         tabMap = new javax.swing.JPanel();
-        jXMapViewerCustom1 = new Entity.GUI_Entity.DataMap.JXMapViewerCustom();
-        jButton2 = new javax.swing.JButton();
-        jButton1 = new javax.swing.JButton();
+        jxMapViewer_Simulation = new Entity.GUI_Entity.DataMap.JXMapViewerCustom();
+        btnAddPort = new javax.swing.JButton();
+        btnClearPort = new javax.swing.JButton();
         tabPortOutputDetail = new javax.swing.JPanel();
         tabShipRouteDetail = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
@@ -93,40 +214,40 @@ public class frm_GASimulation extends javax.swing.JFrame {
         tabMap.setName(""); // NOI18N
         tabMap.setPreferredSize(new java.awt.Dimension(800, 458));
 
-        jXMapViewerCustom1.setPreferredSize(new java.awt.Dimension(800, 452));
+        jxMapViewer_Simulation.setPreferredSize(new java.awt.Dimension(800, 452));
 
-        jButton2.setText("Add Port");
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
+        btnAddPort.setText("Add Port");
+        btnAddPort.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
+                btnAddPortActionPerformed(evt);
             }
         });
 
-        jButton1.setText("Clear Port");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        btnClearPort.setText("Clear Port");
+        btnClearPort.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                btnClearPortActionPerformed(evt);
             }
         });
 
-        javax.swing.GroupLayout jXMapViewerCustom1Layout = new javax.swing.GroupLayout(jXMapViewerCustom1);
-        jXMapViewerCustom1.setLayout(jXMapViewerCustom1Layout);
-        jXMapViewerCustom1Layout.setHorizontalGroup(
-            jXMapViewerCustom1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jXMapViewerCustom1Layout.createSequentialGroup()
+        javax.swing.GroupLayout jxMapViewer_SimulationLayout = new javax.swing.GroupLayout(jxMapViewer_Simulation);
+        jxMapViewer_Simulation.setLayout(jxMapViewer_SimulationLayout);
+        jxMapViewer_SimulationLayout.setHorizontalGroup(
+            jxMapViewer_SimulationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jxMapViewer_SimulationLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jButton2)
+                .addComponent(btnAddPort)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jButton1)
+                .addComponent(btnClearPort)
                 .addContainerGap(665, Short.MAX_VALUE))
         );
-        jXMapViewerCustom1Layout.setVerticalGroup(
-            jXMapViewerCustom1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jXMapViewerCustom1Layout.createSequentialGroup()
+        jxMapViewer_SimulationLayout.setVerticalGroup(
+            jxMapViewer_SimulationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jxMapViewer_SimulationLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jXMapViewerCustom1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton2)
-                    .addComponent(jButton1))
+                .addGroup(jxMapViewer_SimulationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnAddPort)
+                    .addComponent(btnClearPort))
                 .addContainerGap(425, Short.MAX_VALUE))
         );
 
@@ -134,14 +255,11 @@ public class frm_GASimulation extends javax.swing.JFrame {
         tabMap.setLayout(tabMapLayout);
         tabMapLayout.setHorizontalGroup(
             tabMapLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, tabMapLayout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jXMapViewerCustom1, javax.swing.GroupLayout.PREFERRED_SIZE, 850, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+            .addComponent(jxMapViewer_Simulation, javax.swing.GroupLayout.DEFAULT_SIZE, 850, Short.MAX_VALUE)
         );
         tabMapLayout.setVerticalGroup(
             tabMapLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jXMapViewerCustom1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 458, Short.MAX_VALUE)
+            .addComponent(jxMapViewer_Simulation, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 458, Short.MAX_VALUE)
         );
 
         tabOutputDetail.addTab("Map", tabMap);
@@ -559,13 +677,18 @@ public class frm_GASimulation extends javax.swing.JFrame {
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void btnClearPortActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClearPortActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jButton1ActionPerformed
+        clearPort();
+    }//GEN-LAST:event_btnClearPortActionPerformed
 
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+    private void btnAddPortActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddPortActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jButton2ActionPerformed
+        addPort(new Port("P001","Test before Lorete",Port.PointType.START,IPEvent,new GeoPosition(-20.16366002209838, 57.50698320195978)));
+        addPort(new Port("P002","Test before Citadel",Port.PointType.END,IPEvent,new GeoPosition(-20.162778782150987, 57.507959525974705)));//change this from on top f citadele to the road before citadelle
+        
+        
+    }//GEN-LAST:event_btnAddPortActionPerformed
 
     /**
      * @param args the command line arguments
@@ -604,19 +727,19 @@ public class frm_GASimulation extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel TitlePortSelection;
+    private javax.swing.JButton btnAddPort;
+    private javax.swing.JButton btnClearPort;
     private javax.swing.JComboBox<String> cboPortFromSelected;
     private javax.swing.JComboBox<String> cboShipCode;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JTabbedPane jTabbedPane1;
-    private Entity.GUI_Entity.DataMap.JXMapViewerCustom jXMapViewerCustom1;
     private javax.swing.JPanel jpDisplayStatus;
     private javax.swing.JPanel jpPortComboArea;
     private javax.swing.JPanel jpPortSelection;
     private javax.swing.JPanel jpRouteDisplay;
     private javax.swing.JPanel jpShipSelection;
+    private Entity.GUI_Entity.DataMap.JXMapViewerCustom jxMapViewer_Simulation;
     private javax.swing.JLabel lblChosenSpeed;
     private javax.swing.JLabel lblDisplayStatus;
     private javax.swing.JLabel lblDistance;

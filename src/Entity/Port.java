@@ -4,8 +4,9 @@
  */
 package Entity;
 
+import Entity.GUI_Entity.GUI_Port.IEventPortWaypoint;
 import Core.*;
-import Entity.GUI_Entity.Waypoint.*;
+import Entity.GUI_Entity.GUI_Port.ButtonPort;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.time.OffsetDateTime;
@@ -233,9 +234,7 @@ public class Port extends DefaultWaypoint {
         this.pointType = pointType;
     }
     
-    private static enum PointType{
-        START,END;
-    }
+
         
     public Port(){};
     
@@ -253,8 +252,8 @@ public class Port extends DefaultWaypoint {
     // </editor-fold>
     
 
-     private void initButton( IEventPortWaypoint IPortevent){
-        button = new ButtonWaypoint(); //takes care UI aspect, icon etc of the button waypoint
+    private void initButton( IEventPortWaypoint IPortevent){
+        button = new ButtonPort(); //takes care UI aspect, icon etc of the button waypoint
         button.addActionListener(new ActionListener() {
             //add an eventlistener to to the button of the waypoint being created, so that when we click on waypoint, something happens
             @Override
@@ -270,6 +269,9 @@ public class Port extends DefaultWaypoint {
      
     }
     
+    public static enum PointType{
+        START,END;
+    }
     
 
 

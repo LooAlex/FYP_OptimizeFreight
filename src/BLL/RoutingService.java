@@ -35,7 +35,10 @@ public class RoutingService {
     }
     
     private RoutingService(){
-        hopper = createGraphHopperInstance("osm-file/cambodia-latest.osm.pbf");
+        //osm-file/cambodia-latest.osm.pbf
+        //osm-file/mauritius-latest.osm.pbf
+        hopper = createGraphHopperInstance("osm-file/mauritius-latest.osm.pbf");
+        
     }
     
     //this function create a graphhopper instance, with some metric that determines what kind of path the system will provide
@@ -65,13 +68,14 @@ public class RoutingService {
     public List<RoutingData> routing(double fromLat, double fromLon, double toLat, double toLon) {
         //GHRequest take the fromPoint and toPoint lats and longs
         // simple configuration of the request object
+        hopper.clean();
         GHRequest req = new GHRequest(fromLat,fromLon,toLat,toLon).
                 // note that we have to specify which profile we are using even when there is only one like here
                         setProfile("car").
                 // define the language for the turn instructions
                         setLocale(Locale.US);
         GHResponse rsp = hopper.route(req);
-
+        //PointOutofBoundsException happens when point given is outside the osm.pbf graph bounds
         // handle errors, will throw an error if you choos streets that are outside the osm.pbf file we used when creating graphhopper instance
         if (rsp.hasErrors())
             throw new RuntimeException(rsp.getErrors().toString());
