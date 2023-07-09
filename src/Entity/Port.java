@@ -250,7 +250,6 @@ public class Port extends DefaultWaypoint {
 
     }
     // </editor-fold>
-    
 
     private void initButton( IEventPortWaypoint IPortevent){
         button = new ButtonPort(); //takes care UI aspect, icon etc of the button waypoint

@@ -16,7 +16,6 @@ public class ButtonPort extends JButton{
 
     public ButtonPort (){
         setContentAreaFilled(false); //<<setContentAreaFilled(false) will make button fill area blank aka empty/transparent>>
-        String strPathIcon = "./src/Icons/";
         ImageIcon newImageIcon = new ImageIcon(new ImageIcon(getClass().getResource("/Icons/myPin.png")).getImage().getScaledInstance(24, 24, Image.SCALE_SMOOTH));
         setIcon(newImageIcon);
         
