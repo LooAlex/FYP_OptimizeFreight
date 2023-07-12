@@ -245,26 +245,89 @@ public class Port extends DefaultWaypoint {
         this.pointType = pointType;
         initButton(IPortevent);  //did not have this code before<-- 29/06/23
     }
+    
+    public Port (String[] arrCSVLine){
+        //0 UnLocode
+        Code = ((arrCSVLine.length < 2 || arrCSVLine[0]== null || arrCSVLine[1].isBlank() ) ? "" : arrCSVLine[1]);
+        //1 name
+        Description = ((arrCSVLine.length < 2 || arrCSVLine[0]== null || arrCSVLine[1].isBlank() ) ? "" : arrCSVLine[1]);
+        //2 Country      
+        
+        //4 D_Region
+        
+        //5 Longitude
+        PortLon  = ((arrCSVLine.length < 2 || arrCSVLine[6]== null || arrCSVLine[6].isBlank() ) ? 0.00d :Double.parseDouble( arrCSVLine[6]));
+        //6 Latitude
+        PortLat  = ((arrCSVLine.length < 2 || arrCSVLine[7]== null || arrCSVLine[7].isBlank() ) ? 0.00d : Double.parseDouble(arrCSVLine[7]));
+        //7 Draft
+        
+        //8 CostPerFULL
+        
+        //9 CostPerFULLTrnsf
+        
+        //10 PortCallCostFixed yes
+        
+        //11 PortCallCostPerFFE
+        
+        
+        
+        GeoPosition coord = new GeoPosition(PortLat,PortLon);
+    }
     // <editor-fold defaultstate="collapsed" desc="PortSearchDTO">
     public class PortSearchDTO {
 
     }
     // </editor-fold>
-
-    private void initButton( IEventPortWaypoint IPortevent){
-        button = new ButtonPort(); //takes care UI aspect, icon etc of the button waypoint
-        button.addActionListener(new ActionListener() {
-            //add an eventlistener to to the button of the waypoint being created, so that when we click on waypoint, something happens
-            @Override
-            public void actionPerformed(ActionEvent e) {
-             //inate functions of any JButton for an addActionListener is the function actionPerformed, inside this function
-             //is all the things that the system will do once this button for this waypoint is clicked.
-                
-                // if this button is clicked :
-                IPortevent.selected(Port.this);
     
-            }
-        });
+    // <editor-fold defaultstate="collapsed" desc="PortCreateUpdate">
+    public class PortCreateUpdate{
+        public int RegionID;
+        public int RegionName;
+        public String Code = "";        //ex: P001
+        public String Description = ""; //Name -> Port-Louis
+
+        public double PortLat;
+        public double PortLon;
+        public double Port_DockingCost;
+        //Fuel
+        public double Port_FuelPrice ;
+        public double Port_BunkerRefuelFixedCost ;
+        public boolean CanBunker;
+        //Containters
+        public double Port_FixedCostSetUpRig;
+        public double Port_TimeOperation;
+        //Penalty
+        public double Port_PenaltyCostWindowTime;
+
+        public  String Remarks = "";
+        public boolean IsActive;
+
+        public int CreatedBy;
+        public OffsetDateTime CreatedDate;
+        public int ModifiedBy;
+        public OffsetDateTime ModifiedDate;
+        public int RecordID;//general ID incase we need a general ID to use across tables.
+
+        //Waypoint
+        private JButton button;
+        private PointType pointType;
+        
+    }
+    // </editor-fold>
+    private void initButton( IEventPortWaypoint IPortevent){
+            button = new ButtonPort(); //takes care UI aspect, icon etc of the button waypoint
+            button.addActionListener(new ActionListener() {
+                //add an eventlistener to to the button of the waypoint being created, so that when we click on waypoint, something happens
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                 //inate functions of any JButton for an addActionListener is the function actionPerformed, inside this function
+                 //is all the things that the system will do once this button for this waypoint is clicked.
+
+                    // if this button is clicked :
+                    IPortevent.selected(Port.this);
+
+                }
+            });
      
     }
     

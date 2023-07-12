@@ -9,6 +9,9 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import testArena.tuto_csv.CSV_Reader;
@@ -18,38 +21,64 @@ import testArena.tuto_csv.CSV_Reader;
  * @author Loo Alex
  * Contains all general and useful functions
  */
-public final class  CoreFunctions {
+public final class  CoreFunctions  {
     private CoreFunctions(){
         throw new IllegalAccessError("Instanciation not allow");
     }
     
-    //notused
-    public static void readCSV(String FilePath, String seperator){
+    //
+    public static Result readCSV(String FilePath, String regexDelimiter){
+        Error errors = new Error();
         
-        if(seperator.toLowerCase().equals("ws")){
-            seperator = "\\s+";
+        List<String[]> lstArrValues = new ArrayList<>();
+        
+        if(regexDelimiter.toLowerCase().equals("tab")){
+            regexDelimiter = "\\t";
         }
         
         //FilePath = "C:/Alex/Docs1/1_Codings/FYP_OptimizationInFreightTransportation/src/testArena/tuto_csv/[testCSV]DataSource/SacramentocrimeJanuary2006.csv";
         //"C:/Alex/Docs1/1_Codings/FYP_OptimizationInFreightTransportation/src/Data_Resource/portsLinerlib.csv"
         String line =""; //used to read line by line in csv
-
+            String txt = "";
         try {
             BufferedReader br = new BufferedReader(new FileReader(FilePath.toString()));
             while((line = br.readLine()) != null){
                 //if not null, read current line in csv []
-                String[] values = line.split(seperator); // a 1D array, only rows
-                System.out.println("PortName:" + values[1] + ", Country: " + values[2] +", Lat: " + values[5]+ ", Lon: " +values[6]); 
-               
-            }
+                String[] values = line.split(regexDelimiter); // a 1D array, only rows
+                
+                lstArrValues.add(values);
+            }      
             
         } catch (FileNotFoundException ex) {
             ex.printStackTrace();
             Logger.getLogger(CSV_Reader.class.getName()).log(Level.SEVERE, null, ex);
             
+            errors.errorMessages.add("File not found.");
+            
         }  catch (IOException ex) {
             ex.printStackTrace();
             Logger.getLogger(CSV_Reader.class.getName()).log(Level.SEVERE, null, ex);
+           
+            errors.errorMessages.add("Cannot read or write to file");
         }
+        
+        
+        return new Result(lstArrValues,errors);
     }
-}
+    
+    //Takes an object[] and convert it to string, the delimiter is what seperate each values in the array on display.
+    //ex: int[] arr = new int[]{1,2,3,4} Delimiter "-" gives 1-2-3-4 as String output
+    public static String convertObjectArrayToString(Object[] arr, String delimiter) {
+        StringBuilder sb = new StringBuilder();
+        for (Object obj : arr)
+                sb.append(obj.toString()).append(delimiter);
+
+        return sb.substring(0, sb.length() - 1);
+
+    }
+    
+    
+    public static Object[] ConvertToObjectArray( Object obj){   
+        return (Object[])obj;
+    }
+}   

@@ -1,4 +1,4 @@
-UNLocode	name	Country	Cabotage_Region	D_Region	Longitude	Latitude	Draft	CostPerFULL	CostPerFULLTrnsf	PortCallCostFixed	PortCallCostPerFFE
+1UNLocode	2name	3Country	4Cabotage_Region	5D_Region	6Longitude	7Latitude	8Draft	9CostPerFULL	10CostPerFULLTrnsf	11PortCallCostFixed	12PortCallCostPerFFE
 GBABD	Aberdeen	United Kingdom	United Kingdom	UK	-2.0937	57.125	9.5	289.00	137.00	34632.00	10.00
 CIABJ	Abidjan	Ivory Coast	Ivory Coast	West Africa	-4.03	5.32	9.5	170.00	309.00	2238.00	16.00
 AEAUH	Abu Dhabi	U. A. E.	U. A. E.	Dubai	54.3593	24.4531	11	75.00	57.00	1572.00	1.00
