@@ -27,7 +27,7 @@ public final class  CoreFunctions  {
     }
     
     //
-    public static Result readCSV(String FilePath, String regexDelimiter){
+    public static Result<List<String[]>> readCSV(String FilePath, String regexDelimiter){
         Error errors = new Error();
         
         List<String[]> lstArrValues = new ArrayList<>();
@@ -38,8 +38,8 @@ public final class  CoreFunctions  {
         
         //FilePath = "C:/Alex/Docs1/1_Codings/FYP_OptimizationInFreightTransportation/src/testArena/tuto_csv/[testCSV]DataSource/SacramentocrimeJanuary2006.csv";
         //"C:/Alex/Docs1/1_Codings/FYP_OptimizationInFreightTransportation/src/Data_Resource/portsLinerlib.csv"
+        
         String line =""; //used to read line by line in csv
-            String txt = "";
         try {
             BufferedReader br = new BufferedReader(new FileReader(FilePath.toString()));
             while((line = br.readLine()) != null){
@@ -77,7 +77,8 @@ public final class  CoreFunctions  {
 
     }
     
-    
+    //Convert any object into an array of object
+    //used mainly when we hold an array of something that we want to convert to string.
     public static Object[] ConvertToObjectArray( Object obj){   
         return (Object[])obj;
     }

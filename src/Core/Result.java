@@ -15,10 +15,11 @@ import java.util.List;
  * Result is a container that can hold any value in its var Data and if there are errors in any process, 
  * obj Error will be used and bring the message.
  */
-public class Result<T extends Object> implements Serializable{
+public class Result<T extends List<? extends Object>> implements Serializable{
     
     public Error errors;
-    public Collection<? extends T> Data; //to get direct access of the Result.
+    public T Data; //to get direct access of the Result. //a Collection englobe all set, and list
+        //we will changing to list for now
     
     public Error getErrors() {
         return errors;
@@ -32,13 +33,13 @@ public class Result<T extends Object> implements Serializable{
         errors = new Error();
     }
     
-    public Result(Collection<? extends T> c){
-        Data = c;
+    public Result(List<? extends Object> lstContainer){
+        Data = (T) lstContainer;
         errors = new Error();
     }
     //obj+ Errors
-    public Result(Collection<? extends T> c, Error errors){
-        Data = c;
+    public Result(List<? extends Object> lstContainer, Error errors){
+        Data = (T)lstContainer;
         setErrors(errors);
     }
     

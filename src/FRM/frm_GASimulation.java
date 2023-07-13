@@ -155,17 +155,21 @@ public class frm_GASimulation extends javax.swing.JFrame {
     }
     
     public void getPorts(){
-        String currentFilePath = classDirectory + Data_ResourceFilePath + "/portsLinerlib.csv";
-        var result = CoreFunctions.readCSV(currentFilePath, "tab");
+        //csv file name
+        //all worlds ports      ->  portsLinerlib.csv
+        //Indian Opcean ports   ->  portsLinerlibFiltered.csv
+           
+        String currentFilePath = classDirectory + Data_ResourceFilePath + "/portsLinerlibFiltered.csv";
+        var result = CoreFunctions.readCSV(currentFilePath, ",");
         if (result.errors.hasErrors){
             System.out.println("ErrorsMessage:" + result.errors.errorMessages.toString());
         }else{
-            var lst = result.Data;
+            var lst = result.Data; //expecting List<String[]>
             System.out.println("Result: ");
-            String[] abc = new String[]{"ab","ce"};
-            for( var arr : lst){
+            
+            for( String[] arr : lst){
                 
-                System.out.println(CoreFunctions.convertObjectArrayToString(CoreFunctions.ConvertToObjectArray(arr), "-"));
+               
             }
             
         }

@@ -1,0 +1,43 @@
+﻿0_UNLocode,1_name,2_Country,3_Cabotage_Region,4_D_Region,5_Longitude,6_Latitude,7_Draft,8_CostPerFULL,9_CostPerFULLTrnsf,10_PortCallCostFixed,11_PortCallCostPerFFE
+AEAUH,Abu Dhabi,U. A. E.,U. A. E.,Dubai,54.3593,24.4531,11,75,57,1572,1
+YEADE,Aden,Yemen,Yemen,Saudi Arabia,45.01667,12.76667,9.5,143,59,4784,2
+SAJBI,Al Jubayl,Saudi Arabia,Saudi Arabia,Saudi Arabia,49.5667,27.05,12.5,99,60,3393,1
+BHBAH,Bahrain,Bahrain,Bahrain,Dubai,50.5,26,11,160,76,3100,6
+IRBND,Bandar Abbas,Iran,Iran,Dubai,56.25,27.2,12.5,99,80,2495,8
+INMAA,Chennai,India,India,Mumbai,80.18,13.06,12.5,149,160,820,9
+BDCGP,Chittagong,Bangladesh,Bangladesh,Mumbai,91.8281,22.3281,9.5,104,2,7130,39
+INCOK,Cochin,India,India,Mumbai,76.236338,9.987639,11,166,56,7383,3
+LKCMB,Colombo,Sri Lanka,Sri Lanka,Mumbai,79.85,6.933334,13.5,272,73,2568,4
+VNDAD,Da Nang,Vietnam,Vietnam,Singapore,108.25,16,9.5,91,60,3002,7
+SADMM,Dammam,Saudi Arabia,Saudi Arabia,Saudi Arabia,50.1093,26.4218,12.5,50,55,3288,1
+TZDAR,Dar es Salaam,Tanzania,Tanzania,South Africa,39.277,-6.817,8,224,247,11486,4
+DJJIB,Djibouti,Djibouti,Djibouti,West Africa,43.148656,11.598434,13.5,243,233,6179,3
+VNHPH,Haiphong,Vietnam,Vietnam,Singapore,106.68334,20.866667,9.5,76,2,3112,8
+INHAL,Haldia Port. India,India,India,Mumbai,88.02,22.02,8,21,58,6796,38
+VNSGN,Saigon,Vietnam,Vietnam,Singapore,106.66667,10.75,8,91,66,4067,7
+YEHOD,Hodeidah,Yemen,Yemen,Saudi Arabia,43.2,14.8,8,216,78,4559,3
+IDJKT,Jakarta,Indonesia,Indonesia,Singapore,106.8,-6.1667,8,135,62,2999,7
+INNSA,Jawaharlal Nehru,India,India,Mumbai,73.02,18.56,9.5,200,186,6837,17
+AEJEA,Jebel Ali,U. A. E.,U. A. E.,Dubai,55.19,25.14,13.5,133,64,4164,2
+SAJED,Jeddah,Saudi Arabia,Saudi Arabia,Saudi Arabia,39.2,21.48334,13.5,102,66,3304,1
+INIXY,Kandla,India,India,Mumbai,70.21666,23.0312,8,187,76,7513,38
+PKKHI,Karachi,Pakistan,Pakistan,Mumbai,67.05,24.866667,9.5,257,0,9262,49
+INCCU,Kolkata,India,India,Mumbai,88.3593,22.5312,8,91,94,7114,54
+THLCH,Laem Chabang,Thailand,Thailand,Singapore,100.991433,13.382173,9.5,95,1,899,6
+KEMBA,Mombasa,Kenya,Kenya,South Africa,39.6562,-4.0468,8,223,125,7956,18
+OMMCT,Muscat. Oman,Oman,Oman,Saudi Arabia,58.5781,23.6093,9.5,221,80,6368,3
+MYPEN,Penang,Malaysia,Malaysia,Singapore,100.28,5.4062,9.5,134,60,3213,9
+INPAV,Pipavav,India,India,Mumbai,71.583081,20.974917,12.5,208,9,4372,4
+MYPKG,Port Klang,Malaysia,Malaysia,Singapore,101.446,3.042,13.5,50,34,2549,3
+MUPLU,Port Louis,Mauritius,Mauritius,South Africa,57.5,-20.1562,12.5,324,169,5999,9
+PKBQM,Port Qasim,Pakistan,Pakistan,Mumbai,67.33334,24.767667,9.5,102,60,7581,23
+OMSLL,Salalah,Oman,Oman,Saudi Arabia,54.091,17.014,13.5,161,71,3850,2
+AESHJ,Sharjah,U. A. E.,U. A. E.,Dubai,55.408,25.375,8,121,58,1466,1
+KHKOS,Sihanoukville,Cambodia,Cambodia,Singapore,103.53,10.63333,9.5,85,63,3156,10
+SGSIN,Singapore,Singapore,Singapore,Singapore,103.8437,1.2812,13.5,130,85,3268,1
+OMSOH,Sohar,Oman,Oman,Saudi Arabia,56.74,24.3593,13.5,193,77,2100,3
+THSGZ,Songkhla,Thailand,Thailand,Singapore,100.558519,7.215083,9.5,83,65,3293,10
+MYTPP,Tanjung Pelepas,Malaysia,Malaysia,Singapore,103.593,1.405,13.5,115,59,1992,3
+MGTMM,Toamasina,Madagascar,Madagascar,South Africa,49.375,-18.1562,9.5,15,174,3874,21
+SCPOV,Victoria,Seychelles,Seychelles,South Africa,55.4375,-4.6093,9.5,346,228,11391,16
+REREU,Port Reunion,Reunion,Reunion,South Africa,55.533333,-20.883333,9.5,126,9,11598,15
