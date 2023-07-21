@@ -59,11 +59,25 @@ public class PortDTO extends DefaultWaypoint {
     
     //--Time
     public float ETA; //Estimate Time Arrival.
-    
+
     //--Ship
-    public float shp_TimeArrival;       //ship time arrival port
-    public float shp_TimeLeave;         //ship time left port 
-    public float shp_weeklyFrequency;   //weekly frequency cycle to reach a port
+    public ShipDTO currentShip;
+    
+    public float shp_TimeArrival;           //tavi  :ship time arrival port
+    public float shp_TimeLeave;             //tevi  :ship time left port 
+    public float shp_weeklyFrequency;       //fw    :weekly frequency cycle to reach a port
+    public float TotalCostBunkerHolding;    //Hvi   :at this port i, after CheckBunker()
+    public float AvgBunkerHolding;          //hvi   :at this port i, after CheckBunker()
+    
+    //container
+    public DemandDTO demands;
+ 
+    
+    //ObjetiveFunction var
+    public float TotalHandlingCost;     //(DemandAmt+SupplyAmnt)*Port_CostPerFullContainer
+    public float TotalFuelTravelCost;   //previous port i to this port j
+    public float TotalFuelIdleCost;     //for this port i, for duration of operation
+    public float TotalPenaltyCost;
     
     // </editor-fold>
     
@@ -292,6 +306,7 @@ public class PortDTO extends DefaultWaypoint {
         this.PortName = Description;   
         this.pointType = pointType;
         initButton(IPortevent);  //did not have this code before<-- 29/06/23
+        demands = new DemandDTO();
     }
     public PortDTO(ResultSet rs,IEventPortWaypoint IPortEvent) throws SQLException{
         super(new GeoPosition(
@@ -321,6 +336,7 @@ public class PortDTO extends DefaultWaypoint {
         IsActive = CoreFunctions.getBooleanFromStringInt(rs.getString("IsActive"));
         CreatedBy = rs.getInt("CreatedBy");
         
+        demands = new DemandDTO();
 
     }
     public PortDTO (String[]arrCSVLine,IEventPortWaypoint IPortEvent){
@@ -364,6 +380,7 @@ public class PortDTO extends DefaultWaypoint {
         
         CreatedBy = ((arrCSVLine.length < ColumnIndexCSV.CREATEDBY+1 || arrCSVLine[ColumnIndexCSV.CREATEDBY]== null || arrCSVLine[ColumnIndexCSV.CREATEDBY].isBlank() ) ? 0 : Integer.parseInt(arrCSVLine[ColumnIndexCSV.CREATEDBY]));
              
+        demands = new DemandDTO();
         }
     
 

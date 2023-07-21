@@ -10,17 +10,27 @@ import BLL.*;
 import Core.CoreData;
 import Core.CoreFunctions;
 import Entity.DataMap_Entity.RoutingData;
+import Entity.GUI_Entity.DataMap.JXMapViewerCustom;
 import Entity.GUI_Entity.GUI_Port.IEventPortWaypoint;
 import Entity.GUI_Entity.GUI_Port.PortRenderer;
 import testArena.tuto_map.GUI_Waypoint.WaypointRenderer;
 import Entity.PortDTO;
+import java.awt.HeadlessException;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JTabbedPane;
+import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.event.MouseInputListener;
@@ -144,7 +154,9 @@ public class frm_GASimulation extends javax.swing.JFrame {
         }
         
         myPorts.add(port);
-        getPorts(); //fill the myPorts with new ports
+        //getContainerType
+        //get
+        getPorts(); //db
         initPort();
         
         
@@ -154,30 +166,32 @@ public class frm_GASimulation extends javax.swing.JFrame {
         return new IEventPortWaypoint(){
             @Override
             public void selected(PortDTO port) {
-                JOptionPane.showMessageDialog(frm_GASimulation.this.tabMap,port.getPortName());
+                int width = 225; //max number of char per line.
+               
+                String html = 
+                "<html><body width='%10s'>"
+                + "<h1>Port</h1>"
+                + "<h3>"
+                + "UnLocode: "+port.UnLoCode+"<br><br>"
+                + "Port Name: "+port.PortName+"<br><br>"
+                + "Coords: ("+port.PortLat+","+port.PortLon+")<br><br>" 
+                + "Demand Amt: "+port.demands.DemandAmt+" Ton<br><br>" 
+                + "Supply Amt: "+port.demands.SupplyAmt+" Ton<br><br>" 
+                + "Port Call  $"+port.PortCall_Cost+"<br><br>"
+                + "Fuel Price  $"+port.Port_FuelPrice+"<br><br>"
+                + "<h3>";
+               
+                JOptionPane.showMessageDialog(frm_GASimulation.this.tabMap,String.format(html, width,width));
+                
             }
         };
     }
     
     public void getPorts(){
-        //csv file name
-        //all worlds ports      ->  portsLinerlib.csv
-        //Indian Opcean ports   ->  portsLinerlibFiltered.csv
-           
-//        String currentFilePath = classDirectory + Data_ResourceFilePath + "/Port_20-07-23.csv";
-//        var result = CoreFunctions.readCSV(currentFilePath, ",",true);
-//        if (result.errors.hasErrors){
-//            System.out.println("ErrorsMessage:" + result.errors.errorMessages.toString());
-//        }else{
-//            var lst = result.Data; //expecting List<String[]>
-//            System.out.println("Result: ");
-//            
-//            for( var arr : lst){
-//                myPorts.add(new PortDTO(arr,IPEvent));
-//            }
-//            
-//        }
-        var result = dll_Init.getPorts(IPEvent);
+        DLL_Port dllport = new DLL_Port();
+        var result = dllport.getPorts(IPEvent);
+        
+       // var result = dllport.getPort_ListByRow(1, IPEvent);
          if (result.errors.hasErrors){
             System.out.println("ErrorsMessage:" + result.errors.errorMessages.toString());
         }else{
@@ -189,6 +203,89 @@ public class frm_GASimulation extends javax.swing.JFrame {
             
         }
          
+    }
+    public void getPortsCSV(){
+                //csv file name
+        //all worlds ports      ->  portsLinerlib.csv
+        //Indian Opcean ports   ->  portsLinerlibFiltered.csv
+           
+        String currentFilePath = classDirectory + Data_ResourceFilePath + "/Port_20-07-23.csv";
+        var result = CoreFunctions.readCSV(currentFilePath, ",",true);
+        if (result.errors.hasErrors){
+            System.out.println("ErrorsMessage:" + result.errors.errorMessages.toString());
+        }else{
+            var lst = result.Data; //expecting List<String[]>
+            System.out.println("Result: ");
+            
+            for( var arr : lst){
+                myPorts.add(new PortDTO(arr,IPEvent));
+            }
+            
+        }
+    }
+    public frm_GASimulation(IEventPortWaypoint IPEvent, Point mousePosition, DLL_InitAll dll_Init, JPanel OutputPanel, JLabel TitlePortSelection, JButton btnAddPort, JButton btnClearPort, JComboBox<String> cboMapType, JComboBox<String> cboPortFromSelected, JComboBox<String> cboShipCode, JLabel jLabel10, JTabbedPane jTabbedPane1, JPanel jpDisplayStatus, JPanel jpPortComboArea, JPanel jpPortSelection, JPanel jpRouteDisplay, JPanel jpShipSelection, JXMapViewerCustom jxMapViewer_Simulation, JLabel lblChosenSpeed, JLabel lblDisplayStatus, JLabel lblDistance, JLabel lblFuelBunkerCost, JLabel lblFuelBunkered, JLabel lblIdealSpeed, JLabel lblLoadedCapacity, JLabel lblMaxSpeed, JLabel lblMinSpeed, JLabel lblOperationalCost, JLabel lblPortFromSelected, JLabel lblPortTo, JLabel lblShipBunkerCapacity, JLabel lblShipBunkerLevel, JLabel lblShipCapacity, JLabel lblShipCategory, JLabel lblShipCode, JLabel lblShipDescription, JLabel lblTimeTaken, JLabel lblTravelFuelCost, JMenuItem mnEnd, JMenuItem mnStart, JPopupMenu pmnChoosePointType, JPanel tabMap, JTabbedPane tabOutputDetail, JPanel tabPortOutputDetail, JPanel tabShipRouteDetail, JTextField txtChosenSpeed, JTextField txtDistance, JTextField txtFuelBunkerCost, JTextField txtFuelBunkered, JTextField txtIdealSpeed, JTextField txtLoadedCapacity, JTextField txtMaxSpeed, JTextField txtMinSpeed, JTextField txtOperationalCost, JTextField txtPortTo, JTextField txtShipBunkerCapacity, JTextField txtShipBunkerLevel, JTextField txtShipCapacity, JTextField txtShipCategory, JTextField txtShipDescription, JTextField txtTimeTaken3, JTextField txtTravelFuelCost) throws HeadlessException {
+        this.IPEvent = IPEvent;
+        this.mousePosition = mousePosition;
+        this.dll_Init = dll_Init;
+        this.OutputPanel = OutputPanel;
+        this.TitlePortSelection = TitlePortSelection;
+        this.btnAddPort = btnAddPort;
+        this.btnClearPort = btnClearPort;
+        this.cboMapType = cboMapType;
+        this.cboPortFromSelected = cboPortFromSelected;
+        this.cboShipCode = cboShipCode;
+        this.jLabel10 = jLabel10;
+        this.jTabbedPane1 = jTabbedPane1;
+        this.jpDisplayStatus = jpDisplayStatus;
+        this.jpPortComboArea = jpPortComboArea;
+        this.jpPortSelection = jpPortSelection;
+        this.jpRouteDisplay = jpRouteDisplay;
+        this.jpShipSelection = jpShipSelection;
+        this.jxMapViewer_Simulation = jxMapViewer_Simulation;
+        this.lblChosenSpeed = lblChosenSpeed;
+        this.lblDisplayStatus = lblDisplayStatus;
+        this.lblDistance = lblDistance;
+        this.lblFuelBunkerCost = lblFuelBunkerCost;
+        this.lblFuelBunkered = lblFuelBunkered;
+        this.lblIdealSpeed = lblIdealSpeed;
+        this.lblLoadedCapacity = lblLoadedCapacity;
+        this.lblMaxSpeed = lblMaxSpeed;
+        this.lblMinSpeed = lblMinSpeed;
+        this.lblOperationalCost = lblOperationalCost;
+        this.lblPortFromSelected = lblPortFromSelected;
+        this.lblPortTo = lblPortTo;
+        this.lblShipBunkerCapacity = lblShipBunkerCapacity;
+        this.lblShipBunkerLevel = lblShipBunkerLevel;
+        this.lblShipCapacity = lblShipCapacity;
+        this.lblShipCategory = lblShipCategory;
+        this.lblShipCode = lblShipCode;
+        this.lblShipDescription = lblShipDescription;
+        this.lblTimeTaken = lblTimeTaken;
+        this.lblTravelFuelCost = lblTravelFuelCost;
+        this.mnEnd = mnEnd;
+        this.mnStart = mnStart;
+        this.pmnChoosePointType = pmnChoosePointType;
+        this.tabMap = tabMap;
+        this.tabOutputDetail = tabOutputDetail;
+        this.tabPortOutputDetail = tabPortOutputDetail;
+        this.tabShipRouteDetail = tabShipRouteDetail;
+        this.txtChosenSpeed = txtChosenSpeed;
+        this.txtDistance = txtDistance;
+        this.txtFuelBunkerCost = txtFuelBunkerCost;
+        this.txtFuelBunkered = txtFuelBunkered;
+        this.txtIdealSpeed = txtIdealSpeed;
+        this.txtLoadedCapacity = txtLoadedCapacity;
+        this.txtMaxSpeed = txtMaxSpeed;
+        this.txtMinSpeed = txtMinSpeed;
+        this.txtOperationalCost = txtOperationalCost;
+        this.txtPortTo = txtPortTo;
+        this.txtShipBunkerCapacity = txtShipBunkerCapacity;
+        this.txtShipBunkerLevel = txtShipBunkerLevel;
+        this.txtShipCapacity = txtShipCapacity;
+        this.txtShipCategory = txtShipCategory;
+        this.txtShipDescription = txtShipDescription;
+        this.txtTimeTaken3 = txtTimeTaken3;
+        this.txtTravelFuelCost = txtTravelFuelCost;
     }
     /**
      * This method is called from within the constructor to initialize the form.

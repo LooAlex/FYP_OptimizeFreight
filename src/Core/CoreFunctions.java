@@ -3,7 +3,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package Core;
-
+import java.util.Random;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -98,4 +98,8 @@ public final class  CoreFunctions  {
         return bool;
     }
     
+    public static int randomInt(int floor,int ceiling){
+        return new Random().nextInt(floor,ceiling);
+    }
+            
 }   

@@ -4,6 +4,7 @@
  */
 import testArena.tuto_map.frm_tst_Map;
 import testArena.tuto_csv.*;
+import testArena.tuto_GA.*;
 import Core.*;
 import FRM.*;
 import com.fasterxml.jackson.databind.util.ClassUtil;
@@ -44,7 +45,7 @@ public class FYP_OptimizationInFreightTransportation {
         String codeActi = "";
         //System.out.println("Enter activationCode, it work once");
         //codeActi = sc.nextLine();
-        codeActi  = "map";
+        codeActi  = "ga";
         
         callingTestArena(codeActi.toLowerCase());
         // </editor-fold> 
@@ -72,15 +73,20 @@ public class FYP_OptimizationInFreightTransportation {
     
     public static void callingTestArena(String codeActivation){
        switch(codeActivation){
-           case "map":        
+            case "map":        
                new frm_tst_Map().setVisible(true);
                break;
                
-           case "csv":
+            case "csv":
                new CSV_Reader().readCSV();
                break;   
                
-           case "abc":
+            case "ga":
+                tst_GA ga = new tst_GA();
+             
+               break;
+               
+            case "abc":
                break;
                
            default:
