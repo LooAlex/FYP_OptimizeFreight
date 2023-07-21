@@ -1,0 +1,3 @@
+"UserAccount_ID","UserAccessID","FirstName","LastName","Email","Password","Remarks","IsActive","CreatedBy"
+"1","1","Loo Alex","Kim-Soo","alexdev@gmail.com","P@ssw0rd01","rmks_IsAdmin","1","1"
+"2","4","Cedric","Kim-Soo","cedClient@gmail.com","ClientPassword1","rmks_IsClientOnly","1","1"

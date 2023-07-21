@@ -27,8 +27,8 @@ public final class  CoreFunctions  {
     }
     
     //
-    public static Result<List<String[]>> readCSV(String FilePath, String regexDelimiter){
-        Error errors = new Error();
+    public static Result<List<String[]>> readCSV(String FilePath, String regexDelimiter,boolean hasTitle){
+        Errors errors = new Errors();
         
         List<String[]> lstArrValues = new ArrayList<>();
         
@@ -43,6 +43,12 @@ public final class  CoreFunctions  {
         try {
             BufferedReader br = new BufferedReader(new FileReader(FilePath.toString()));
             while((line = br.readLine()) != null){
+                if(hasTitle == true){
+                    hasTitle = false;
+                    continue;
+                    
+                }
+                    
                 //if not null, read current line in csv []
                 String[] values = line.split(regexDelimiter); // a 1D array, only rows
                 
@@ -82,4 +88,14 @@ public final class  CoreFunctions  {
     public static Object[] ConvertToObjectArray( Object obj){   
         return (Object[])obj;
     }
+    
+    public static boolean getBooleanFromStringInt(String s){
+        boolean bool = false;
+        if(Integer.parseInt(s) == 1){
+            bool = true;
+        }
+        
+        return bool;
+    }
+    
 }   

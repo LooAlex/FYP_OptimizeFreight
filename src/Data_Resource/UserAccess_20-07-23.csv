@@ -1,0 +1,6 @@
+"UserAccess_ID","Code","Description","Remarks","IsActive","CreatedBy"
+"1","ADM","Admin",,"1","1"
+"2","CTL","Controller","The Client Admin user","1","1"
+"3","DEV","Developers",,"1","1"
+"4","CLT","Client","The Client of our Company","1","1"
+"5","CTM","Customer","Customer of our Client","1","1"

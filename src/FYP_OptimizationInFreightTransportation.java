@@ -12,6 +12,7 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.sql.SQLException;
 import javax.swing.UIManager;
 import javax.swing.UIManager.*;
 import java.util.Scanner;
@@ -55,6 +56,14 @@ public class FYP_OptimizationInFreightTransportation {
     
     //init anything needed here
     public static void init (){
+        try {
+            DBHelper DBHelper = new DBHelper(); //RegisterDriver
+            
+        } catch (SQLException ex) {
+            Logger.getLogger(FYP_OptimizationInFreightTransportation.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(FYP_OptimizationInFreightTransportation.class.getName()).log(Level.SEVERE, null, ex);
+        }
         FYP_OptimizationInFreightTransportation FYP_Main = new FYP_OptimizationInFreightTransportation();
         
     }

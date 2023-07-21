@@ -4,7 +4,7 @@
  */
 package Entity.GUI_Entity.GUI_Port;
 
-import Entity.Port;
+import Entity.PortDTO;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.geom.Point2D;
@@ -17,11 +17,11 @@ import org.jxmapviewer.viewer.WaypointPainter;
  * @author Loo Alex
  * Render the port where it should base on the frame of its JXMapViewer and actual GeoPosition
  */
-public class PortRenderer extends WaypointPainter<Port>{
+public class PortRenderer extends WaypointPainter<PortDTO>{
 
     @Override
     protected void doPaint(Graphics2D g, JXMapViewer map, int width, int height) {
-        for(Port prt : getWaypoints()){
+        for(PortDTO prt : getWaypoints()){
             Point2D p2d = map.getTileFactory().geoToPixel(prt.getPosition(), map.getZoom());//get size and position of the port.
             Rectangle rec = map.getViewportBounds(); //JxMapViewerCustom size of Panel
             

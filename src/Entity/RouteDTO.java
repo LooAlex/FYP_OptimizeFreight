@@ -3,14 +3,20 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package Entity;
-
 import Core.*;
-
 /**
  *
  * @author Loo Alex
- * //Code,Description,IsActive,CreatedBy,CreatedDate,ModifiedBy,ModifiedDate inherited from BaseDTO
  */
-public class Ship extends BaseDTO{
+public class RouteDTO extends BaseDTO{
+    public int RouteID;
+    
+    public int OriginPortID;
+    public int DestinationPortID;
+    
+    public int Distance;
+    
+    public String Code;
+    public String Description;
     
 }

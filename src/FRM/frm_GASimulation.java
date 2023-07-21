@@ -5,13 +5,15 @@
 package FRM;
 
 import BLL.RoutingService;
+import DLL.*;
+import BLL.*;
 import Core.CoreData;
 import Core.CoreFunctions;
 import Entity.DataMap_Entity.RoutingData;
 import Entity.GUI_Entity.GUI_Port.IEventPortWaypoint;
 import Entity.GUI_Entity.GUI_Port.PortRenderer;
 import testArena.tuto_map.GUI_Waypoint.WaypointRenderer;
-import Entity.Port;
+import Entity.PortDTO;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -37,24 +39,27 @@ import org.jxmapviewer.viewer.WaypointPainter;
  * New Window, accessed from frm_SimulationPanel_Main
  */
 public class frm_GASimulation extends javax.swing.JFrame {
-    private final Set<Port> myPorts = new HashSet<>();
+    private Set<PortDTO> myPorts = new HashSet<>();
     private List<RoutingData> myRoutingData = new ArrayList<>();
     private IEventPortWaypoint IPEvent;
     private Point mousePosition;
     
     public String classDirectory = CoreData.classDirectory;
     public String Data_ResourceFilePath = CoreData.Data_ResourceFilePath;
+    
+    public DLL_InitAll dll_Init;
     /**
      * Creates new form frm_GASimulation
      */
     public frm_GASimulation() {
-        
+        dll_Init = new DLL_InitAll();
         initComponents();
         initMap();
     }
     
     public void initMap(){
-        TileFactoryInfo info = new OSMTileFactoryInfo();
+        //using Virtual Earth
+        TileFactoryInfo info = new  VirtualEarthTileFactoryInfo(VirtualEarthTileFactoryInfo.MAP);
         
         DefaultTileFactory tileFactory = new DefaultTileFactory(info);
         jxMapViewer_Simulation.setTileFactory(tileFactory);
@@ -74,52 +79,51 @@ public class frm_GASimulation extends javax.swing.JFrame {
         
         //init EventPort
         IPEvent = getEvent();
-    
+        //OSM = 0, VEMap = 1, VEHybrid = 2, VESatelite = 3
+        cboMapType.setSelectedIndex(1);
     }
   
     public void initPort(){
     //Init Portset
         //Init PortDisplayButton
-        WaypointPainter<Port> wp = new PortRenderer();
+        WaypointPainter<PortDTO> wp = new PortRenderer();
         wp.setWaypoints(myPorts);
         jxMapViewer_Simulation.setOverlayPainter(wp);
         //Add PortButton to map
-        for(Port prt : myPorts){
+        for(PortDTO prt : myPorts){
             jxMapViewer_Simulation.add(prt.getButton());
         }
         
         //RoutingData
-        if(myPorts.size() == 2){//has START and END
-            GeoPosition start = null;
-            GeoPosition end = null;
-            
-            for (Port prt : myPorts){
-                if(prt.getPointType() == Port.PointType.START){
-                    start = prt.getPosition();
-                }else if (prt.getPointType() == Port.PointType.END){
-                    end = prt.getPosition();
-                }
-            }
-            
-            //Getting RoutingData here - call BLL.
-            if(start != null && end != null){
-                
-                myRoutingData = RoutingService.getInstance().routing(
-                        start.getLatitude(), start.getLongitude(), 
-                        end.getLatitude(), end.getLongitude());
-                
-            }else{
-                myRoutingData.clear();
-            }
-            
-            jxMapViewer_Simulation.setRoutingData(myRoutingData);
-            
-        }
+//        if(myPorts.size() == 2){//has START and END
+//            GeoPosition start = null;
+//            GeoPosition end = null;
+//            
+//            for (PortDTO prt : myPorts){
+//                if(prt.getPointType() == PortDTO.PointType.START){
+//                    start = prt.getPosition();
+//                }else if (prt.getPointType() == PortDTO.PointType.END){
+//                    end = prt.getPosition();
+//                }
+//            }
+//            
+//            //Getting RoutingData here - call BLL.
+//            if(start != null && end != null){
+//                
+//                myRoutingData = RoutingService.getInstance().routing(
+//                        start.getLatitude(), start.getLongitude(), 
+//                        end.getLatitude(), end.getLongitude());
+//                
+//            }else{
+//                myRoutingData.clear();
+//            }
+//            jxMapViewer_Simulation.setRoutingData(myRoutingData);
+//        }
         
     }
     
     public void clearPort(){
-        for(Port p : myPorts){
+        for(PortDTO p : myPorts){
             jxMapViewer_Simulation.remove(p.getButton());
         }
         myRoutingData.clear();
@@ -127,12 +131,12 @@ public class frm_GASimulation extends javax.swing.JFrame {
         initPort();
     }
     
-    public void addPort (Port port){
-        for(Port p : myPorts){
+    public void addPort (PortDTO port){
+        for(PortDTO p : myPorts){
             jxMapViewer_Simulation.remove(p.getButton());
         }
         
-        Iterator<Port> iter = myPorts.iterator();
+        Iterator<PortDTO> iter = myPorts.iterator();
         while(iter.hasNext()){
             if(iter.next().getPointType() == port.getPointType()){
                 iter.remove();
@@ -140,16 +144,17 @@ public class frm_GASimulation extends javax.swing.JFrame {
         }
         
         myPorts.add(port);
+        getPorts(); //fill the myPorts with new ports
         initPort();
         
-        getPorts();
+        
     }
     
     public IEventPortWaypoint getEvent(){
         return new IEventPortWaypoint(){
             @Override
-            public void selected(Port port) {
-                JOptionPane.showMessageDialog(frm_GASimulation.this.tabMap,port.getDescription());
+            public void selected(PortDTO port) {
+                JOptionPane.showMessageDialog(frm_GASimulation.this.tabMap,port.getPortName());
             }
         };
     }
@@ -159,20 +164,31 @@ public class frm_GASimulation extends javax.swing.JFrame {
         //all worlds ports      ->  portsLinerlib.csv
         //Indian Opcean ports   ->  portsLinerlibFiltered.csv
            
-        String currentFilePath = classDirectory + Data_ResourceFilePath + "/portsLinerlibFiltered.csv";
-        var result = CoreFunctions.readCSV(currentFilePath, ",");
-        if (result.errors.hasErrors){
+//        String currentFilePath = classDirectory + Data_ResourceFilePath + "/Port_20-07-23.csv";
+//        var result = CoreFunctions.readCSV(currentFilePath, ",",true);
+//        if (result.errors.hasErrors){
+//            System.out.println("ErrorsMessage:" + result.errors.errorMessages.toString());
+//        }else{
+//            var lst = result.Data; //expecting List<String[]>
+//            System.out.println("Result: ");
+//            
+//            for( var arr : lst){
+//                myPorts.add(new PortDTO(arr,IPEvent));
+//            }
+//            
+//        }
+        var result = dll_Init.getPorts(IPEvent);
+         if (result.errors.hasErrors){
             System.out.println("ErrorsMessage:" + result.errors.errorMessages.toString());
         }else{
-            var lst = result.Data; //expecting List<String[]>
+             var lst = result.Data; //expecting List<String[]>
+           for(var p : lst){
+               myPorts.add(p);
+           }
             System.out.println("Result: ");
             
-            for( String[] arr : lst){
-                
-               
-            }
-            
         }
+         
     }
     /**
      * This method is called from within the constructor to initialize the form.
@@ -750,8 +766,8 @@ public class frm_GASimulation extends javax.swing.JFrame {
 
     private void btnAddPortActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddPortActionPerformed
         // TODO add your handling code here:
-        addPort(new Port("P001","Test before Lorete",Port.PointType.START,IPEvent,new GeoPosition(-20.16366002209838, 57.50698320195978)));
-        addPort(new Port("P002","Test before Citadel",Port.PointType.END,IPEvent,new GeoPosition(-20.162778782150987, 57.507959525974705)));//change this from on top f citadele to the road before citadelle
+        addPort(new PortDTO("P001","Test before Lorete",PortDTO.PointType.START,IPEvent,new GeoPosition(-20.16366002209838, 57.50698320195978)));
+        addPort(new PortDTO("P002","Test before Citadel",PortDTO.PointType.END,IPEvent,new GeoPosition(-20.162778782150987, 57.507959525974705)));//change this from on top f citadele to the road before citadelle
         
         
     }//GEN-LAST:event_btnAddPortActionPerformed
@@ -759,7 +775,7 @@ public class frm_GASimulation extends javax.swing.JFrame {
     private void cboMapTypeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cboMapTypeActionPerformed
         //<<TileFactoryInfo is incharge of getting properties of different Map type and their colors etc like the brain of a printer>>
         TileFactoryInfo info; 
-        
+
         int selectedIndex = cboMapType.getSelectedIndex();
         
         if(selectedIndex == 0){
@@ -789,13 +805,13 @@ public class frm_GASimulation extends javax.swing.JFrame {
     private void mnStartActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnStartActionPerformed
             // MENUE: START Waypoint:
             GeoPosition geop = jxMapViewer_Simulation.convertPointToGeoPosition(mousePosition);
-            addPort(new Port("P001 tst", "Start location", Port.PointType.START, IPEvent, new GeoPosition(geop.getLatitude(), geop.getLongitude())));
+            addPort(new PortDTO("P001 tst", "Start location", PortDTO.PointType.START, IPEvent, new GeoPosition(geop.getLatitude(), geop.getLongitude())));
     }//GEN-LAST:event_mnStartActionPerformed
 
     private void mnEndActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnEndActionPerformed
             // MENUE: END Waypoint:
             GeoPosition geop = jxMapViewer_Simulation.convertPointToGeoPosition(mousePosition);
-            addPort(new Port("P002 tst", "End location", Port.PointType.END, IPEvent, new GeoPosition(geop.getLatitude(), geop.getLongitude())));
+            addPort(new PortDTO("P002 tst", "End location", PortDTO.PointType.END, IPEvent, new GeoPosition(geop.getLatitude(), geop.getLongitude())));
     }//GEN-LAST:event_mnEndActionPerformed
 
     /**

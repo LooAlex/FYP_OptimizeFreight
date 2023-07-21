@@ -11,7 +11,7 @@ import java.util.*;
  *
  * @author Loo Alex
  */
-public class Error implements Serializable {
+public class Errors implements Serializable {
     public List<String> errorMessages;
     public boolean hasErrors = false;
 
@@ -44,7 +44,7 @@ public class Error implements Serializable {
     }
 
     
-    public Error(){
+    public Errors(){
         isHasErrors();
         errorMessages = new ArrayList<String>(){
             @Override

@@ -1,7 +1,7 @@
 
 package testArena.tuto_map.GUI_Waypoint;
 
-import Entity.Port;
+import Entity.PortDTO;
 
 /**
  *
