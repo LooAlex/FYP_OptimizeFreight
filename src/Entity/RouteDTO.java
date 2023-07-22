@@ -4,19 +4,26 @@
  */
 package Entity;
 import Core.*;
+import java.sql.*;
 /**
  *
  * @author Loo Alex
+ * 
+ * there will be RouteHeaderDTO, and RouteContentDTO
  */
 public class RouteDTO extends BaseDTO{
     public int RouteID;
     
     public int OriginPortID;
     public int DestinationPortID;
+    public double Distance;
+
+    public RouteDTO() {
+    }
     
-    public int Distance;
-    
-    public String Code;
-    public String Description;
+    public RouteDTO(ResultSet r) throws SQLException{
+        super(r);
+       
+    }
     
 }

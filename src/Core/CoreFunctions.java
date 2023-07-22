@@ -89,7 +89,7 @@ public final class  CoreFunctions  {
         return (Object[])obj;
     }
     
-    public static boolean getBooleanFromStringInt(String s){
+    public static boolean convertStringToBoolean(String s){
         boolean bool = false;
         if(Integer.parseInt(s) == 1){
             bool = true;

@@ -2,21 +2,17 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package Core;
-
+package Algorithms;
+import java.nio.file.FileSystemNotFoundException;
+import java.util.*;
+import Core.*;
+import DLL.*;
+import Entity.*;
+import java.sql.*;
 /**
  *
  * @author Loo Alex
- * 
- * NOTE: NOT BEING USED
  */
-public class CoreEnum {
+public class GA_PortAlgorithm {
     
-    public static enum PointType{
-        START, END ;
-    }
-    
-    public static enum SelectionType{
-        TOURNAMENT,ROULETTE
-    }
 }

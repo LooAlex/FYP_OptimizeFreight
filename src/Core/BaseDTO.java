@@ -4,14 +4,16 @@
  */
 package Core;
 
+import java.io.Serializable;
 import java.time.OffsetDateTime;
 import java.time.*;
+import java.sql.*;
 
 /**
  *
  * @author Loo Alex
  */
-public class BaseDTO {
+public class BaseDTO implements Serializable{
     public int RecordID;
     public String Code = "";        //ex: P001
     public String Description = ""; //Name -> Port-Louis
@@ -97,5 +99,39 @@ public class BaseDTO {
         this.ModifiedDate = ModifiedDate;
     }
 
+    public BaseDTO() {
+    }
+
+    public BaseDTO (String Remarks, boolean isActive, int CreatedBy){
+        this.IsActive = isActive; 
+        this.Remarks = Remarks;
+        this.CreatedBy = CreatedBy;
+    }
+    
+    public BaseDTO (String Code, String Description, String Remarks, boolean isActive, int CreatedBy){
+        this.Code = Code;
+        this.Description = Description;
+        this.IsActive = isActive; 
+        this.Remarks = Remarks;
+        this.CreatedBy = CreatedBy;
+    }
+    
+    public BaseDTO (int RecordID,String Code, String Description, String Remarks, boolean isActive, int CreatedBy){
+        this.RecordID = RecordID;
+        this.Code = Code;
+        this.Description = Description;
+        this.IsActive = isActive; 
+        this.Remarks = Remarks;
+        this.CreatedBy = CreatedBy;
+    }
+    
+    public BaseDTO(ResultSet r) throws SQLException
+    {
+        this.Code = r.getString("Code");
+        this.Description = r.getString("Description");
+        this.IsActive = CoreFunctions.convertStringToBoolean(r.getString("IsActive"));
+        this.Remarks = r.getString("Remarks");
+        this.CreatedBy = r.getInt("CreatedBy");
+    }
 
 }

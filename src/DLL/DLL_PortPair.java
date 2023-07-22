@@ -30,5 +30,115 @@ public class DLL_PortPair {
     }
         
     //Functions
+      public Result<ArrayList<PortPairDistanceDTO>> getPairPortDistances(){
+        
+        Errors errors = new Errors();
+        ArrayList<PortPairDistanceDTO> lst = new ArrayList<>();
+        
+        try
+        {
+            Connection conn = _DBHelper.createConnection();
+        
+            CallableStatement statement = conn.prepareCall("{call PairPortDistance_GetAll()}");
+
+            ResultSet rs = statement.executeQuery();//use this to execute the current SP or query inside that stm
+           
+            if(rs != null){
+                while(rs.next()){
+                    lst.add(new PortPairDistanceDTO(rs));
+                }
+            }else{
+                errors.errorMessages.add("A Problem was encounter while retreiving Pair Port Distances");
+            }
+           
+            
+            statement.close();
+            conn.close();
+ 
+            System.out.println("Stored procedure called successfully!  PairPortDistance_GetAll");
+            
+            
+        }catch(Exception ex){
+           ex.printStackTrace();
+        }
+                
+        return new Result(lst,errors);
+    }
     
+    public Result<ArrayList<PortPairDistanceDTO>> getPairPortDistance_ListByRow(int OriginPortID,int DestinationPortID){
+        
+        Errors errors = new Errors();
+        ArrayList<PortPairDistanceDTO> lst = new ArrayList<>();
+        
+        try
+        {
+            Connection conn = _DBHelper.createConnection();
+        
+            CallableStatement statement = conn.prepareCall("{call PortPairDistance_ListByRow_OD(?,?)}");
+            
+            statement.setInt("_OriginPortID", OriginPortID);
+            statement.setInt("_DestinationPortID", DestinationPortID);
+            ResultSet rs = statement.executeQuery();//use this to execute the current SP or query inside that stm
+
+            if(rs != null){
+                while(rs.next()){
+                    lst.add(new PortPairDistanceDTO(rs));
+                    break;
+                }
+            }else{
+                errors.errorMessages.add("A Problem was encounter while retreiving Pair Port Distances");
+            }
+            
+            
+            statement.close();
+            conn.close();
+ 
+            System.out.println("Stored procedure called successfully! PortPairDistance_ListByRow");
+            
+            
+        }catch(Exception ex){
+           ex.printStackTrace();
+        }
+                
+        return new Result(lst,errors);
+    }
+    
+    public Result<ArrayList<PortPairDistanceDTO>> getPort_GetData(String Code,String Description,int OriginPortID,int DestinationPortID){
+        
+        Errors errors = new Errors();
+        ArrayList<PortPairDistanceDTO> lst = new ArrayList<>();
+        
+        try
+        {
+            Connection conn = _DBHelper.createConnection();
+        
+            CallableStatement statement = conn.prepareCall("{call PairPortDistance_GetData(?,?)}");
+            
+            statement.setString("_Code", Code);
+            statement.setString("_Description", Description);
+            statement.setInt("_OriginPortID", OriginPortID);
+            statement.setInt("_DestinationPortID", DestinationPortID);
+            
+            ResultSet rs = statement.executeQuery();//use this to execute the current SP or query inside that stm
+
+            if(rs != null){
+                while(rs.next()){
+                    lst.add(new PortPairDistanceDTO(rs));
+                }
+            }else{
+                errors.errorMessages.add("A Problem was encounter while retreiving Pair Port Distances");
+            }
+            
+            statement.close();
+            conn.close();
+ 
+            System.out.println("Stored procedure called successfully!");
+            
+            
+        }catch(Exception ex){
+           ex.printStackTrace();
+        }
+                
+        return new Result(lst,errors);
+    }
 }//end

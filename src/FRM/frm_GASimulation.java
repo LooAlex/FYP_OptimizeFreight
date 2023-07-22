@@ -4,9 +4,11 @@
  */
 package FRM;
 
+import Algorithms.GA_Main;
 import BLL.RoutingService;
 import DLL.*;
 import BLL.*;
+import Core.*;
 import Core.CoreData;
 import Core.CoreFunctions;
 import Entity.DataMap_Entity.RoutingData;
@@ -14,26 +16,43 @@ import Entity.GUI_Entity.DataMap.JXMapViewerCustom;
 import Entity.GUI_Entity.GUI_Port.IEventPortWaypoint;
 import Entity.GUI_Entity.GUI_Port.PortRenderer;
 import testArena.tuto_map.GUI_Waypoint.WaypointRenderer;
-import Entity.PortDTO;
+import Entity.*;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.HeadlessException;
 import java.awt.Point;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
+import javax.swing.JTable;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.ScrollPaneLayout;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
+import javax.swing.border.Border;
 import javax.swing.event.MouseInputListener;
+import javax.swing.table.DefaultTableModel;
 import org.jxmapviewer.OSMTileFactoryInfo;
 import org.jxmapviewer.VirtualEarthTileFactoryInfo;
 import org.jxmapviewer.input.PanMouseInputListener;
@@ -49,7 +68,14 @@ import org.jxmapviewer.viewer.WaypointPainter;
  * New Window, accessed from frm_SimulationPanel_Main
  */
 public class frm_GASimulation extends javax.swing.JFrame {
-    private Set<PortDTO> myPorts = new HashSet<>();
+    private List<ShipCategoryDTO> myShipCats;
+    private List<PortDTO> lstPorts;
+       
+    public Set<PortDTO> SelectedPorts = new HashSet<>();
+    public ShipCategoryDTO SelectedShipCategory;
+    public ContainerTypeDTO SelectedContainerType;
+    
+    //private List<PortDTO> SelectedPorts = new ArrayList<>();
     private List<RoutingData> myRoutingData = new ArrayList<>();
     private IEventPortWaypoint IPEvent;
     private Point mousePosition;
@@ -58,15 +84,31 @@ public class frm_GASimulation extends javax.swing.JFrame {
     public String Data_ResourceFilePath = CoreData.Data_ResourceFilePath;
     
     public DLL_InitAll dll_Init;
+    
+    //GUI
+    JCheckBox[] arrCheckBoxPort;
     /**
      * Creates new form frm_GASimulation
      */
     public frm_GASimulation() {
         dll_Init = new DLL_InitAll();
         initComponents();
+        initAll();
+        
+    }
+    public void initAll(){
+        textArea.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        textArea.setLineWrap(true);
+        textArea.setWrapStyleWord(true);
+        textArea.setEditable(false);
+        //init EventPort
+        IPEvent = getEvent();
+        
+        getContainerTypes();
+        getShipCategorys();
+        getPorts();
         initMap();
     }
-    
     public void initMap(){
         //using Virtual Earth
         TileFactoryInfo info = new  VirtualEarthTileFactoryInfo(VirtualEarthTileFactoryInfo.MAP);
@@ -87,8 +129,7 @@ public class frm_GASimulation extends javax.swing.JFrame {
         jxMapViewer_Simulation.addMouseMotionListener(mn);
         jxMapViewer_Simulation.addMouseWheelListener(new ZoomMouseWheelListenerCenter(jxMapViewer_Simulation));
         
-        //init EventPort
-        IPEvent = getEvent();
+
         //OSM = 0, VEMap = 1, VEHybrid = 2, VESatelite = 3
         cboMapType.setSelectedIndex(1);
     }
@@ -97,10 +138,10 @@ public class frm_GASimulation extends javax.swing.JFrame {
     //Init Portset
         //Init PortDisplayButton
         WaypointPainter<PortDTO> wp = new PortRenderer();
-        wp.setWaypoints(myPorts);
+        wp.setWaypoints(SelectedPorts);
         jxMapViewer_Simulation.setOverlayPainter(wp);
         //Add PortButton to map
-        for(PortDTO prt : myPorts){
+        for(PortDTO prt : SelectedPorts){
             jxMapViewer_Simulation.add(prt.getButton());
         }
         
@@ -133,30 +174,40 @@ public class frm_GASimulation extends javax.swing.JFrame {
     }
     
     public void clearPort(){
-        for(PortDTO p : myPorts){
-            jxMapViewer_Simulation.remove(p.getButton());
+        for(var c: arrCheckBoxPort){
+            c.setSelected(false);
         }
         myRoutingData.clear();
-        myPorts.clear();
+        clearUIPort();
         initPort();
     }
     
+    public void clearUIPort(){
+        textArea.setText("");
+        lblTotalPortSelected.setText("0");
+         for(PortDTO p : SelectedPorts){
+            jxMapViewer_Simulation.remove(p.getButton());
+        }
+         SelectedPorts.clear();
+        
+    }
     public void addPort (PortDTO port){
-        for(PortDTO p : myPorts){
+        for(PortDTO p : SelectedPorts){
             jxMapViewer_Simulation.remove(p.getButton());
         }
         
-        Iterator<PortDTO> iter = myPorts.iterator();
+        Iterator<PortDTO> iter = SelectedPorts.iterator();
         while(iter.hasNext()){
             if(iter.next().getPointType() == port.getPointType()){
                 iter.remove();
             }
         }
         
-        myPorts.add(port);
+        SelectedPorts.add(port);
         //getContainerType
         //get
-        getPorts(); //db
+        //only choose selected ports in checkbox areas.
+        //getPorts(); //db
         initPort();
         
         
@@ -187,23 +238,99 @@ public class frm_GASimulation extends javax.swing.JFrame {
         };
     }
     
+    public void getShipCategorys(){
+        DLL_ShipCategory ddlShipCategory  = new DLL_ShipCategory();
+        var result  = ddlShipCategory.getShipCategorys();
+        if(result.Data.size()>0){
+            myShipCats = result.Data;
+            String[] arrShipCatCode = new String[result.Data.size()];
+            
+            for(int i = 0; i<result.Data.size(); i++){
+                arrShipCatCode[i] = myShipCats.get(i).getCode();
+            }  
+            
+            cboShipCode.setModel(new javax.swing.DefaultComboBoxModel<>(arrShipCatCode));
+            setShipCategoryToGUIDisplay(0);
+        }
+        
+        
+        
+    }
+    public void setShipCategoryToGUIDisplay(int SelectedIndex){
+        
+        cboShipCode.setSelectedIndex(SelectedIndex);
+        
+        SelectedShipCategory = myShipCats.get(SelectedIndex);
+        txtShipBunkerCapacity.setText(String.valueOf(SelectedShipCategory.BunkerCapacity)) ;
+        txtShipCapacity.setText(String.valueOf(SelectedShipCategory.CapacityTEU));
+        txtShipDescription.setText(String.valueOf(SelectedShipCategory.getDescription()));
+        txtDesignSpeed.setText(String.valueOf(SelectedShipCategory.DesignSpeed));
+        txtMinSpeed.setText(String.valueOf(SelectedShipCategory.MinSpeed));
+        txtMaxSpeed.setText(String.valueOf(SelectedShipCategory.MaxSpeed));
+        txtShipLoadUnloadTimePerContainer.setText(String.valueOf((SelectedShipCategory.TimeLoadUnLoadPerFullContainerTEU)));
+        
+        
+    }
+    
+    public void getContainerTypes(){
+        DLL_ContainerType dllContainerType = new DLL_ContainerType();
+        var result = dllContainerType.getContainerType_ListByRow(1);
+        if(result.Data != null && result.Data.size() > 0){
+            SelectedContainerType = result.Data.get(0);
+        }
+        
+    }
     public void getPorts(){
+
+        
         DLL_Port dllport = new DLL_Port();
         var result = dllport.getPorts(IPEvent);
         
        // var result = dllport.getPort_ListByRow(1, IPEvent);
+       
          if (result.errors.hasErrors){
             System.out.println("ErrorsMessage:" + result.errors.errorMessages.toString());
         }else{
-             var lst = result.Data; //expecting List<String[]>
-           for(var p : lst){
-               myPorts.add(p);
-           }
-            System.out.println("Result: ");
+             lstPorts = result.Data; //expecting List<String[]>
+             
+             int length = lstPorts.size();
+             var PortNames = new ArrayList<String>();
             
+            int displayRow =0;
+           int displayCol = 2;
+           int divide=(PortNames.size()%displayCol);
+	    //incase "divide" is not a factor of col, 3, it means we will have 1 extra row to display
+	    if(divide>0)
+	    	divide+=1;
+	    
+	    //increment the number of rows
+	    for(int i=0;i<divide;i++)
+	    	displayRow++;
+            
+            arrCheckBoxPort = new JCheckBox[length];
+            
+
+           
+           jpCheckBoxContainer.setLayout(new GridLayout(displayRow,displayCol,6,6));
+           
+            for(int i = 0; i<length; i++){
+               
+               //SelectedPorts.add(lstPorts.get(i));
+               PortNames.add(lstPorts.get(i).getPortName());
+               arrCheckBoxPort[i] = new JCheckBox(lstPorts.get(i).getPortName());
+               
+               jpCheckBoxContainer.add(new JPanel().add(arrCheckBoxPort[i]));
+            }
+           
+         
+           
+           
+           
         }
          
     }
+    
+   
     public void getPortsCSV(){
                 //csv file name
         //all worlds ports      ->  portsLinerlib.csv
@@ -218,7 +345,7 @@ public class frm_GASimulation extends javax.swing.JFrame {
             System.out.println("Result: ");
             
             for( var arr : lst){
-                myPorts.add(new PortDTO(arr,IPEvent));
+                SelectedPorts.add(new PortDTO(arr,IPEvent));
             }
             
         }
@@ -237,7 +364,6 @@ public class frm_GASimulation extends javax.swing.JFrame {
         this.jLabel10 = jLabel10;
         this.jTabbedPane1 = jTabbedPane1;
         this.jpDisplayStatus = jpDisplayStatus;
-        this.jpPortComboArea = jpPortComboArea;
         this.jpPortSelection = jpPortSelection;
         this.jpRouteDisplay = jpRouteDisplay;
         this.jpShipSelection = jpShipSelection;
@@ -257,7 +383,7 @@ public class frm_GASimulation extends javax.swing.JFrame {
         this.lblShipBunkerCapacity = lblShipBunkerCapacity;
         this.lblShipBunkerLevel = lblShipBunkerLevel;
         this.lblShipCapacity = lblShipCapacity;
-        this.lblShipCategory = lblShipCategory;
+        this.lblShipLoadUnloadTimePerContainer = lblShipCategory;
         this.lblShipCode = lblShipCode;
         this.lblShipDescription = lblShipDescription;
         this.lblTimeTaken = lblTimeTaken;
@@ -273,7 +399,7 @@ public class frm_GASimulation extends javax.swing.JFrame {
         this.txtDistance = txtDistance;
         this.txtFuelBunkerCost = txtFuelBunkerCost;
         this.txtFuelBunkered = txtFuelBunkered;
-        this.txtIdealSpeed = txtIdealSpeed;
+        this.txtDesignSpeed = txtIdealSpeed;
         this.txtLoadedCapacity = txtLoadedCapacity;
         this.txtMaxSpeed = txtMaxSpeed;
         this.txtMinSpeed = txtMinSpeed;
@@ -282,10 +408,14 @@ public class frm_GASimulation extends javax.swing.JFrame {
         this.txtShipBunkerCapacity = txtShipBunkerCapacity;
         this.txtShipBunkerLevel = txtShipBunkerLevel;
         this.txtShipCapacity = txtShipCapacity;
-        this.txtShipCategory = txtShipCategory;
+        this.txtShipLoadUnloadTimePerContainer = txtShipCategory;
         this.txtShipDescription = txtShipDescription;
         this.txtTimeTaken3 = txtTimeTaken3;
         this.txtTravelFuelCost = txtTravelFuelCost;
+        
+        
+        
+        
     }
     /**
      * This method is called from within the constructor to initialize the form.
@@ -312,7 +442,7 @@ public class frm_GASimulation extends javax.swing.JFrame {
         jpShipSelection = new javax.swing.JPanel();
         lblShipCode = new javax.swing.JLabel();
         lblShipDescription = new javax.swing.JLabel();
-        lblShipCategory = new javax.swing.JLabel();
+        lblShipLoadUnloadTimePerContainer = new javax.swing.JLabel();
         lblShipBunkerCapacity = new javax.swing.JLabel();
         lblShipCapacity = new javax.swing.JLabel();
         lblIdealSpeed = new javax.swing.JLabel();
@@ -321,11 +451,11 @@ public class frm_GASimulation extends javax.swing.JFrame {
         jLabel10 = new javax.swing.JLabel();
         cboShipCode = new javax.swing.JComboBox<>();
         txtShipCapacity = new javax.swing.JTextField();
-        txtIdealSpeed = new javax.swing.JTextField();
+        txtDesignSpeed = new javax.swing.JTextField();
         txtMinSpeed = new javax.swing.JTextField();
         txtMaxSpeed = new javax.swing.JTextField();
         txtShipDescription = new javax.swing.JTextField();
-        txtShipCategory = new javax.swing.JTextField();
+        txtShipLoadUnloadTimePerContainer = new javax.swing.JTextField();
         txtShipBunkerCapacity = new javax.swing.JTextField();
         jpDisplayStatus = new javax.swing.JPanel();
         lblDisplayStatus = new javax.swing.JLabel();
@@ -353,8 +483,15 @@ public class frm_GASimulation extends javax.swing.JFrame {
         txtDistance = new javax.swing.JTextField();
         jpPortSelection = new javax.swing.JPanel();
         TitlePortSelection = new javax.swing.JLabel();
-        jpPortComboArea = new javax.swing.JPanel();
         jpRouteDisplay = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        textArea = new javax.swing.JTextArea();
+        jLabel2 = new javax.swing.JLabel();
+        lblTotalPortSelected = new javax.swing.JLabel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jpCheckBoxContainer = new javax.swing.JPanel();
+        btnStartAlgo = new javax.swing.JButton();
 
         mnStart.setText("Start");
         mnStart.addActionListener(new java.awt.event.ActionListener() {
@@ -427,7 +564,7 @@ public class frm_GASimulation extends javax.swing.JFrame {
                     .addComponent(btnAddPort)
                     .addComponent(btnClearPort)
                     .addComponent(cboMapType, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(425, Short.MAX_VALUE))
+                .addContainerGap(422, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout tabMapLayout = new javax.swing.GroupLayout(tabMap);
@@ -481,7 +618,7 @@ public class frm_GASimulation extends javax.swing.JFrame {
         );
         OutputPanelLayout.setVerticalGroup(
             OutputPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 266, Short.MAX_VALUE)
+            .addGap(0, 191, Short.MAX_VALUE)
         );
 
         jpShipSelection.setPreferredSize(new java.awt.Dimension(530, 700));
@@ -493,8 +630,8 @@ public class frm_GASimulation extends javax.swing.JFrame {
         lblShipDescription.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         lblShipDescription.setText("Ship Description");
 
-        lblShipCategory.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        lblShipCategory.setText("Ship Category");
+        lblShipLoadUnloadTimePerContainer.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        lblShipLoadUnloadTimePerContainer.setText("Load Unload Per Container (hr)");
 
         lblShipBunkerCapacity.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         lblShipBunkerCapacity.setText("Ship Bunker Capacity (Ton)");
@@ -516,29 +653,17 @@ public class frm_GASimulation extends javax.swing.JFrame {
         jLabel10.setText("Ship Selection");
 
         cboShipCode.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        cboShipCode.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         cboShipCode.setPreferredSize(new java.awt.Dimension(75, 26));
-
-        txtShipCapacity.setText("jTextField1");
-
-        txtIdealSpeed.setText("jTextField2");
-
-        txtMinSpeed.setText("jTextField3");
-
-        txtMaxSpeed.setText("jTextField4");
-
-        txtShipDescription.setText("jTextField5");
-
-        txtShipCategory.setText("jTextField6");
-
-        txtShipBunkerCapacity.setText("jTextField7");
+        cboShipCode.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cboShipCodeActionPerformed(evt);
+            }
+        });
 
         jpDisplayStatus.setPreferredSize(new java.awt.Dimension(510, 450));
 
         lblDisplayStatus.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         lblDisplayStatus.setText("Display Status");
-
-        txtFuelBunkered.setText("jTextField6");
 
         lblChosenSpeed.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         lblChosenSpeed.setText("Chosen Speed (kn) ");
@@ -550,10 +675,6 @@ public class frm_GASimulation extends javax.swing.JFrame {
         lblTravelFuelCost.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         lblTravelFuelCost.setText("Travel Fuel Cost ($) ");
 
-        txtChosenSpeed.setText("jTextField4");
-
-        txtPortTo.setText("jTextField5");
-
         lblShipBunkerLevel.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         lblShipBunkerLevel.setText("Ship Bunker Level (Ton) ");
 
@@ -561,41 +682,38 @@ public class frm_GASimulation extends javax.swing.JFrame {
         lblPortFromSelected.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         lblPortFromSelected.setText("Port From");
 
-        txtLoadedCapacity.setText("jTextField1");
-
         lblFuelBunkered.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         lblFuelBunkered.setText("Fuel Bunkered (Ton)");
 
         lblFuelBunkerCost.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         lblFuelBunkerCost.setText("Fuel Bunker Cost  ($)");
 
-        txtShipBunkerLevel.setText("jTextField2");
-
         cboPortFromSelected.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        cboPortFromSelected.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        cboPortFromSelected.setToolTipText("");
         cboPortFromSelected.setPreferredSize(new java.awt.Dimension(75, 26));
+        cboPortFromSelected.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cboPortFromSelectedActionPerformed(evt);
+            }
+        });
 
         lblLoadedCapacity.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         lblLoadedCapacity.setText("Loaded Capacity (TEU) ");
 
-        txtFuelBunkerCost.setText("jTextField7");
-
-        txtTravelFuelCost.setText("jTextField3");
+        txtFuelBunkerCost.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtFuelBunkerCostActionPerformed(evt);
+            }
+        });
 
         lblOperationalCost.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         lblOperationalCost.setText("Operational Cost ($) ");
 
-        txtOperationalCost.setText("jTextField1");
-
         lblTimeTaken.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         lblTimeTaken.setText("Time Taken (Hr) ");
 
-        txtTimeTaken3.setText("jTextField2");
-
         lblDistance.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         lblDistance.setText("Distance (nmi) ");
-
-        txtDistance.setText("jTextField3");
 
         javax.swing.GroupLayout jpDisplayStatusLayout = new javax.swing.GroupLayout(jpDisplayStatus);
         jpDisplayStatus.setLayout(jpDisplayStatusLayout);
@@ -640,7 +758,7 @@ public class frm_GASimulation extends javax.swing.JFrame {
                                     .addComponent(txtTravelFuelCost)
                                     .addComponent(txtLoadedCapacity)
                                     .addComponent(txtShipBunkerLevel, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE))))))
-                .addContainerGap(90, Short.MAX_VALUE))
+                .addContainerGap(178, Short.MAX_VALUE))
         );
         jpDisplayStatusLayout.setVerticalGroup(
             jpDisplayStatusLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -691,7 +809,7 @@ public class frm_GASimulation extends javax.swing.JFrame {
                 .addGroup(jpDisplayStatusLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblDistance)
                     .addComponent(txtDistance, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(18, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout jpShipSelectionLayout = new javax.swing.GroupLayout(jpShipSelection);
@@ -699,36 +817,40 @@ public class frm_GASimulation extends javax.swing.JFrame {
         jpShipSelectionLayout.setHorizontalGroup(
             jpShipSelectionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jpShipSelectionLayout.createSequentialGroup()
-                .addContainerGap()
                 .addGroup(jpShipSelectionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jpDisplayStatus, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(jpShipSelectionLayout.createSequentialGroup()
-                        .addComponent(jLabel10)
+                        .addContainerGap()
+                        .addGroup(jpShipSelectionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jpDisplayStatus, javax.swing.GroupLayout.DEFAULT_SIZE, 601, Short.MAX_VALUE)
+                            .addGroup(jpShipSelectionLayout.createSequentialGroup()
+                                .addComponent(jLabel10)
+                                .addGap(0, 0, Short.MAX_VALUE))))
+                    .addGroup(jpShipSelectionLayout.createSequentialGroup()
+                        .addGap(43, 43, 43)
+                        .addGroup(jpShipSelectionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lblShipLoadUnloadTimePerContainer)
+                            .addGroup(jpShipSelectionLayout.createSequentialGroup()
+                                .addGroup(jpShipSelectionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jpShipSelectionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                        .addComponent(lblShipCapacity, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(lblIdealSpeed, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(lblMinSpeed, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(lblMaxSpeed, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(lblShipCode, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(lblShipDescription, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                    .addComponent(lblShipBunkerCapacity, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(22, 22, 22)
+                                .addGroup(jpShipSelectionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(cboShipCode, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(txtShipLoadUnloadTimePerContainer)
+                                    .addComponent(txtShipDescription)
+                                    .addComponent(txtShipBunkerCapacity)
+                                    .addComponent(txtShipCapacity)
+                                    .addComponent(txtDesignSpeed)
+                                    .addComponent(txtMinSpeed)
+                                    .addComponent(txtMaxSpeed, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE))))
                         .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
-            .addGroup(jpShipSelectionLayout.createSequentialGroup()
-                .addGap(43, 43, 43)
-                .addGroup(jpShipSelectionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jpShipSelectionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                        .addComponent(lblShipCapacity, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(lblIdealSpeed, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(lblMinSpeed, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(lblMaxSpeed, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(lblShipCode, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(lblShipDescription, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(lblShipCategory, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(lblShipBunkerCapacity, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(22, 22, 22)
-                .addGroup(jpShipSelectionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(cboShipCode, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(txtShipCategory)
-                    .addComponent(txtShipDescription)
-                    .addComponent(txtShipBunkerCapacity)
-                    .addComponent(txtShipCapacity)
-                    .addComponent(txtIdealSpeed)
-                    .addComponent(txtMinSpeed)
-                    .addComponent(txtMaxSpeed, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(89, Short.MAX_VALUE))
         );
         jpShipSelectionLayout.setVerticalGroup(
             jpShipSelectionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -745,8 +867,8 @@ public class frm_GASimulation extends javax.swing.JFrame {
                     .addComponent(txtShipDescription, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jpShipSelectionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblShipCategory)
-                    .addComponent(txtShipCategory, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(lblShipLoadUnloadTimePerContainer)
+                    .addComponent(txtShipLoadUnloadTimePerContainer, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jpShipSelectionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblShipBunkerCapacity)
@@ -758,7 +880,7 @@ public class frm_GASimulation extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jpShipSelectionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblIdealSpeed, javax.swing.GroupLayout.PREFERRED_SIZE, 16, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtIdealSpeed, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(txtDesignSpeed, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jpShipSelectionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblMinSpeed)
@@ -768,7 +890,7 @@ public class frm_GASimulation extends javax.swing.JFrame {
                     .addComponent(lblMaxSpeed)
                     .addComponent(txtMaxSpeed, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
-                .addComponent(jpDisplayStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 438, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jpDisplayStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 426, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -779,27 +901,67 @@ public class frm_GASimulation extends javax.swing.JFrame {
         TitlePortSelection.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         TitlePortSelection.setText("Port Selection");
 
-        javax.swing.GroupLayout jpPortComboAreaLayout = new javax.swing.GroupLayout(jpPortComboArea);
-        jpPortComboArea.setLayout(jpPortComboAreaLayout);
-        jpPortComboAreaLayout.setHorizontalGroup(
-            jpPortComboAreaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 510, Short.MAX_VALUE)
-        );
-        jpPortComboAreaLayout.setVerticalGroup(
-            jpPortComboAreaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 501, Short.MAX_VALUE)
-        );
+        jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        jLabel1.setText("Selected Initial Route Sequence:");
+
+        textArea.setColumns(20);
+        textArea.setRows(5);
+        textArea.setBorder(null);
+        textArea.setOpaque(false);
+        jScrollPane3.setViewportView(textArea);
+
+        jLabel2.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        jLabel2.setText("Total Ports:");
+
+        lblTotalPortSelected.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        lblTotalPortSelected.setText("0");
 
         javax.swing.GroupLayout jpRouteDisplayLayout = new javax.swing.GroupLayout(jpRouteDisplay);
         jpRouteDisplay.setLayout(jpRouteDisplayLayout);
         jpRouteDisplayLayout.setHorizontalGroup(
             jpRouteDisplayLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
+            .addGroup(jpRouteDisplayLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jpRouteDisplayLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane3)
+                    .addGroup(jpRouteDisplayLayout.createSequentialGroup()
+                        .addGroup(jpRouteDisplayLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel1)
+                            .addGroup(jpRouteDisplayLayout.createSequentialGroup()
+                                .addComponent(jLabel2)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(lblTotalPortSelected)))
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addContainerGap())
         );
         jpRouteDisplayLayout.setVerticalGroup(
             jpRouteDisplayLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 195, Short.MAX_VALUE)
+            .addGroup(jpRouteDisplayLayout.createSequentialGroup()
+                .addGap(24, 24, 24)
+                .addComponent(jLabel1)
+                .addGap(12, 12, 12)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addGroup(jpRouteDisplayLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel2)
+                    .addComponent(lblTotalPortSelected))
+                .addContainerGap(32, Short.MAX_VALUE))
         );
+
+        lblTotalPortSelected.getAccessibleContext().setAccessibleName("lblTotalPortSelected");
+
+        javax.swing.GroupLayout jpCheckBoxContainerLayout = new javax.swing.GroupLayout(jpCheckBoxContainer);
+        jpCheckBoxContainer.setLayout(jpCheckBoxContainerLayout);
+        jpCheckBoxContainerLayout.setHorizontalGroup(
+            jpCheckBoxContainerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 607, Short.MAX_VALUE)
+        );
+        jpCheckBoxContainerLayout.setVerticalGroup(
+            jpCheckBoxContainerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 415, Short.MAX_VALUE)
+        );
+
+        jScrollPane1.setViewportView(jpCheckBoxContainer);
 
         javax.swing.GroupLayout jpPortSelectionLayout = new javax.swing.GroupLayout(jpPortSelection);
         jpPortSelection.setLayout(jpPortSelectionLayout);
@@ -807,27 +969,31 @@ public class frm_GASimulation extends javax.swing.JFrame {
             jpPortSelectionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jpPortSelectionLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jpPortSelectionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jpPortComboArea, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(jpPortSelectionLayout.createSequentialGroup()
-                        .addComponent(TitlePortSelection)
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(jpRouteDisplay, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap())
+                .addComponent(TitlePortSelection)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addComponent(jScrollPane1)
+            .addComponent(jpRouteDisplay, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         jpPortSelectionLayout.setVerticalGroup(
             jpPortSelectionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jpPortSelectionLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(TitlePortSelection)
-                .addGap(18, 18, 18)
-                .addComponent(jpPortComboArea, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(jpRouteDisplay, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 421, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 42, Short.MAX_VALUE)
+                .addComponent(jpRouteDisplay, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(33, 33, 33))
         );
 
         jTabbedPane1.addTab("Port Selection", jpPortSelection);
+
+        btnStartAlgo.setText("Start Algorithm");
+        btnStartAlgo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnStartAlgoActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -835,12 +1001,15 @@ public class frm_GASimulation extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 522, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 89, Short.MAX_VALUE)
+                .addComponent(jTabbedPane1)
+                .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(OutputPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(tabOutputDetail, javax.swing.GroupLayout.PREFERRED_SIZE, 850, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(tabOutputDetail, javax.swing.GroupLayout.PREFERRED_SIZE, 850, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(735, 735, 735)
+                        .addComponent(btnStartAlgo, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -848,8 +1017,10 @@ public class frm_GASimulation extends javax.swing.JFrame {
                 .addComponent(tabOutputDetail, javax.swing.GroupLayout.PREFERRED_SIZE, 489, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(OutputPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                .addGap(28, 28, 28)
+                .addComponent(btnStartAlgo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGap(17, 17, 17))
+            .addComponent(jTabbedPane1)
         );
 
         pack();
@@ -863,10 +1034,24 @@ public class frm_GASimulation extends javax.swing.JFrame {
 
     private void btnAddPortActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddPortActionPerformed
         // TODO add your handling code here:
-        addPort(new PortDTO("P001","Test before Lorete",PortDTO.PointType.START,IPEvent,new GeoPosition(-20.16366002209838, 57.50698320195978)));
-        addPort(new PortDTO("P002","Test before Citadel",PortDTO.PointType.END,IPEvent,new GeoPosition(-20.162778782150987, 57.507959525974705)));//change this from on top f citadele to the road before citadelle
+       // addPort(new PortDTO("P001","Test before Lorete",PortDTO.PointType.START,IPEvent,new GeoPosition(-20.16366002209838, 57.50698320195978)));
+       // addPort(new PortDTO("P002","Test before Citadel",PortDTO.PointType.END,IPEvent,new GeoPosition(-20.162778782150987, 57.507959525974705)));//change this from on top f citadele to the road before citadelle
         
+        clearUIPort();
+        for(int i = 0 ; i<lstPorts.size();i++){
+            if(arrCheckBoxPort[i].isSelected()){
+                SelectedPorts.add(lstPorts.get(i));
+                
+            }
+        }
+        initPort();
+        List<String> text  = new ArrayList<>();
+        for(var p : SelectedPorts){ 
+            text.add(p.PortName);
+        }
         
+        textArea.setText(String.join("->",text));
+        lblTotalPortSelected.setText(String.valueOf(SelectedPorts.size()));
     }//GEN-LAST:event_btnAddPortActionPerformed
 
     private void cboMapTypeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cboMapTypeActionPerformed
@@ -911,6 +1096,68 @@ public class frm_GASimulation extends javax.swing.JFrame {
             addPort(new PortDTO("P002 tst", "End location", PortDTO.PointType.END, IPEvent, new GeoPosition(geop.getLatitude(), geop.getLongitude())));
     }//GEN-LAST:event_mnEndActionPerformed
 
+    private void cboShipCodeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cboShipCodeActionPerformed
+        int selectedIndex = cboShipCode.getSelectedIndex();
+        
+        setShipCategoryToGUIDisplay(selectedIndex);
+    }//GEN-LAST:event_cboShipCodeActionPerformed
+
+    private void cboPortFromSelectedActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cboPortFromSelectedActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_cboPortFromSelectedActionPerformed
+
+    private void txtFuelBunkerCostActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtFuelBunkerCostActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtFuelBunkerCostActionPerformed
+
+    private void btnStartAlgoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnStartAlgoActionPerformed
+        // TODO add your handling code here:
+        //only choosing those 4 ports for testing :
+        //Abu Dhabi - Bandar Abbas - Sitra - Sharjah
+        long startTime = System.nanoTime();
+        if( (SelectedPorts !=null && SelectedPorts.size()>2) &&(SelectedContainerType != null )&&(SelectedShipCategory != null )){
+            SelectedShipCategory.AvgWeightUtilizeContainer = SelectedContainerType.AvgUtilizeWeight;
+            //1 convert selectedPort from hashset to list to maintain order
+            ArrayList<PortDTO> lstSelectedPorts = new ArrayList<>(SelectedPorts);
+            //2 Create IndexOrder:PortIDMatrix
+            HashMap<Integer,Integer> IndexToPortIDMatrix = new HashMap<>();
+            
+            DLL_PortPair dllPortPair = new DLL_PortPair();
+            
+            int numberOfPorts =lstSelectedPorts.size();
+            
+            double[][] TravelDistances = new double[numberOfPorts][numberOfPorts];
+            
+            for(int i = 0; i<numberOfPorts;i++){
+                IndexToPortIDMatrix.put(i,lstSelectedPorts.get(i).PortID);
+            }
+            String Text= "";
+            for(int i = 0; i<numberOfPorts;i++){
+                for(int j =0; j<numberOfPorts; j++){
+                    if(i == j){
+                        TravelDistances[i][j] = 0;
+                    }else{
+                        var data = dllPortPair.getPairPortDistance_ListByRow(IndexToPortIDMatrix.get(i), IndexToPortIDMatrix.get(j)).Data;
+                        if(data != null && data.size() > 0){
+                            //we got the distance
+                            TravelDistances[i][j] = data.get(0).Distance;
+                            TravelDistances[j][i] = TravelDistances[i][j];
+                        }
+                    }
+                }
+            }
+            long endTime = System.nanoTime();
+            
+            //selectedPort,SelectedShip,IndexToPortIDMatrix,TravelDistances
+            //roulette or tournament, genomeSize,populationSize,TournamentSize,reproductionSize,startingCity,targetFitness.
+            GA_Main main = new GA_Main();
+            System.out.println(startTime+" - "+endTime);
+        }
+        
+        
+        
+    }//GEN-LAST:event_btnStartAlgoActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -951,13 +1198,18 @@ public class frm_GASimulation extends javax.swing.JFrame {
     private javax.swing.JLabel TitlePortSelection;
     private javax.swing.JButton btnAddPort;
     private javax.swing.JButton btnClearPort;
+    private javax.swing.JButton btnStartAlgo;
     private javax.swing.JComboBox<String> cboMapType;
     private javax.swing.JComboBox<String> cboPortFromSelected;
     private javax.swing.JComboBox<String> cboShipCode;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JTabbedPane jTabbedPane1;
+    private javax.swing.JPanel jpCheckBoxContainer;
     private javax.swing.JPanel jpDisplayStatus;
-    private javax.swing.JPanel jpPortComboArea;
     private javax.swing.JPanel jpPortSelection;
     private javax.swing.JPanel jpRouteDisplay;
     private javax.swing.JPanel jpShipSelection;
@@ -977,10 +1229,11 @@ public class frm_GASimulation extends javax.swing.JFrame {
     private javax.swing.JLabel lblShipBunkerCapacity;
     private javax.swing.JLabel lblShipBunkerLevel;
     private javax.swing.JLabel lblShipCapacity;
-    private javax.swing.JLabel lblShipCategory;
     private javax.swing.JLabel lblShipCode;
     private javax.swing.JLabel lblShipDescription;
+    private javax.swing.JLabel lblShipLoadUnloadTimePerContainer;
     private javax.swing.JLabel lblTimeTaken;
+    private javax.swing.JLabel lblTotalPortSelected;
     private javax.swing.JLabel lblTravelFuelCost;
     private javax.swing.JMenuItem mnEnd;
     private javax.swing.JMenuItem mnStart;
@@ -989,11 +1242,12 @@ public class frm_GASimulation extends javax.swing.JFrame {
     private javax.swing.JTabbedPane tabOutputDetail;
     private javax.swing.JPanel tabPortOutputDetail;
     private javax.swing.JPanel tabShipRouteDetail;
+    private javax.swing.JTextArea textArea;
     private javax.swing.JTextField txtChosenSpeed;
+    private javax.swing.JTextField txtDesignSpeed;
     private javax.swing.JTextField txtDistance;
     private javax.swing.JTextField txtFuelBunkerCost;
     private javax.swing.JTextField txtFuelBunkered;
-    private javax.swing.JTextField txtIdealSpeed;
     private javax.swing.JTextField txtLoadedCapacity;
     private javax.swing.JTextField txtMaxSpeed;
     private javax.swing.JTextField txtMinSpeed;
@@ -1002,8 +1256,8 @@ public class frm_GASimulation extends javax.swing.JFrame {
     private javax.swing.JTextField txtShipBunkerCapacity;
     private javax.swing.JTextField txtShipBunkerLevel;
     private javax.swing.JTextField txtShipCapacity;
-    private javax.swing.JTextField txtShipCategory;
     private javax.swing.JTextField txtShipDescription;
+    private javax.swing.JTextField txtShipLoadUnloadTimePerContainer;
     private javax.swing.JTextField txtTimeTaken3;
     private javax.swing.JTextField txtTravelFuelCost;
     // End of variables declaration//GEN-END:variables

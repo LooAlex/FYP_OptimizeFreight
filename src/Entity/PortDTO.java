@@ -55,14 +55,15 @@ public class PortDTO extends DefaultWaypoint {
     //--Penalty
     public double Penalty_LateArrival;
     
+    
     // <editor-fold defaultstate="collapsed" desc="Simulation variable">
     
     //--Time
     public float ETA; //Estimate Time Arrival.
 
     //--Ship
-    public ShipDTO currentShip;
-    
+    public ShipCategoryDTO currentShip;
+  
     public float shp_TimeArrival;           //tavi  :ship time arrival port
     public float shp_TimeLeave;             //tevi  :ship time left port 
     public float shp_weeklyFrequency;       //fw    :weekly frequency cycle to reach a port
@@ -327,13 +328,13 @@ public class PortDTO extends DefaultWaypoint {
         PortCall_Cost = rs.getDouble("PortCallCost");
         
         Port_FuelPrice = rs.getDouble("PortFuelPrice");
-        CanBunker = CoreFunctions.getBooleanFromStringInt(rs.getString("CanBunker"));
+        CanBunker = CoreFunctions.convertStringToBoolean(rs.getString("CanBunker"));
         
         Port_CostPerFullContainer = rs.getDouble("CostPerFullContainerLoadUnLoad");
         Penalty_LateArrival = rs.getDouble("PenaltyLateArrival");
         
         Remarks = rs.getString("Remarks");
-        IsActive = CoreFunctions.getBooleanFromStringInt(rs.getString("IsActive"));
+        IsActive = CoreFunctions.convertStringToBoolean(rs.getString("IsActive"));
         CreatedBy = rs.getInt("CreatedBy");
         
         demands = new DemandDTO();
@@ -370,13 +371,13 @@ public class PortDTO extends DefaultWaypoint {
         //8 Port_FuelPrice;
         Port_FuelPrice = ((arrCSVLine.length < ColumnIndexCSV.PORT_FUEL_PRICE+1 || arrCSVLine[ColumnIndexCSV.PORT_FUEL_PRICE]== null || arrCSVLine[ColumnIndexCSV.PORT_FUEL_PRICE].isBlank() ) ? 0.00d : Double.parseDouble(arrCSVLine[ColumnIndexCSV.PORT_FUEL_PRICE]));
         //9 CanBunker  
-        CanBunker = ((arrCSVLine.length < ColumnIndexCSV.CAN_BUNKER+1 || arrCSVLine[ColumnIndexCSV.CAN_BUNKER]== null || arrCSVLine[ColumnIndexCSV.CAN_BUNKER].isBlank() ) ? false : CoreFunctions.getBooleanFromStringInt(arrCSVLine[ColumnIndexCSV.CAN_BUNKER]));
+        CanBunker = ((arrCSVLine.length < ColumnIndexCSV.CAN_BUNKER+1 || arrCSVLine[ColumnIndexCSV.CAN_BUNKER]== null || arrCSVLine[ColumnIndexCSV.CAN_BUNKER].isBlank() ) ? false : CoreFunctions.convertStringToBoolean(arrCSVLine[ColumnIndexCSV.CAN_BUNKER]));
         
         Penalty_LateArrival = ((arrCSVLine.length < ColumnIndexCSV.PENALTY_LATE_ARRIVAL_PER_HOUR+1 || arrCSVLine[ColumnIndexCSV.PENALTY_LATE_ARRIVAL_PER_HOUR]== null || arrCSVLine[ColumnIndexCSV.PENALTY_LATE_ARRIVAL_PER_HOUR].isBlank() ) ? 0.00d : Double.parseDouble(arrCSVLine[ColumnIndexCSV.PENALTY_LATE_ARRIVAL_PER_HOUR]));;
         
         Remarks = ((arrCSVLine.length < ColumnIndexCSV.REMARKS+1 || arrCSVLine[ColumnIndexCSV.REMARKS]== null || arrCSVLine[ColumnIndexCSV.REMARKS].isBlank() ) ? "" : arrCSVLine[ColumnIndexCSV.REMARKS]);;
         
-        IsActive =  ((arrCSVLine.length < ColumnIndexCSV.ISACTIVE+1 || arrCSVLine[ColumnIndexCSV.ISACTIVE]== null || arrCSVLine[ColumnIndexCSV.ISACTIVE].isBlank() ) ? false : CoreFunctions.getBooleanFromStringInt(arrCSVLine[ColumnIndexCSV.ISACTIVE]));
+        IsActive =  ((arrCSVLine.length < ColumnIndexCSV.ISACTIVE+1 || arrCSVLine[ColumnIndexCSV.ISACTIVE]== null || arrCSVLine[ColumnIndexCSV.ISACTIVE].isBlank() ) ? false : CoreFunctions.convertStringToBoolean(arrCSVLine[ColumnIndexCSV.ISACTIVE]));
         
         CreatedBy = ((arrCSVLine.length < ColumnIndexCSV.CREATEDBY+1 || arrCSVLine[ColumnIndexCSV.CREATEDBY]== null || arrCSVLine[ColumnIndexCSV.CREATEDBY].isBlank() ) ? 0 : Integer.parseInt(arrCSVLine[ColumnIndexCSV.CREATEDBY]));
              

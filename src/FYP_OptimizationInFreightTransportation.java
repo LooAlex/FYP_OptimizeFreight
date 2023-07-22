@@ -45,7 +45,7 @@ public class FYP_OptimizationInFreightTransportation {
         String codeActi = "";
         //System.out.println("Enter activationCode, it work once");
         //codeActi = sc.nextLine();
-        codeActi  = "ga";
+        codeActi  = "";
         
         callingTestArena(codeActi.toLowerCase());
         // </editor-fold> 

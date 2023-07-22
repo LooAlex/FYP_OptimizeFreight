@@ -7,7 +7,7 @@ package Core;
 import java.util.*;
 /**
  *
- * @author Loo Alex
+* @author Loo Alex
  */
 public class GAGenome implements Comparable<GAGenome>{
 
