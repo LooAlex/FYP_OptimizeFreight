@@ -27,7 +27,7 @@ public class TravelingSaleman {
     
     public TravelingSaleman (int numberofCities,SelectionType type, int [][] travelPrices, int startingCity, int targetFitness){
         this.numberOfCities = numberofCities;
-        this.genomeSize = numberofCities-1;
+        this.genomeSize = numberofCities-1; //numCities = 12, so 12 genes, - 1 to remove starting gene that wont change
         this.travelPrices = travelPrices;
         this.startingCity = startingCity;
         this.targetFitness = targetFitness;
@@ -54,34 +54,37 @@ public class TravelingSaleman {
         SalesmanGenome winner; //this has a genome-> list of cities, number of ciities, and fitness.
         for(int i = 0 ; i <reproductionSize; i++){
             if(selectionType == SelectionType.ROULETTE){
-                selected.add(rouletteSelection(population));
+                selected.add(rouletteSelection(population));    //return only 1 salesGenome
             }else if (selectionType == SelectionType.TOURNAMENT){
-                selected.add(selectionTournament(population));
+                selected.add(selectionTournament(population)); //return only 1 salesGenome
             }
             
+            //each loop has 1 purpose select 1 salesGenome to pass onto the next generation until we hit the reproductionSize
+            //so, the selectedSize will of size 200 only
         }
         return selected;
     }
 
     public SalesmanGenome rouletteSelection(List<SalesmanGenome>population){
         int totalFitness = population.stream().map(SalesmanGenome::getFitness).mapToInt(Integer::intValue).sum();
+        //vatList.stream().map(T :: functioninT).mapToInt(
         
         //pick random value
         Random random = new Random();
-        int selectedValue = random.nextInt(totalFitness);
+        int selectedValue = random.nextInt(totalFitness); //totalFitness = popFitness which if popFitness is 1000, the random value is 0-999, if 1 comes out, a lot
             
     // Because we're doing minimization, we need to use reciprocal
     // value so the probability of selecting a genome would be
     // inversely proportional to its fitness - the smaller the fitness
-    // the higher the probability
-        float recValue = (float)1/selectedValue; //since our target is 0, the larger the selected value, the less it pass, the less
+    // the higher the probability of genomes in this population to pass
+        float recValue = (float)1/selectedValue; 
         
         //We add up values until we reach our recValue and we pick the genome that cross the threshold, for below
         float currentSum=0;
         for(SalesmanGenome genome : population){
             currentSum +=(float)1/genome.getFitness();
             if(currentSum >= recValue){
-                return genome;
+                return genome;//the moment someone pass >=recValue, rouletterSelectionStop, so it can stop at index 0 even!
             }
         }
         
@@ -175,7 +178,7 @@ public class TravelingSaleman {
         while(currentGenerationSize < generationSize){
             List<SalesmanGenome> parents = pickRandomElements(population, 2);
             List<SalesmanGenome> children = crossover(parents);
-            //we could use a for loop to loop through all children but that expensive, so we use static
+            //we could use a for loop to loop through all children but that expensive, so we use static since we ever gonna use 2 parent
             children.set(0,mutate(children.get(0)));
             children.set(1, mutate(children.get(1)));//before we add children to new pop, we see if they will mutate
             
@@ -193,10 +196,10 @@ public class TravelingSaleman {
         List<SalesmanGenome> population  = initialPopulation();
         SalesmanGenome globalBestGenome = population.get(0);
         
-        for(int i = 0; i< maxIterations; i++){
+        for(int i = 0; i< maxIterations; i++){//mainly it only select and mate
             List<SalesmanGenome> selected = selection(population);
             population = createGeneration(selected);
-            globalBestGenome = Collections.min(population);
+            globalBestGenome = Collections.min(population); //does not compare globalBestGenome, only replace it and use it to see if we are close to heuristic or not
             if(globalBestGenome.getFitness()< targetFitness)
                 break;
         }

@@ -84,11 +84,11 @@ public class SalesmanGenome implements Comparable<SalesmanGenome>{
     private List<Integer> randomSaleman(){
         List<Integer> result = new ArrayList<>();
         for(int i = 0; i<numberOfCities; i++){
-            if(i != startingCity)
+            if(i != startingCity)//at all ID except startingCityIndex, because since we using just sequencial number 0 - 9, we can affort to think like that, but in my case i will already select a list of port, i just need to shuffle 
                 result.add(i);
         }
-        Collections.shuffle(result);
-        return result;
+        Collections.shuffle(result); //will use only this one in my Genome, as the list of port id will be already given to me.
+        return result;  //contains all cityID except starting city at the start, the last index of same start city will be added later
     }
     
     //fitness calculation, it is a minimization problem, and we will be using the travelingCost matrix to help us
@@ -100,7 +100,7 @@ public class SalesmanGenome implements Comparable<SalesmanGenome>{
         //calculate entire path cost.
         for(int gene : genome){
             fitness+=travelPrices[currentCity][gene];//currentCity = rowIndex, gene = colIndex, cell at that coord = cost to travel there
-            currentCity = gene;
+            currentCity = gene; //if genomeSize = numberOfCities-1 = first iter will be #0 and #1, then #1 to #2 ... until #
         }
         
         fitness += travelPrices[genome.get(numberOfCities-2)][startingCity];
@@ -111,7 +111,7 @@ public class SalesmanGenome implements Comparable<SalesmanGenome>{
     @Override
     public String toString(){
         StringBuilder sb = new StringBuilder();
-        sb.append("Path");
+        sb.append("Path: ");
         sb.append(startingCity);
         for(int gene:genome){
             sb.append(" ");
@@ -120,7 +120,7 @@ public class SalesmanGenome implements Comparable<SalesmanGenome>{
         }
         sb.append(" ");
         sb.append(startingCity);
-        sb.append("\nLength");
+        sb.append("\nLength: ");
         sb.append(getFitness());
         return sb.toString();
     }

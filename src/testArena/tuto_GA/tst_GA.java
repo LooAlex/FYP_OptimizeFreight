@@ -12,7 +12,7 @@ import java.util.*;
 public class tst_GA {
     public tst_GA(){
         
-        int numberOfCities = 3;
+        int numberOfCities = 12;
         int[][] travelPrices = new int[numberOfCities][numberOfCities];
         for(int i = 0; i<numberOfCities;i++){
             for(int j = 0; j <numberOfCities; j++){
@@ -31,7 +31,7 @@ public class tst_GA {
         //numberOfCities = 3 see at start of main
         //targetFitness =0, so least maximum
         //startingCity = 0, so its id is 0
-        TravelingSaleman geneticAlgorithm =  new TravelingSaleman(numberOfCities,SelectionType.ROULETTE,travelPrices,0,0);
+        TravelingSaleman geneticAlgorithm =  new TravelingSaleman(numberOfCities,SelectionType.ROULETTE,travelPrices,5,0);
         SalesmanGenome result = geneticAlgorithm.optimize();
         System.out.println(result);
     }
