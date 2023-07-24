@@ -9,23 +9,83 @@ import java.util.*;
 import Core.*;
 import DLL.*;
 import Entity.*;
-import java.sql.*;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 /**
  *
 * @author Loo Alex
  */
 public class GAGenome implements Comparable<GAGenome>{
 
+    public ArrayList<Integer> getGenome_FullCyclePath() {
+        return genome_FullCyclePath;
+    }
+
+    public void setGenome_FullCyclePath(ArrayList<Integer> genome_FullCyclePath) {
+        this.genome_FullCyclePath = genome_FullCyclePath;
+    }
+
+    public int getIndexStartingPort() {
+        return IndexStartingPort;
+    }
+
+    public void setIndexStartingPort(int IndexStartingPort) {
+        this.IndexStartingPort = IndexStartingPort;
+    }
+
+    public double getDistanceTravel() {
+        return DistanceTravel;
+    }
+
+    public void setDistanceTravel(double DistanceTravel) {
+        this.DistanceTravel = DistanceTravel;
+    }
+
+    public float getTotalTimeTaken() {
+        return TotalTimeTaken;
+    }
+
+    public void setTotalTimeTaken(float TotalTimeTaken) {
+        this.TotalTimeTaken = TotalTimeTaken;
+    }
+
+    public ShipCategoryDTO getShip() {
+        return ship;
+    }
+
+    public void setShip(ShipCategoryDTO ship) {
+        this.ship = ship;
+    }
+
+    public HashMap<Integer, PortDTO> getIndexToPortMatrix() {
+        return IndexToPortMatrix;
+    }
+
+    public void setIndexToPortMatrix(HashMap<Integer, PortDTO> IndexToPortMatrix) {
+        this.IndexToPortMatrix = IndexToPortMatrix;
+    }
+
     List<Integer> genome;   //all ports except origin and destination for shuffle
     ArrayList<Integer> genome_FullCyclePath ;
+    public ArrayList<PortDTO> DataPorts;
     double[][] travelDistances;
     int IndexStartingPort;  
     int numberOfPorts;
     double fitness;         //totalOperatingCost for that portSequence including StartingPort
     
+    float TotalTimeTaken;
     public ShipCategoryDTO ship;
     public HashMap<Integer, PortDTO> IndexToPortMatrix;  //
-
+    public String Path ;
+    public double DistanceTravel;
+    
+    //Port Variable
+    public double TotalHandlingCost;        //CHdl :: $ |(DemandAmt+SupplyAmnt)*Port_CostPerFullContainer
+    public double TotalFuelTravelCost;      //Ctravel :: $ |previous port i to this port j
+    public double TotalFuelIdleCost;        //CFIdle :: $ |for this port i, for duration of operation
+    public double TotalPenaltyCost;         //CPnt :: $ |
+    
+    
     public List<Integer> getGenome() {
         return genome;
     }
@@ -70,10 +130,11 @@ public class GAGenome implements Comparable<GAGenome>{
     public GAGenome(int numberOfPorts, int IndexSelectedStartingPort, HashMap<Integer,PortDTO> IndexToPortMatrix,ShipCategoryDTO SelectedShipCategory, double [][]travelDistances) {
         this.numberOfPorts  = numberOfPorts;//to make random int shuffle
         this.IndexStartingPort = IndexSelectedStartingPort;//access indexMatrix and create genome
-        this.IndexToPortMatrix = IndexToPortMatrix;
+        
+        createIndexToPortMatrix(IndexToPortMatrix);
+        
         this.travelDistances  = travelDistances;
-        this.ship = SelectedShipCategory;
-
+        this.ship = new ShipCategoryDTO(SelectedShipCategory);
         
         //shuffle new genome
         this.genome = randomPorts(); //all ports except orgin and destination
@@ -81,16 +142,18 @@ public class GAGenome implements Comparable<GAGenome>{
         createFullPath();
         
         this.fitness = this.calculateFitness();
-        
+   
     }
     
      //userDefined genome //from mutation or permutation
     public GAGenome (List<Integer> permutationOfPorts, int numberOfPorts, int IndexSelectedStartingPort, HashMap<Integer,PortDTO> IndexToPortMatrix,ShipCategoryDTO SelectedShipCategory, double [][]travelDistances){
         this.numberOfPorts  = numberOfPorts;//to make random int shuffle
         this.IndexStartingPort = IndexSelectedStartingPort;//access indexMatrix and create genome
-        this.IndexToPortMatrix = IndexToPortMatrix;
+        
+        createIndexToPortMatrix(IndexToPortMatrix);
+        
         this.travelDistances  = travelDistances;
-        this.ship = SelectedShipCategory;
+        this.ship = new ShipCategoryDTO(SelectedShipCategory);
         
         this.genome = permutationOfPorts;
         //addFullPath
@@ -99,11 +162,16 @@ public class GAGenome implements Comparable<GAGenome>{
         this.fitness = this.calculateFitness();
         
     }
-    
+    private void createIndexToPortMatrix(HashMap<Integer,PortDTO> IndexToPortMatrix){
+        this.IndexToPortMatrix = new HashMap<>();
+        this.IndexToPortMatrix.putAll(IndexToPortMatrix);
+    }
     private void createFullPath(){
         this.genome_FullCyclePath = new ArrayList<>();
         this.genome_FullCyclePath.add(IndexStartingPort);//Start Origin Port
-        this.genome_FullCyclePath.addAll(genome);        //all other ports in middle 
+        for(int i = 0 ; i< genome.size() ; i++){
+            this.genome_FullCyclePath.add(genome.get(i));
+        }
         this.genome_FullCyclePath.add(IndexStartingPort);//End Origin Port
     }
     //we can use the randomPorts as it will always be 0-NPorts and IndexStartingPoint will be same
@@ -127,28 +195,39 @@ public class GAGenome implements Comparable<GAGenome>{
         int IndexCurrentPort = 0;   //the id
         
         double final_Hvi;
+        this.DataPorts = new ArrayList<>();
+        String previousPortName  ="";
  //-----//calculate entire path cost except origin and destination.
        // for(int gene : genenomeWithStarting){
        for(int i = 0; i < genome_FullCyclePath.size() ; i++){
             IndexCurrentPort = genome_FullCyclePath.get(i);  //next port Index for IndexToPortMatrix and travelDistanceMatrix
-            PortDTO currentPort = IndexToPortMatrix.get(IndexCurrentPort);
+            PortDTO currentPort = new PortDTO(IndexToPortMatrix.get(IndexCurrentPort));
+            currentPort.shp_choseSpeed = ship.SelectedSpeed;
+            
+            if(i == i_LastPort){
+                //just deposit demand at last port, will not re supply again
+                currentPort.demands.DemandAmt = 0;
+            }
  //current gene  = already traveled to port j
-            resetShipPortDependentVariable();
+            resetShip_Port_DependentVariable();
             //getDistance From_PreviousPort To_CurrentPort
-            ship.DistanceTravel = travelDistances[IndexPreviousPort][IndexCurrentPort];
+            this.DistanceTravel = travelDistances[IndexPreviousPort][IndexCurrentPort];
+            
             //getTimeTravel
-            ship.timeTravel = ((ship.SelectedSpeed < 1.00d) ? 0.00d : ship.DistanceTravel /ship.SelectedSpeed);
+            ship.timeTravel = ((ship.SelectedSpeed < 1.00d) ? 0.00d : this.DistanceTravel /ship.SelectedSpeed);
+            
             //cal µvi
             ship.BunkerLevelAtArrival = cal_uvi(ship.BunkerLevelAfterOper);
   //-------//cal CTrv
             currentPort.TotalFuelTravelCost = cal_CTrv();
+            
             //set tA :: Time arrival at currentPort
             setShipTimeArrivalAtPort();
   //-------//CPnt
             //check penaltyLateArrival
             if(ship.timeArrival > ship.ETA && i != 0){
                 ship.timeLate = ship.timeArrival - ship.ETA;
-                currentPort.TotalPenaltyCost = currentPort.Penalty_LateArrival * ship.timeLate ;   
+                TotalPenaltyCost = currentPort.Penalty_LateArrival * ship.timeLate ;   
             }
             //check penaltyZeroBunker if <0.05*BunkerCap
             if(ship.BunkerLevelAtArrival < ship.CriticalBunkerLevelNew && i != 0){
@@ -158,29 +237,28 @@ public class GAGenome implements Comparable<GAGenome>{
                 }else{
                     ship.Dept_Bunker = (ship.BunkerLevelAtArrival) + ship.CriticalBunkerLevelNew*10;
                 }
+                
                 currentPort.TotalPenaltyCost += ship.Dept_Bunker * ship.Penalty_ZeroBunker;
             }
             //check if need Bunkering
             //cal Bvi //rework when i add starting port again
-            if(i ==0 ){
-                //at Origin Max bunker
-                ship.AmountBunkered = ship.BunkerCapacity;
-            }
-            else if(ship.BunkerLevelAtArrival <= ship.minBunkerAmt && i != i_LastPort){
+            if(ship.BunkerLevelAtArrival <= ship.minBunkerAmt && i != i_LastPort){
                 //must not be origin and IndexLastPort = other port that need bunkering
                 randomBunkerAmount();
+                
             }else{
                 //i not origin and CurrentBunkerLevel is high or indexLastPort
                 ship.AmountBunkered  = 0;
-            }
+            }  
             //set bvi
             set_bvi_CurrentBunkerAmount();
+            
  //--------//cal Hvi
             ship.CurrentTotalBunkerHoldingCost = cal_Hvi(ship.AvgCurrentBunkerHoldingCost, ship.BunkerLevelAtArrival, currentPort.Port_FuelPrice);
             //cal hvi
             cal_hvi_AvgCurrentBunkerHoldingCost();
             //StartLoadingFirstSupply
-            if(currentPort.demands.DemandAmt > 0){
+            if(currentPort.demands.DemandAmt > 0 || ship.TotalAmountContainerCarried > 0){
                 //set TS
                 ship.TimeStartOper = ship.timeArrival+0.5;
                 //cal total time to load
@@ -203,24 +281,39 @@ public class GAGenome implements Comparable<GAGenome>{
                 final_Hvi = 0;
             //all ports except last port     
                 //set tE
-                ship.timeLeave = ship.TimeEndOper+0.25;
+                ship.timeLeave = ship.TimeEndOper+0.25;  
                 //Choose a speed
                 randomSpeed();
                 //set TEst, Estimate Time of Arival
                 setShipETA();
             }else{
-                ship.TimeHorizon = ship.TimeEndOper;
+                ship.timeLeave = ship.TimeEndOper;
                 //finalHvi after all operations
                 final_Hvi = cal_FinalHvi(ship.AvgCurrentBunkerHoldingCost, ship.BunkerLevelAfterOper);
             }
-
- //--CalOper + PortCall
-            fitnessOper += currentPort.TotalFuelTravelCost + currentPort.PortCall_Cost +  currentPort.TotalPenaltyCost + currentPort.TotalHandlingCost + currentPort.TotalFuelIdleCost + final_Hvi;
-
-            IndexPreviousPort = IndexCurrentPort;//need previous only to get distance to current port
             
+            currentPort.shp_timeTaken = ship.timeLeave - ship.timeArrival ;
+ //--CalOper + PortCall
+            currentPort.TotalOperationalCost = currentPort.TotalFuelTravelCost + currentPort.PortCall_Cost +  currentPort.TotalPenaltyCost + currentPort.TotalHandlingCost + currentPort.TotalFuelIdleCost + final_Hvi;
+            fitnessOper += currentPort.TotalOperationalCost;
+            ship.DistanceTravel+=DistanceTravel;
+            
+            
+            
+            
+            ship.previousPortName = previousPortName;
+            IndexPreviousPort = IndexCurrentPort;//need previous only to get distance to current port
+           
+                
+            previousPortName = currentPort.PortName;
+            
+            //copy
+            ShipCategoryDTO currentShip = new ShipCategoryDTO(ship);
+            currentPort.currentShip = currentShip;
+            DataPorts.add(currentPort);
         }
-
+        TotalTimeTaken = (float)ship.timeLeave/24;
+        toPath();
         return fitnessOper;
     }
     
@@ -231,7 +324,7 @@ public class GAGenome implements Comparable<GAGenome>{
         ship.timeArrival = ship.timeLeave+ship.timeTravel;
     }
     public double cal_uvi(double FuelAmountAtLeave_PreviousPort){
-        ship.FuelConsumedTraveled = (ship.DistanceTravel/24.00) * ship.Coeff_FuelTravel * Math.pow(ship.SelectedSpeed, 2) * (ship.Coeff_Alpha + ship.Coeff_Beta*ship.CurrentShipPayload);
+        ship.FuelConsumedTraveled = (this.DistanceTravel/24.00) * ship.Coeff_FuelTravel * Math.pow(ship.SelectedSpeed, 2) * (ship.Coeff_Alpha + ship.Coeff_Beta*ship.CurrentShipPayload);
         
         return (FuelAmountAtLeave_PreviousPort - ship.FuelConsumedTraveled);
     }
@@ -246,15 +339,17 @@ public class GAGenome implements Comparable<GAGenome>{
             ship.AmountBunkered -= excessBunker;
         }
         ship.CurrentBunkerAmount = ship.BunkerLevelAtArrival + ship.AmountBunkered;   
+        
     }
     public double cal_Hvi(double previous_hvi,double FuelAtArrival,double PortFuelPrice){
         return (previous_hvi*FuelAtArrival)+(PortFuelPrice*ship.AmountBunkered);
     }
     public void cal_hvi_AvgCurrentBunkerHoldingCost(){
-        ship.CurrentTotalBunkerHoldingCost= ship.CurrentTotalBunkerHoldingCost*ship.CurrentBunkerAmount;   
+        ship.AvgCurrentBunkerHoldingCost= ship.CurrentTotalBunkerHoldingCost/ship.CurrentBunkerAmount;   
     }
     public double cal_ti(int AmtSupply,int AmtDemand,double timeShipToLoadUnloadContainer){
-        return(AmtDemand+AmtSupply)*timeShipToLoadUnloadContainer;
+        ship.totalLoadUnLoad = (AmtDemand+AmtSupply);
+        return ship.totalLoadUnLoad*timeShipToLoadUnloadContainer;
     }
     public double cal_CHdl(int AmtDemand,int AmtSupply,double CostToLoadUnloadContainer){
         return(AmtDemand+AmtSupply)*CostToLoadUnloadContainer;
@@ -276,16 +371,19 @@ public class GAGenome implements Comparable<GAGenome>{
         return (ship.CurrentBunkerAmount-ship.FuelConsumedIdle);
     }
     
-    public void resetShipPortDependentVariable(){
+    public void resetShip_Port_DependentVariable(){
+        
+        
         ship.TimeStartOper = 0;
         ship.TimeEndOper = 0;
         ship.TotalOperationTime = 0;
         ship.timeLate = 0;
-        ship.DistanceTravel = 0;
+        this.DistanceTravel = 0;
         ship.AmountBunkered = 0;
         //1.00 or 1.00d java see as double
         //1.00f java see as float
     }
+   
     
     public void randomSpeed(){
         Random rand = new Random();
@@ -299,7 +397,24 @@ public class GAGenome implements Comparable<GAGenome>{
     public double cal_FinalHvi(double previous_hvi,double BunkerLevelAfterOper_Avi){
         return (previous_hvi*BunkerLevelAfterOper_Avi);
     }
-    
+    public void toPath(){
+        StringBuilder sb = new StringBuilder();
+        sb.append("PathID: ");
+        
+        for(int i = 0 ; i < genome_FullCyclePath.size(); i++){
+            sb.append(IndexToPortMatrix.get(genome_FullCyclePath.get(i)).getPortID());
+            sb.append(" ");
+        }
+        sb.append("\nPath: ");
+        
+        for(int i = 0 ; i < genome_FullCyclePath.size(); i++){
+            sb.append(IndexToPortMatrix.get(genome_FullCyclePath.get(i)).getPortName());
+            if(i != genome_FullCyclePath.size()-1){
+                sb.append(" -> ");
+            }       
+        }
+        Path = sb.toString();
+    }
     @Override
     public int compareTo(GAGenome genome) {
         if(this.fitness > genome.getFitness())
@@ -313,16 +428,10 @@ public class GAGenome implements Comparable<GAGenome>{
     @Override
     public String toString(){
         StringBuilder sb = new StringBuilder();
-        sb.append("Path: ");
-        
-        for(int i = 0 ; i < genome_FullCyclePath.size(); i++){
-            sb.append(IndexToPortMatrix.get(genome_FullCyclePath.get(i)).getPortID());
-            sb.append(" ");
-        }
-  
-        sb.append(" ");
+        toPath();
+        sb.append(Path); 
         sb.append("\nTotal Operation Cost: ");
-        sb.append(getFitness());
+        sb.append(new BigDecimal(getFitness()).setScale(2,RoundingMode.HALF_UP));
         
         return sb.toString();
     }

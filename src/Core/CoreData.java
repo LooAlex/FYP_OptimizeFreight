@@ -23,7 +23,7 @@ public final class CoreData implements Serializable{
     public static String classDirectory =  System.getProperty("user.dir") ; //return path of project folder
     public static String Data_ResourceFilePath = "/src/Data_Resource";
     
-    public static float TimeHorizon;
+    
     
     
    

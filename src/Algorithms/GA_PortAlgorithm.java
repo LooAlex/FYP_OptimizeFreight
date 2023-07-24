@@ -49,7 +49,7 @@ public class GA_PortAlgorithm {
         this.reproductionSize = reproductionSize;
         this.mutationRate = mutationRate;
         this.selectionType= type;
-        this.tournamentSize= this.tournamentSize;
+        this.tournamentSize= tournamentSize;
         
         this.MaxIterations = 1000;
         this.genomeSize = numberOfPorts-1;
@@ -61,7 +61,7 @@ public class GA_PortAlgorithm {
         for(int i = 0 ;i<generationSize ; i++){
             //random GAGenome constructor
             population.add(new GAGenome(numberOfPorts,IndexSelectedStartPort,IndexToPortMatrix,SelectedShipCategory,TravelDistances));
-           
+            System.out.println("First Pop: Genene "+i);
         }
         
         return population;
@@ -183,6 +183,7 @@ public class GA_PortAlgorithm {
             currentGenerationSize += 2; //because we got 2 childrens, from mixing 2 parent
         }
         
+        
         return newGeneration;
     }
     
@@ -191,8 +192,9 @@ public class GA_PortAlgorithm {
         GAGenome globalBestGenome = population.get(0);
         
         for(int i = 0; i< this.MaxIterations; i++){//mainly it only select and mate
-            List<GAGenome> selected = selection(population);
-            population = createGeneration(selected);
+            List<GAGenome> selected = selection(population);     //bestfit
+            population = createGeneration(selected);    //mating
+            System.out.println("Population No: "+i);
             globalBestGenome = Collections.min(population); //does not compare globalBestGenome, only replace it and use it to see if we are close to heuristic or not
             if(globalBestGenome.getFitness()< this.TargetOperationCostFitness)
                 break;

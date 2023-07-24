@@ -46,8 +46,6 @@ public class ShipCategoryDTO extends BaseDTO{
     
     //Simulation
     //public List <DemandDTO> Demands;//contains [RouteID which contains PortFromTo][DemandAmount][TotalWeightBaseOnContainerType]
-    public int CurrentPortID;                       //i
-    public int PreviousPortID;                      //i-1
     public double DistanceTravel;                      //Dij :: NauticalMile
     
     public Date StartingDate;
@@ -85,8 +83,9 @@ public class ShipCategoryDTO extends BaseDTO{
     
     public int TotalAmountContainerCarried;         //Lvig = (Lvi +TotalDemands) ::number
     public double CurrentShipPayload;               //Wij ::Ton  NoContainers*weight_Coeff + CurrentBunkerAmount(cuz in ton)
+    public double totalLoadUnLoad;
     
-    
+    public String previousPortName;
     public ShipCategoryDTO(){
         
     }
@@ -116,7 +115,66 @@ public class ShipCategoryDTO extends BaseDTO{
         minAmountToBunkerUp = this.BunkerCapacity *0.20;
         
     }
+    
+    //deep copy
+    public ShipCategoryDTO(ShipCategoryDTO ship){
+        super(ship.Code,ship.Description,ship.Remarks,ship.IsActive,ship.CreatedBy);
+        ShipCategory_ID = ship.ShipCategory_ID;
+        CapacityTEU = ship.CapacityTEU;
+        CapacityFEU = ship.CapacityFEU;
+        MinSpeed = ship.MinSpeed;
+        MaxSpeed =ship.MaxSpeed;
+        DesignSpeed = ship.DesignSpeed;
+        Coeff_FuelIdle = ship.Coeff_FuelIdle;	
+        Coeff_Alpha = ship.Coeff_Alpha;
+        Coeff_Beta = ship.Coeff_Beta;
+        Coeff_FuelTravel= ship.Coeff_FuelTravel;
+        BunkerCapacity = ship.BunkerCapacity;	
+        CriticalBunkerLevel = ship.CriticalBunkerLevel;
+        TimeLoadUnLoadPerFullContainerTEU = ship.TimeLoadUnLoadPerFullContainerTEU;
+        TimeLoadUnLoadPerFullContainerFEU = ship.TimeLoadUnLoadPerFullContainerFEU;
+        Penalty_ZeroBunker = ship.Penalty_ZeroBunker;
+        weeklyFrequencyHour = ship.weeklyFrequencyHour;
+        AvgWeightUtilizeContainer = ship.AvgWeightUtilizeContainer;
+        SpeedOptions = new ArrayList<>(Arrays.asList(new Double[]{DesignSpeed,MinSpeed,MaxSpeed}));
+        TimeHorizon = ship.TimeHorizon;
+        CriticalBunkerLevelNew = this.BunkerCapacity * 0.05;
+        minBunkerAmt =this.BunkerCapacity * 0.15;
+        minAmountToBunkerUp = this.BunkerCapacity *0.20;
+        
+        this.DistanceTravel= ship.DistanceTravel;                      //Dij :: NauticalMile
+   
+    
+        this.ETA = ship.ETA;                              //T Estimate :: Hour = timeEnd+weeklyFrequency
+        this.SelectedSpeed = ship.SelectedSpeed;                    //v nauticalMiles/hour
+        this.timeTravel = ship.timeTravel;                       //Tij :: Hour
 
+        this.timeArrival = ship.timeArrival;                      //tA :: Hour
+        this.timeLeave = ship.timeLeave;                        //tE :: Hour 
+        this.timeLate = ship.timeLate;                         //TLate :: Hour
+
+        this.TimeStartOper = ship.TimeStartOper;                    //TS :: Hour | tA+0.5
+        this.TotalOperationTime = ship.TotalOperationTime;               //ti ::HOUR
+        this.TimeEndOper = ship.TimeEndOper;                      //TE ::Hour | TS+ti
+
+        this.BunkerLevelAfterOper = ship.BunkerLevelAfterOper;             //Avi and Avi-1 :: TON depends on when we use it
+        this.BunkerLevelAtArrival = ship.BunkerLevelAtArrival;             //µvi :: TON
+        this.CurrentBunkerAmount = ship.CurrentBunkerAmount;              //bvi ::TON
+        this.CurrentTotalBunkerHoldingCost = ship.CurrentTotalBunkerHoldingCost;    //Hvi ::TON
+        this.AvgCurrentBunkerHoldingCost = ship.AvgCurrentBunkerHoldingCost;      //hvi ::TON
+        this.Dept_Bunker = ship.Dept_Bunker;                      //dvi ::TON
+
+        this.AmountBunkered = ship.AmountBunkered;                   //Bvi ::TON, total fuel bunkered , random value between 20% and bunkerCapacity
+
+        this.FuelConsumedIdle = ship.FuelConsumedIdle;                 //FIdle ::TON
+        this.FuelConsumedTraveled = ship.FuelConsumedTraveled;              //FTravel ::TON
+
+        this.TotalAmountContainerCarried = ship.TotalAmountContainerCarried;         //Lvig = (Lvi +TotalDemands) ::number
+        this.CurrentShipPayload = ship.CurrentShipPayload;               //Wij ::Ton  NoContainers*weight_Coeff + CurrentBunkerAmount(cuz in ton)
+        this.totalLoadUnLoad = ship.totalLoadUnLoad;
+        this.previousPortName = ship.previousPortName;
+        
+    }
     @Override
     public String toString() {
         return this.Code;

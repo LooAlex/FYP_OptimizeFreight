@@ -8,6 +8,7 @@ import java.io.Serializable;
 import java.time.OffsetDateTime;
 import java.time.*;
 import java.sql.*;
+import java.text.DecimalFormat;
 
 /**
  *
@@ -25,6 +26,7 @@ public class BaseDTO implements Serializable{
     public OffsetDateTime CreatedDate;
     public int ModifiedBy;
     public OffsetDateTime ModifiedDate;
+    
     
     
     public int getRecordID() {
@@ -98,6 +100,8 @@ public class BaseDTO implements Serializable{
     public void setModifiedDate(OffsetDateTime ModifiedDate) {
         this.ModifiedDate = ModifiedDate;
     }
+    
+     
 
     public BaseDTO() {
     }

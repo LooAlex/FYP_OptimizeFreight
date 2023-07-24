@@ -9,6 +9,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.URL;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -22,6 +23,8 @@ import testArena.tuto_csv.CSV_Reader;
  * Contains all general and useful functions
  */
 public final class  CoreFunctions  {
+    
+    
     private CoreFunctions(){
         throw new IllegalAccessError("Instanciation not allow");
     }
@@ -102,4 +105,10 @@ public final class  CoreFunctions  {
         return new Random().nextInt(floor,ceiling);
     }
             
+    public static DecimalFormat getDecimalFormat(int decimalPoint){
+        DecimalFormat df  = new DecimalFormat();
+        df.setMaximumFractionDigits(decimalPoint);
+            
+        return df;
+    }
 }   
