@@ -402,9 +402,9 @@ public class frm_GASimulation extends javax.swing.JFrame {
             for(int j = 0; j < numberOfPorts; j++){
                 System.out.println(TravelDistances[i][j]);
                 if(TravelDistances[i][j]/10==0)
-                    System.out.print("  ");//cuz ij = 0, so to make retain space and have like a matrix, we add 2extra space
+                    System.out.print("    ");//cuz ij = 0, so to make retain space and have like a matrix, we add 2extra space
                 else
-                    System.out.print(' ');
+                    System.out.print(" ");
             }
             System.out.println("");
                 
@@ -1496,15 +1496,15 @@ public class frm_GASimulation extends javax.swing.JFrame {
             //the first genome sequence created here will always be 0,1,2,3,4...n
             GA_PortAlgorithm portAlgorithm = new GA_PortAlgorithm(
                 SelectedShipCategory,
-                numberOfPorts,SelectedStartPort,IndexSelectedStartPort,
+                numberOfPorts,IndexSelectedStartPort,
                 IndexToPortMatrix,TravelDistances,
                 TargetOrperatingCostFitness,    
                 generationSize,reproductionSize,mutationRate,
                 type,tournamentSize
             );
             
-            //RouteGenome result  = portAlgorithm.optimize();
-            //System.out.println(result);
+            GAGenome result  = portAlgorithm.optimize();
+            System.out.println(result);
         }
         
         
