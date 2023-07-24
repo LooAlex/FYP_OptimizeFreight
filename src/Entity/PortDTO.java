@@ -64,21 +64,21 @@ public class PortDTO extends DefaultWaypoint {
     //--Ship
     public ShipCategoryDTO currentShip;
   
-    public float shp_TimeArrival;           //tavi  :ship time arrival port
-    public float shp_TimeLeave;             //tevi  :ship time left port 
-    public float shp_weeklyFrequency;       //fw    :weekly frequency cycle to reach a port
-    public float TotalCostBunkerHolding;    //Hvi   :at this port i, after CheckBunker()
-    public float AvgBunkerHolding;          //hvi   :at this port i, after CheckBunker()
+    public double shp_TimeArrival;           //tavi  :ship time arrival port
+    public double shp_TimeLeave;             //tevi  :ship time left port 
+    public double shp_weeklyFrequency;       //fw    :weekly frequency cycle to reach a port
+    public double TotalCostBunkerHolding;    //Hvi   :at this port i, after CheckBunker()
+    public double AvgBunkerHolding;          //hvi   :at this port i, after CheckBunker()
     
     //container
     public DemandDTO demands;
  
     
     //ObjetiveFunction var
-    public float TotalHandlingCost;     //(DemandAmt+SupplyAmnt)*Port_CostPerFullContainer
-    public float TotalFuelTravelCost;   //previous port i to this port j
-    public float TotalFuelIdleCost;     //for this port i, for duration of operation
-    public float TotalPenaltyCost;
+    public double TotalHandlingCost;        //CHdl :: $ |(DemandAmt+SupplyAmnt)*Port_CostPerFullContainer
+    public double TotalFuelTravelCost;      //Ctravel :: $ |previous port i to this port j
+    public double TotalFuelIdleCost;        //CFIdle :: $ |for this port i, for duration of operation
+    public double TotalPenaltyCost;         //CPnt :: $ |
     
     // </editor-fold>
     
@@ -686,6 +686,12 @@ public class PortDTO extends DefaultWaypoint {
         
     }
 
+    @Override
+    public String toString() {
+        return this.getPortName();
+    }
+    
+    
     
 }
 

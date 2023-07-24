@@ -4,6 +4,11 @@
  */
 package Core;
 import java.io.Serializable;
+import javax.swing.JOptionPane;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
+import javax.swing.text.DocumentFilter;
 
 /**
  *
@@ -19,4 +24,7 @@ public final class CoreData implements Serializable{
     public static String Data_ResourceFilePath = "/src/Data_Resource";
     
     public static float TimeHorizon;
+    
+    
+   
 }

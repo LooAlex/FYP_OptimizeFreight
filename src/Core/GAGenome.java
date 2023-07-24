@@ -4,18 +4,26 @@
  */
 package Core;
 
+
 import java.util.*;
+import Core.*;
+import DLL.*;
+import Entity.*;
+import java.sql.*;
 /**
  *
 * @author Loo Alex
  */
 public class GAGenome implements Comparable<GAGenome>{
 
-    List<Integer> genome;
-    int startingPort;
+    List<Integer> genome;   //portSequence by Index base on lstPort excluding startingport
+    double[][] travelDistances;
+    int IndexStartingPort;  
     int numberOfPorts;
-    int[][] travelMatrix;
-    double fitness;
+    double fitness;         //totalOperatingCost for that portSequence including StartingPort
+    
+    public ShipCategoryDTO ship;
+    public HashMap<Integer, PortDTO> IndexToPortMatrix;  //
 
     public List<Integer> getGenome() {
         return genome;
@@ -26,11 +34,11 @@ public class GAGenome implements Comparable<GAGenome>{
     }
 
     public int getStatingPort() {
-        return startingPort;
+        return IndexStartingPort;
     }
 
     public void setStatingPort(int statingPort) {
-        this.startingPort = statingPort;
+        this.IndexStartingPort = statingPort;
     }
 
     public int getNumberOfPorts() {
@@ -41,12 +49,12 @@ public class GAGenome implements Comparable<GAGenome>{
         this.numberOfPorts = numberOfPorts;
     }
 
-    public int[][] getTravelMatrix() {
-        return travelMatrix;
+    public double[][] getTravelDistances() {
+        return travelDistances;
     }
 
-    public void setTravelMatrix(int[][] travelMatrix) {
-        this.travelMatrix = travelMatrix;
+    public void setTravelDistances(double[][] travelDistances) {
+        this.travelDistances = travelDistances;
     }
 
     public double getFitness() {
@@ -57,20 +65,22 @@ public class GAGenome implements Comparable<GAGenome>{
         this.fitness = fitness;
     }
 
-    public GAGenome(int numberOfPorts, int [][]travelMatrix,int startingPort) {
-        this.travelMatrix  = travelMatrix;
+    //prep data
+    public GAGenome(int numberOfPorts, double [][]travelDistances,int IndexSelectedtartingPort) {
+        this.travelDistances  = travelDistances;
         this.numberOfPorts  = numberOfPorts;
-        this.startingPort = startingPort;
+        this.IndexStartingPort = IndexSelectedtartingPort;
         
         this.genome = randomPorts();
         this.fitness = this.calculateFitness();
         
     }
     
-    private List<Integer> randomPorts(){
+    //we can use the randomPorts as it will always be 0-NPorts and IndexStartingPoint will be same
+    private List<Integer> randomPorts(){//we use this functions since i encoded the pord ID with their respective Index
         List<Integer> result = new ArrayList<>();
         for(int i = 0; i<numberOfPorts; i++){
-            if(i != startingPort)
+            if(i != IndexStartingPort)
                 result.add(i);
         }
         Collections.shuffle(result);
@@ -80,18 +90,114 @@ public class GAGenome implements Comparable<GAGenome>{
     //how to calculate this fitness path?
     
     public double calculateFitness(){
-        int fitness = 0;
-        int currentPort  = this.startingPort;
+        double fitnessOper = 0;
+        int IndexCurrentPort  = this.IndexStartingPort; //use this for matrix
+        PortDTO currentPort = IndexToPortMatrix.get(IndexCurrentPort);
+        resetShipPortDependentVariable();
+        //setParameter of ShipAtOrigin //all time and load will be zero by default, bunker etc.
+        //bunkerfull
+        ship.binaryBunkered = 1;
+        //init Bvi
+        ship.AmountBunkered = ship.BunkerCapacity;       
+        //init bvi
+        ship.CurrentBunkerAmount = ship.AmountBunkered;
+        //cal Hvi
+        ship.CurrentTotalBunkerHoldingCost = cal_Hvi(0, 0, currentPort.Port_FuelPrice);
+        //cal hvi  cal_hvi_AvgCurrentBunkerHoldingCost
+        cal_hvi_AvgCurrentBunkerHoldingCost();
         
-        //calculate entire path cost.
+        //StartLoadingFirstSupply
+        if( currentPort.demands.DemandAmt > 0){
+            //set TS
+            ship.TimeStartOper = ship.timeArrival+0.5;
+            //cal total time to load
+            ship.TotalOperationTime = cal_ti(currentPort.demands.DemandAmt,ship.TotalAmountContainerCarried,ship.TimeLoadUnLoadPerFullContainerTEU);
+        }
+        //set TE
+        ship.TimeEndOper = ship.TimeStartOper + ship.TotalOperationTime;
+        //cal_CHdl
+        currentPort.TotalHandlingCost = cal_CHdl(currentPort.demands.DemandAmt,ship.TotalAmountContainerCarried,currentPort.Port_CostPerFullContainer);
+        //cal_Wij
+        ship.CurrentShipPayload = cal_Wij(currentPort.demands.DemandAmt);
+        //cal_FIdle
+        ship.FuelConsumedIdle = cal_FIdle(ship.Coeff_FuelIdle,ship.TotalOperationTime);
+        //cal_CFIdle
+        currentPort.TotalFuelIdleCost = cal_CFIdle();
+        //cal Avi
+        ship.BunkerLevelAfterOper = cal_Avi();
+        //set tE
+        ship.timeLeave = ship.TimeEndOper+0.25;
+        //Choose a speed
+        randomSpeed();
+        //set TEst, Estimate Time of Arival
+        setShipETA();
+        //cal Origin OperationCost
+        fitnessOper = currentPort.PortCall_Cost + currentPort.TotalFuelTravelCost + currentPort.TotalPenaltyCost + currentPort.TotalHandlingCost + currentPort.TotalFuelIdleCost;
+        double distance = 0;
+        
+ //-----//calculate entire path cost except origin and destination.
         for(int gene : genome){
-            fitness += travelMatrix[currentPort][gene];//currentCity = rowIndex, gene = colIndex, cell at that coord = cost to travel there
-            currentPort = gene;
+ //current gene  = already traveled to port j
+            resetShipPortDependentVariable();
+            //getDistance From_PreviousPort To_CurrentPort
+            ship.DistanceTravel = travelDistances[IndexCurrentPort][gene];
+            //getTimeTravel
+            ship.timeTravel = ship.DistanceTravel/ship.SelectedSpeed;
+            //cal µvi
+            ship.BunkerLevelAtArrival = cal_uvi(ship.BunkerLevelAfterOper);
+  //-------//cal CTrv
+            currentPort.TotalFuelTravelCost = cal_CTrv();
+            //set tA :: Time arrival at currentPort
+            setShipTimeArrivalAtPort();
+  //-------//CPnt
+            //check penaltyLateArrival
+            if(ship.timeArrival > ship.ETA){
+                ship.timeLate = ship.timeArrival - ship.ETA;
+                currentPort.TotalPenaltyCost = currentPort.Penalty_LateArrival * ship.timeLate ;   
+            }
+            //check penaltyZeroBunker if <0.05*BunkerCap
+            if(ship.BunkerLevelAtArrival < ship.CriticalBunkerLevelNew){
+                if(ship.BunkerLevelAtArrival <= 0){
+                    //normalize and discourage negative or zero bunker
+                    ship.Dept_Bunker = (ship.BunkerLevelAtArrival *-1) + ship.CriticalBunkerLevelNew*1000.00;
+                }else{
+                    ship.Dept_Bunker = (ship.BunkerLevelAtArrival) + ship.CriticalBunkerLevelNew*10;
+                }
+                currentPort.TotalPenaltyCost += ship.Dept_Bunker * ship.Penalty_ZeroBunker;
+            }
+            //check if need Bunkering
+            //cal Bvi
+            if(ship.BunkerLevelAtArrival <= ship.minBunkerAmt){
+                randomBunkerAmount();
+            }else{
+                ship.AmountBunkered  = 0;
+            }
+            //set bvi
+            setCurrentBunkerFuelLevel_bvi();
+            //cal Hvi
+            ship.CurrentTotalBunkerHoldingCost = cal_Hvi(ship.AvgCurrentBunkerHoldingCost, ship.BunkerLevelAtArrival, currentPort.Port_FuelPrice);
+            //cal hvi
+            cal_hvi_AvgCurrentBunkerHoldingCost();
+            //StartLoadingFirstSupply
+            if(currentPort.demands.DemandAmt > 0){
+                //set TS
+                ship.TimeStartOper = ship.timeArrival+0.5;
+                //cal total time to load
+                ship.TotalOperationTime = cal_ti(currentPort.demands.DemandAmt,ship.TotalAmountContainerCarried,ship.TimeLoadUnLoadPerFullContainerTEU);
+            }
+            
+            fitnessOper += currentPort.TotalFuelTravelCost + currentPort.PortCall_Cost +  currentPort.TotalPenaltyCost + currentPort.TotalHandlingCost + currentPort.TotalFuelIdleCost;
+                    
+            IndexCurrentPort = gene;
+            currentPort = IndexToPortMatrix.get(IndexCurrentPort);
         }
         
-        fitness += travelMatrix[genome.get(numberOfPorts-2)][startingPort];
-        
-        return fitness;
+        // onelast calculation for to add the return to startingPort
+        ship.DistanceTravel = travelDistances[genome.get(numberOfPorts-2)][IndexStartingPort];
+        //
+        //final oper
+        fitnessOper += currentPort.TotalFuelTravelCost + currentPort.PortCall_Cost +  currentPort.TotalPenaltyCost + currentPort.TotalHandlingCost + currentPort.TotalFuelIdleCost+ ship.CurrentTotalBunkerHoldingCost;
+        return fitnessOper;
     }
     
     @Override
@@ -103,5 +209,77 @@ public class GAGenome implements Comparable<GAGenome>{
         else
             return 0;
     }
+    public void setShipETA(){
+        ship.ETA = ship.timeLeave+ship.weeklyFrequencyHour;
+    }
+    public void setShipTimeArrivalAtPort(){
+        ship.timeArrival = ship.timeLeave+ship.timeTravel;
+    }
+    public double cal_uvi(double FuelAmountAtLeave_PreviousPort){
+        ship.FuelConsumedTraveled = (ship.DistanceTravel/24.00) * ship.Coeff_FuelTravel * Math.pow(ship.SelectedSpeed, 2) * (ship.Coeff_Alpha + ship.Coeff_Beta*ship.CurrentShipPayload);
+        
+        return (FuelAmountAtLeave_PreviousPort - ship.FuelConsumedTraveled);
+    }
+    public double cal_CTrv(){
+        return (ship.FuelConsumedTraveled * ship.AvgCurrentBunkerHoldingCost);
+    }
+    public void setCurrentBunkerFuelLevel_bvi(){
+        double excessBunker = 0;
+        if(ship.AmountBunkered > ship.BunkerCapacity){
+            //remove excess, now BunkerLevel  is max
+            excessBunker = ship.AmountBunkered - ship.BunkerCapacity; 
+            ship.AmountBunkered -= excessBunker;
+        }
+        ship.CurrentBunkerAmount = ship.BunkerLevelAtArrival + ship.AmountBunkered;   
+    }
+    public double cal_Hvi(double previous_hvi,double FuelAtArrival,double PortFuelPrice){
+        return (previous_hvi*FuelAtArrival)+(PortFuelPrice*ship.AmountBunkered);
+    }
+    public void cal_hvi_AvgCurrentBunkerHoldingCost(){
+        ship.CurrentTotalBunkerHoldingCost= ship.CurrentTotalBunkerHoldingCost*ship.CurrentBunkerAmount;   
+    }
+    public double cal_ti(int AmtDemand,int AmtSupply,double timeShipToLoadUnloadContainer){
+        return(AmtDemand+AmtSupply)*timeShipToLoadUnloadContainer;
+    }
+    public double cal_CHdl(int AmtDemand,int AmtSupply,double CostToLoadUnloadContainer){
+        return(AmtDemand+AmtSupply)*CostToLoadUnloadContainer;
+    }
+    public double cal_Wij(int AmtDemand){
+        // total to be carried = only demand amt as we assume next port we will supply the entire demand to that port
+        //so its load, complete unload, to reload
+        ship.TotalAmountContainerCarried = AmtDemand;
+        return ship.TotalAmountContainerCarried*ship.AvgWeightUtilizeContainer;
+    }
+    public double cal_FIdle(double coeff_FuelIdle,double TotalOperationTime){
+        return coeff_FuelIdle*(TotalOperationTime/24.00);
+    }
+    public double cal_CFIdle(){
+        return (ship.FuelConsumedIdle*ship.AvgCurrentBunkerHoldingCost);
+    }
+     public double cal_Avi(){
+         //bvi - FIdle
+        return (ship.CurrentBunkerAmount-ship.FuelConsumedIdle);
+    }
+    public void resetShipPortDependentVariable(){
+        ship.TimeStartOper = 0;
+        ship.TimeEndOper = 0;
+        ship.TotalOperationTime = 0;
+        ship.timeLate = 0;
+        ship.DistanceTravel = 0;
+        ship.AmountBunkered = 0;
+        //1.00 or 1.00d java see as double
+        //1.00f java see as float
+    }
     
+    public void randomSpeed(){
+        Random rand = new Random();
+        ship.SelectedSpeed  = ship.SpeedOptions.get(rand.nextInt(0,3));
+    }
+    public void randomBunkerAmount(){
+        Random rand = new Random();
+        ship.AmountBunkered = rand.nextInt((int)ship.minAmountToBunkerUp, (int)ship.BunkerCapacity);
+        //we could restrict the ceiling with maxBunker-currentLevel but this will reduce the chance of system to bunker full once in a while.
+        
+        
+    }
 }

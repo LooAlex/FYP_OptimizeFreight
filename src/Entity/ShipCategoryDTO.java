@@ -40,42 +40,48 @@ public class ShipCategoryDTO extends BaseDTO{
     public double Coeff_Beta;                       //β
     public double Coeff_FuelTravel;                 //Fe 
     public double BunkerCapacity;                   //Wv ::TON
-    public double CriticalBunkerLevel;              //siv ::Ton //bunkerCapacity*0.05, or use CriticalBunkerLevel
-        
+    public double CriticalBunkerLevel;              //DB preset CriticalBunkerLevel
+    public double CriticalBunkerLevelNew;            //siv ::Ton //bunkerCapacity*0.05
     public double Penalty_ZeroBunker;               //PBkn :: $/TON
     
     //Simulation
     //public List <DemandDTO> Demands;//contains [RouteID which contains PortFromTo][DemandAmount][TotalWeightBaseOnContainerType]
     public int CurrentPortID;                       //i
     public int PreviousPortID;                      //i-1
-    public int DistanceTravel;                      //Dij :: NauticalMile
+    public double DistanceTravel;                      //Dij :: NauticalMile
     
     public Date StartingDate;
     public Date EndingDate;
     
     public double TimeHorizon;                      //T ::Hour
-    public double weeklyFrequency;                  //fw ::HOUR
+    public double weeklyFrequencyHour;                  //fw ::HOUR
     public double ETA;                              //T Estimate :: Hour = timeEnd+weeklyFrequency
     public double SelectedSpeed;                    //v nauticalMiles/hour
-    public double TravelTime;                       //Tij :: Hour
+    public double timeTravel;                       //Tij :: Hour
     
     public double timeArrival;                      //tA :: Hour
-    public double timeEnd;                          //tE :: Hour 
+    public double timeLeave;                        //tE :: Hour 
     public double timeLate;                         //TLate :: Hour
     
-    public double TimeStartOper;                    //Ts :: Hour | tA+0.5
+    public double TimeStartOper;                    //TS :: Hour | tA+0.5
     public double TotalOperationTime;               //ti ::HOUR
-    public double TimeEndOper;                      //TE ::Hour | Ts+ti
+    public double TimeEndOper;                      //TE ::Hour | TS+ti
     
     public double BunkerLevelAfterOper;             //Avi and Avi-1 :: TON depends on when we use it
-    public double BunkerLevelAtArrival;             //µvi
+    public double BunkerLevelAtArrival;             //µvi :: TON
     public double CurrentBunkerAmount;              //bvi ::TON
     public double CurrentTotalBunkerHoldingCost;    //Hvi ::TON
     public double AvgCurrentBunkerHoldingCost;      //hvi ::TON
     public double Dept_Bunker;                      //dvi ::TON
+   
+    public double minAmountToBunkerUp;                //Yv ::TON
+    public double minBunkerAmt;                      //yvi ::TON
     public double AmountBunkered;                   //Bvi ::TON, total fuel bunkered , random value between 20% and bunkerCapacity
     public boolean hasBunkered;                     // true false
     public int binaryBunkered;                      //Nvi {0,1} only.
+    
+    public double FuelConsumedIdle;                 //FIdle ::TON
+    public double FuelConsumedTraveled;              //FTravel ::TON
     
     public int TotalAmountContainerCarried;         //Lvig = (Lvi +TotalDemands) ::number
     public double CurrentShipPayload;               //Wij ::Ton  NoContainers*weight_Coeff + CurrentBunkerAmount(cuz in ton)
@@ -105,11 +111,18 @@ public class ShipCategoryDTO extends BaseDTO{
        
         SpeedOptions = new ArrayList<>(Arrays.asList(new Double[]{DesignSpeed,MinSpeed,MaxSpeed}));
         TimeHorizon = 0;
+        CriticalBunkerLevelNew = this.BunkerCapacity * 0.05;
+        minBunkerAmt =this.BunkerCapacity * 0.15;
+        minAmountToBunkerUp = this.BunkerCapacity *0.20;
         
     }
+
+    @Override
+    public String toString() {
+        return this.Code;
     
     
-    
+    }
     
     
 }

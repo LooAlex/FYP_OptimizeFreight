@@ -42,9 +42,9 @@ public class tst_GA {
             for(int j = 0; j < numberOfCities; j++){
                 System.out.println(TravelPrices[i][j]);
                 if(TravelPrices[i][j]/10==0)
-                    System.out.println("  ");//cuz ij = 0, so to make retain space and have like a matrix, we add 2extra space
+                    System.out.print("  ");//cuz ij = 0, so to make retain space and have like a matrix, we add 2extra space
                 else
-                    System.out.println(' ');
+                    System.out.print(' ');
             }
             System.out.println("");
                 

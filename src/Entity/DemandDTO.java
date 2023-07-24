@@ -11,24 +11,22 @@ import Core.*;
  */
 public class DemandDTO extends BaseDTO{
     public int DemandAmt;
-    public int SupplyAmt;
     public int ContainerTypeID;
     public float AvgWeight_Ton;
     
     public DemandDTO(){
         DemandAmt = CoreFunctions.randomInt(0, 5000);
-        SupplyAmt = CoreFunctions.randomInt(0, 5000);
     }
     
     //Demand base on Ship Size
-    public DemandDTO(int shp_Size){
-        DemandAmt = CoreFunctions.randomInt(0, shp_Size);
-        SupplyAmt = CoreFunctions.randomInt(0, shp_Size);
+    public DemandDTO(int minAmount,int shp_Size){
+        DemandAmt = CoreFunctions.randomInt(minAmount, shp_Size);
+       
     }
     
     //specific Demand amount
-    public DemandDTO(int DemandAmt,int SupplyAmt){
+    public DemandDTO(int DemandAmt){
         this.DemandAmt = DemandAmt;
-        this.SupplyAmt = SupplyAmt;
+        
     }
 }
