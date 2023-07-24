@@ -14,37 +14,40 @@ import java.sql.*;
  * @author Loo Alex
  */
 public class GA_PortAlgorithm {
-      //From GUI
-    public CoreEnum.SelectionType type;
-    public ShipCategoryDTO SelectedShipCategory;
-    public ArrayList<PortDTO> lstSelectedPort;
-    public int numberOfPorts;
-    public PortDTO SelectedStartPort;
-    public int IndexSelectedStartPort;
-    public HashMap<Integer,PortDTO> IndexToPortMatrix;
-    public double [][]TravelDistances;
-    public double TargetOperationCostFitness;
-    public int generationSize;
-    public int reproductionSize;
-    public float mutationRate;
-    public int tournamentSize;
+      //From 
+    public int generationSize;              //GUI
+    public int numberOfPorts;               //GUI
+    public int reproductionSize;            //GUI
+    public float mutationRate;              //GUI    
+    public double [][]TravelDistances;      //GUI
+    public int IndexSelectedStartPort;      //GUI
+    public double TargetOperationCostFitness;   //GUI
+    public int tournamentSize;              //GUI
+    public CoreEnum.SelectionType type;     //GUI
+    
+    public ShipCategoryDTO SelectedShipCategory;    //GUI
+    public HashMap<Integer,PortDTO> IndexToPortMatrix;//GUI
+    
+    public int genomeSize;                  //Here
+    public int MaxIteration;                //HERE
+    
+    
+    
     
     //Here
-    public int MaxIteration;
+    
     
     
     public GA_PortAlgorithm
     (
-        ShipCategoryDTO SelectedShipCategory,int numberOfPorts,PortDTO SelectedStartPort,int IndexSelectedStartPort,
+        ShipCategoryDTO SelectedShipCategory,int numberOfPorts,int IndexSelectedStartPort,
         HashMap<Integer,PortDTO> IndexToPortMatrix, double [][]TravelDistances,
         double TargetOperationCostFitness,
         int generationSize,int reproductionSize,float mutationRate,
         CoreEnum.SelectionType type,int tournamentSize
     ){
         this.SelectedShipCategory = SelectedShipCategory;
-        this.lstSelectedPort = lstSelectedPort;
         this.numberOfPorts = numberOfPorts;
-        this.SelectedStartPort = SelectedStartPort;
         this.IndexSelectedStartPort = IndexSelectedStartPort;
         this.IndexToPortMatrix = IndexToPortMatrix;
         this.TravelDistances  = TravelDistances;
@@ -55,9 +58,22 @@ public class GA_PortAlgorithm {
         this.type= type;
         this.tournamentSize= this.tournamentSize;
         
-        this.MaxIteration = 10000;
+        this.MaxIteration = 1000;
+        this.genomeSize = numberOfPorts-1;
         
     }
+    
+     public List<GAGenome> initialPopulation(){
+        List<GAGenome> population  = new ArrayList<>();
+        for(int i = 0 ;i<generationSize ; i++){
+            population.add(new GAGenome(numberOfCities,travelPrices,startingCity)); //first pop we use randomConstructor
+        }
+        
+        return population;
+    }
+    
+    
+    
 }
 
 
