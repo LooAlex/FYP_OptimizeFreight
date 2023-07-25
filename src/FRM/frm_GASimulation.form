@@ -55,8 +55,8 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="1" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="jTabbedPane1" min="-2" pref="533" max="-2" attributes="0"/>
-              <EmptySpace pref="49" max="32767" attributes="0"/>
+              <Component id="jTabbedPane1" min="-2" pref="626" max="-2" attributes="0"/>
+              <EmptySpace pref="43" max="32767" attributes="0"/>
               <Group type="103" groupAlignment="0" max="-2" attributes="0">
                   <Component id="tabOutputDetail" pref="828" max="32767" attributes="0"/>
                   <Component id="OutputPanel" max="32767" attributes="0"/>
@@ -253,8 +253,8 @@
               <Group type="102" alignment="0" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="jLabel19" alignment="0" min="-2" pref="43" max="-2" attributes="0"/>
-                      <Component id="jScrollPane4" alignment="0" min="-2" pref="765" max="-2" attributes="0"/>
+                      <Component id="jLabel19" min="-2" pref="43" max="-2" attributes="0"/>
+                      <Component id="jScrollPane4" min="-2" pref="798" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="32767" attributes="0"/>
               </Group>
@@ -292,10 +292,10 @@
                   <EmptySpace min="-2" pref="18" max="-2" attributes="0"/>
                   <Component id="jLabel19" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="32767" attributes="0"/>
-                  <Component id="jScrollPane4" min="-2" pref="48" max="-2" attributes="0"/>
+                  <Component id="jScrollPane4" min="-2" pref="60" max="-2" attributes="0"/>
+                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Group type="102" attributes="0">
-                          <EmptySpace min="-2" pref="24" max="-2" attributes="0"/>
+                      <Group type="102" alignment="1" attributes="0">
                           <Group type="103" groupAlignment="3" attributes="0">
                               <Component id="jLabel18" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="txtGenomeTotalTimeTaken" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -313,7 +313,6 @@
                           <EmptySpace min="-2" pref="47" max="-2" attributes="0"/>
                       </Group>
                       <Group type="102" alignment="1" attributes="0">
-                          <EmptySpace max="-2" attributes="0"/>
                           <Component id="btnStartAlgo" min="-2" pref="61" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                       </Group>
@@ -414,7 +413,7 @@
                           <Group type="102" alignment="0" attributes="0">
                               <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="jpDisplayStatus" pref="521" max="32767" attributes="0"/>
+                                  <Component id="jpDisplayStatus" pref="614" max="32767" attributes="0"/>
                                   <Group type="102" attributes="0">
                                       <Component id="jLabel10" min="-2" max="-2" attributes="0"/>
                                       <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
@@ -666,7 +665,7 @@
                                   </Group>
                               </Group>
                           </Group>
-                          <EmptySpace pref="101" max="32767" attributes="0"/>
+                          <EmptySpace pref="194" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -878,8 +877,8 @@
                       <Component id="TitlePortSelection" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="32767" attributes="0"/>
                   </Group>
-                  <Component id="jScrollPane1" pref="533" max="32767" attributes="0"/>
-                  <Component id="jpRouteDisplay" alignment="0" pref="0" max="32767" attributes="0"/>
+                  <Component id="jScrollPane1" max="32767" attributes="0"/>
+                  <Component id="jpRouteDisplay" alignment="0" max="32767" attributes="0"/>
               </Group>
             </DimensionLayout>
             <DimensionLayout dim="1">
@@ -913,15 +912,15 @@
                       <Group type="102" alignment="1" attributes="0">
                           <EmptySpace max="32767" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
+                              <Component id="jScrollPane3" min="-2" pref="594" max="-2" attributes="0"/>
                               <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
                               <Group type="102" attributes="0">
                                   <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                                   <Component id="lblTotalPortSelected" min="-2" max="-2" attributes="0"/>
                               </Group>
-                              <Component id="jScrollPane3" min="-2" pref="528" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace min="-2" pref="72" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -1000,7 +999,7 @@
                   <Layout>
                     <DimensionLayout dim="0">
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <EmptySpace min="0" pref="607" max="32767" attributes="0"/>
+                          <EmptySpace min="0" pref="620" max="32767" attributes="0"/>
                       </Group>
                     </DimensionLayout>
                     <DimensionLayout dim="1">
@@ -1044,28 +1043,23 @@
                                   <Component id="jLabel12" alignment="1" min="-2" max="-2" attributes="0"/>
                                   <Component id="jLabel14" alignment="1" min="-2" max="-2" attributes="0"/>
                               </Group>
+                              <EmptySpace type="separate" max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
-                                  <Group type="102" attributes="0">
-                                      <EmptySpace type="separate" max="-2" attributes="0"/>
-                                      <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                                          <Component id="cboSelectedAlgo" alignment="0" max="32767" attributes="0"/>
-                                          <Component id="txtNumberOfPorts" alignment="0" max="32767" attributes="0"/>
-                                          <Component id="jScrollPane2" alignment="0" pref="327" max="32767" attributes="0"/>
-                                          <Component id="cboStartingPort" alignment="0" max="32767" attributes="0"/>
-                                          <Component id="cboSelectionType" alignment="0" max="32767" attributes="0"/>
-                                          <Component id="sldMutationRateBig" alignment="0" max="32767" attributes="0"/>
-                                          <Component id="lblMurationRate" alignment="0" max="32767" attributes="0"/>
-                                          <Component id="sldReproductionSize" alignment="0" max="32767" attributes="0"/>
-                                          <Component id="lblReproductionSize" alignment="0" max="32767" attributes="0"/>
-                                          <Component id="sldGenerationSize" alignment="0" max="32767" attributes="0"/>
-                                          <Component id="lblGenerationSize" alignment="0" max="32767" attributes="0"/>
-                                          <Component id="txtTargetOperationalCostFitness" alignment="0" max="32767" attributes="0"/>
-                                          <Component id="lblTournamentSize" alignment="0" max="32767" attributes="0"/>
-                                      </Group>
-                                  </Group>
-                                  <Group type="102" alignment="1" attributes="0">
-                                      <EmptySpace min="-2" pref="28" max="-2" attributes="0"/>
-                                      <Component id="sldTournamentSize" min="-2" pref="317" max="-2" attributes="0"/>
+                                  <Component id="sldTournamentSize" min="-2" pref="412" max="-2" attributes="0"/>
+                                  <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                                      <Component id="txtNumberOfPorts" alignment="0" max="32767" attributes="0"/>
+                                      <Component id="jScrollPane2" alignment="0" max="32767" attributes="0"/>
+                                      <Component id="cboStartingPort" alignment="0" max="32767" attributes="0"/>
+                                      <Component id="cboSelectionType" alignment="0" max="32767" attributes="0"/>
+                                      <Component id="sldMutationRateBig" alignment="0" max="32767" attributes="0"/>
+                                      <Component id="lblMurationRate" alignment="0" max="32767" attributes="0"/>
+                                      <Component id="sldReproductionSize" alignment="0" max="32767" attributes="0"/>
+                                      <Component id="lblReproductionSize" alignment="0" max="32767" attributes="0"/>
+                                      <Component id="sldGenerationSize" alignment="0" max="32767" attributes="0"/>
+                                      <Component id="lblGenerationSize" alignment="0" max="32767" attributes="0"/>
+                                      <Component id="txtTargetOperationalCostFitness" alignment="0" max="32767" attributes="0"/>
+                                      <Component id="lblTournamentSize" alignment="0" max="32767" attributes="0"/>
+                                      <Component id="cboSelectedAlgo" alignment="0" min="-2" pref="412" max="-2" attributes="0"/>
                                   </Group>
                               </Group>
                           </Group>
