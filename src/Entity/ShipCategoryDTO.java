@@ -39,6 +39,10 @@ public class ShipCategoryDTO extends BaseDTO{
     public double Coeff_Alpha;                      //α
     public double Coeff_Beta;                       //β
     public double Coeff_FuelTravel;                 //Fe 
+    
+    public double Coeff_k_speed;                    //Coeff k1 from Yao
+    public double Coeff_k_weight;                   //Coef k2 from Yao  F = Dij/24*k1V^2+k2
+    
     public double BunkerCapacity;                   //Wv ::TON
     public double CriticalBunkerLevel;              //DB preset CriticalBunkerLevel
     public double CriticalBunkerLevelNew;            //siv ::Ton //bunkerCapacity*0.05
@@ -85,6 +89,9 @@ public class ShipCategoryDTO extends BaseDTO{
     public double CurrentShipPayload;               //Wij ::Ton  NoContainers*weight_Coeff + CurrentBunkerAmount(cuz in ton)
     public double totalLoadUnLoad;
     
+  
+    
+    
     public String previousPortName;
     public ShipCategoryDTO(){
         
@@ -102,6 +109,10 @@ public class ShipCategoryDTO extends BaseDTO{
         Coeff_Alpha = rs.getDouble("Coeff_Alpha");
         Coeff_Beta = rs.getDouble("Coeff_Beta");
         Coeff_FuelTravel= rs.getDouble("Coeff_FuelTravel");
+        
+        Coeff_k_speed= rs.getDouble("Coeff_k_speed");
+        Coeff_k_weight= rs.getDouble("Coeff_k_weight");
+        
         BunkerCapacity = rs.getDouble("BunkerCapacity");	
         CriticalBunkerLevel = rs.getDouble("CriticalBunkerLevel");
         TimeLoadUnLoadPerFullContainerTEU = rs.getDouble("TimeLoadUnLoadPerFullContainerTEU");
@@ -128,6 +139,10 @@ public class ShipCategoryDTO extends BaseDTO{
         Coeff_FuelIdle = ship.Coeff_FuelIdle;	
         Coeff_Alpha = ship.Coeff_Alpha;
         Coeff_Beta = ship.Coeff_Beta;
+                
+        Coeff_k_speed= ship.Coeff_k_speed;
+        Coeff_k_weight= ship.Coeff_k_weight;
+        
         Coeff_FuelTravel= ship.Coeff_FuelTravel;
         BunkerCapacity = ship.BunkerCapacity;	
         CriticalBunkerLevel = ship.CriticalBunkerLevel;

@@ -86,18 +86,20 @@ public class frm_GASimulation extends javax.swing.JFrame {
     public PortDTO SelectedStartPort;
     public int IndexSelectedStartPort;
     
+    public GAGenome result;
     public int ShipContainerCapacity;
     public double FrequencyCycle = 2.00; //number of weeks
     
     public String[] arrSelectedPortName;
-    public String[] arrAlgoSelected = new String[]{"Genertic Algorithm"};
     public double TargetOrperatingCostFitness = 0;
     public int generationSize   = 5000;
     public int reproductionSize = 200;
     public int tournamentSize   = 40;
     public float mutationRate = 0.1f;
     public String[] arrSelectionTypes = new String[]{"Roulette","Tournament"};
-    public CoreEnum.SelectionType type = CoreEnum.SelectionType.ROULETTE;
+    public CoreEnum.SelectionType type ;
+    public String[] arrFuelFunctionTypes = new String[]{"Weight Variable","Speed Only"};
+    public CoreEnum.FuelFunctionType Ftype;
     
     //private List<PortDTO> setSelectedPorts = new ArrayList<>();
     private List<RoutingData> myRoutingData = new ArrayList<>();
@@ -143,8 +145,14 @@ public class frm_GASimulation extends javax.swing.JFrame {
         taSelectedPortSequence.setWrapStyleWord(true);
         taSelectedPortSequence.setEditable(false);
         
-        cboSelectedAlgo.setModel(new javax.swing.DefaultComboBoxModel<>(arrAlgoSelected));
+        cboSelectedFuelFunction.setModel(new javax.swing.DefaultComboBoxModel<>(arrFuelFunctionTypes));
+        cboSelectedFuelFunction.setSelectedIndex(0);
+        Ftype = CoreEnum.FuelFunctionType.WEIGHTVARIABLE;
+        
         cboSelectionType.setModel(new javax.swing.DefaultComboBoxModel<>(arrSelectionTypes));
+        cboSelectionType.setSelectedIndex(0);
+        type = CoreEnum.SelectionType.ROULETTE;
+        
         initCboStartingPort();
         
         sldGenerationSize.setValue(generationSize);
@@ -161,6 +169,7 @@ public class frm_GASimulation extends javax.swing.JFrame {
         
         PlainDocument doc  = (PlainDocument)txtTargetOperationalCostFitness.getDocument();
         doc.setDocumentFilter(new MyIntFilter());
+        
         
         
     }
@@ -512,6 +521,44 @@ public class frm_GASimulation extends javax.swing.JFrame {
         
         
     }
+    public void setGUI_resultGenome(){
+         if(result != null && Ftype != null && result.DataPortHistory != null){
+             System.out.println(result.toString());
+             result.toPath();
+             double fitness = 0;
+             
+            fitness = result.CalculateNewFitness(Ftype);
+            
+            DecimalFormat df = CoreFunctions.getDecimalFormat(2);
+            
+            taFinalPath.setText(result.Path);
+            txtGenomeTotalDistanceTravel.setText(df.format(result.TotalDistanceTravel));
+            txtGenomeTotalOperationCost.setText(new BigDecimal(fitness).setScale(2,RoundingMode.HALF_UP).toString());
+            txtGenomeTotalTimeTaken.setText(df.format(result.getTotalTimeTaken()));
+  
+            PortDTO tempPort = new PortDTO();
+            cboPortToSelected.removeAllItems();
+            
+            for(int i = 0 ; i<result.getGenome_FullCyclePath().size() ; i++){
+                
+                if(i == 0 ){
+                    tempPort = result.DataPortsAlter.get(i);
+                    tempPort.PortName = tempPort.PortName+" ORIGIN";
+                    cboPortToSelected.addItem(tempPort);
+                }
+                else if( i == result.getGenome_FullCyclePath().size()-1){
+                    tempPort = result.DataPortHistory.get(i);
+                    tempPort.PortName = tempPort.PortName+" DESTINATION";
+                    cboPortToSelected.addItem(tempPort);
+                }else{
+                    cboPortToSelected.addItem(result.DataPortHistory.get(i));
+                }
+            }
+            SetGUI_GenomeSelectedPortFrom(cboPortToSelected.getItemAt(0));
+        }else{
+            JOptionPane.showMessageDialog(OutputPanel, "No define Optimize Path found. Try to Start the Algorithm");
+        }
+    }
     
     public void SetGUI_GenomeSelectedPortFrom(PortDTO pt){
         DecimalFormat df = CoreFunctions.getDecimalFormat(2);
@@ -564,6 +611,7 @@ public class frm_GASimulation extends javax.swing.JFrame {
         jLabel19 = new javax.swing.JLabel();
         btnStartAlgo = new javax.swing.JButton();
         jLabel15 = new javax.swing.JLabel();
+        btnAlterFuelFunction = new javax.swing.JButton();
         jTabbedPane1 = new javax.swing.JTabbedPane();
         jpShipSelection = new javax.swing.JPanel();
         lblShipCode = new javax.swing.JLabel();
@@ -628,7 +676,7 @@ public class frm_GASimulation extends javax.swing.JFrame {
         jLabel11 = new javax.swing.JLabel();
         jLabel12 = new javax.swing.JLabel();
         jLabel13 = new javax.swing.JLabel();
-        cboSelectedAlgo = new javax.swing.JComboBox<>();
+        cboSelectedFuelFunction = new javax.swing.JComboBox<>();
         txtNumberOfPorts = new javax.swing.JTextField();
         cboStartingPort = new javax.swing.JComboBox<>();
         txtTargetOperationalCostFitness = new javax.swing.JTextField();
@@ -793,35 +841,42 @@ public class frm_GASimulation extends javax.swing.JFrame {
         jLabel15.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         jLabel15.setText("Result");
 
+        btnAlterFuelFunction.setText("Alter Function Fuel");
+        btnAlterFuelFunction.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAlterFuelFunctionActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout OutputPanelLayout = new javax.swing.GroupLayout(OutputPanel);
         OutputPanel.setLayout(OutputPanelLayout);
         OutputPanelLayout.setHorizontalGroup(
             OutputPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(OutputPanelLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(OutputPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel19, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 798, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, OutputPanelLayout.createSequentialGroup()
+                .addGap(13, 13, 13)
+                .addGroup(OutputPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jLabel17)
+                    .addComponent(jLabel18)
+                    .addComponent(jLabel16))
+                .addGap(30, 30, 30)
+                .addGroup(OutputPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(txtGenomeTotalOperationCost)
+                    .addComponent(txtGenomeTotalDistanceTravel, javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(txtGenomeTotalTimeTaken, javax.swing.GroupLayout.Alignment.LEADING))
+                .addGap(281, 281, 281)
+                .addGroup(OutputPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(btnStartAlgo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnAlterFuelFunction, javax.swing.GroupLayout.DEFAULT_SIZE, 143, Short.MAX_VALUE))
+                .addGap(14, 14, 14))
             .addGroup(OutputPanelLayout.createSequentialGroup()
                 .addGroup(OutputPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(OutputPanelLayout.createSequentialGroup()
-                        .addComponent(jLabel15)
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, OutputPanelLayout.createSequentialGroup()
-                        .addGap(13, 13, 13)
-                        .addGroup(OutputPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jLabel17)
-                            .addComponent(jLabel18)
-                            .addComponent(jLabel16))
-                        .addGap(30, 30, 30)
-                        .addGroup(OutputPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(txtGenomeTotalOperationCost)
-                            .addComponent(txtGenomeTotalDistanceTravel, javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txtGenomeTotalTimeTaken, javax.swing.GroupLayout.Alignment.LEADING))
-                        .addGap(300, 300, 300)
-                        .addComponent(btnStartAlgo, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap())
+                        .addContainerGap()
+                        .addGroup(OutputPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel19, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 798, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(jLabel15))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         OutputPanelLayout.setVerticalGroup(
             OutputPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -833,7 +888,7 @@ public class frm_GASimulation extends javax.swing.JFrame {
                 .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(OutputPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, OutputPanelLayout.createSequentialGroup()
+                    .addGroup(OutputPanelLayout.createSequentialGroup()
                         .addGroup(OutputPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel18)
                             .addComponent(txtGenomeTotalTimeTaken, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -844,11 +899,12 @@ public class frm_GASimulation extends javax.swing.JFrame {
                         .addGap(18, 18, 18)
                         .addGroup(OutputPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel16)
-                            .addComponent(txtGenomeTotalOperationCost, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(47, 47, 47))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, OutputPanelLayout.createSequentialGroup()
-                        .addComponent(btnStartAlgo, javax.swing.GroupLayout.PREFERRED_SIZE, 61, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap())))
+                            .addComponent(txtGenomeTotalOperationCost, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(OutputPanelLayout.createSequentialGroup()
+                        .addComponent(btnAlterFuelFunction, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(36, 36, 36)
+                        .addComponent(btnStartAlgo, javax.swing.GroupLayout.PREFERRED_SIZE, 61, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(37, 37, 37))
         );
 
         jpShipSelection.setPreferredSize(new java.awt.Dimension(530, 700));
@@ -1208,7 +1264,7 @@ public class frm_GASimulation extends javax.swing.JFrame {
                 .addComponent(TitlePortSelection)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 421, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 60, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 71, Short.MAX_VALUE)
                 .addComponent(jpRouteDisplay, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(33, 33, 33))
         );
@@ -1218,7 +1274,7 @@ public class frm_GASimulation extends javax.swing.JFrame {
         jLabel3.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         jLabel3.setText("Algorithm Selected:");
 
-        jLabel4.setText("Algorithm");
+        jLabel4.setText("Fuel Function");
 
         jLabel5.setText("Number of Ports Selected");
 
@@ -1240,9 +1296,9 @@ public class frm_GASimulation extends javax.swing.JFrame {
         jLabel13.setText("Tournament Size");
         jLabel13.setVerticalAlignment(javax.swing.SwingConstants.TOP);
 
-        cboSelectedAlgo.addActionListener(new java.awt.event.ActionListener() {
+        cboSelectedFuelFunction.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cboSelectedAlgoActionPerformed(evt);
+                cboSelectedFuelFunctionActionPerformed(evt);
             }
         });
 
@@ -1375,7 +1431,7 @@ public class frm_GASimulation extends javax.swing.JFrame {
                                 .addComponent(lblGenerationSize, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(txtTargetOperationalCostFitness)
                                 .addComponent(lblTournamentSize, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(cboSelectedAlgo, javax.swing.GroupLayout.PREFERRED_SIZE, 412, javax.swing.GroupLayout.PREFERRED_SIZE))))))
+                                .addComponent(cboSelectedFuelFunction, javax.swing.GroupLayout.PREFERRED_SIZE, 412, javax.swing.GroupLayout.PREFERRED_SIZE))))))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1385,7 +1441,7 @@ public class frm_GASimulation extends javax.swing.JFrame {
                 .addGap(27, 27, 27)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel4)
-                    .addComponent(cboSelectedAlgo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(cboSelectedFuelFunction, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel5)
@@ -1430,7 +1486,7 @@ public class frm_GASimulation extends javax.swing.JFrame {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel13, javax.swing.GroupLayout.PREFERRED_SIZE, 46, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(sldTournamentSize, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(76, Short.MAX_VALUE))
+                .addContainerGap(85, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("Algorithm Parameter", jPanel1);
@@ -1538,6 +1594,7 @@ public class frm_GASimulation extends javax.swing.JFrame {
         long startTime = System.nanoTime();
         if  (      (lstSelectedPorts !=null && lstSelectedPorts.size()>2) 
                 && (SelectedContainerType != null) && (SelectedShipCategory != null) 
+                && (Ftype != null)
                 && (type !=null) && (SelectedStartPort !=null) 
                 && (generationSize >=2000 && reproductionSize >=200 && tournamentSize >= 10)
                 && (!txtTargetOperationalCostFitness.getText().isEmpty() && Integer.valueOf(txtTargetOperationalCostFitness.getText())>=0)
@@ -1590,45 +1647,15 @@ public class frm_GASimulation extends javax.swing.JFrame {
                 IndexToPortMatrix,TravelDistances,
                 TargetOrperatingCostFitness,    
                 generationSize,reproductionSize,mutationRate,
-                type,tournamentSize
+                type,tournamentSize,
+                Ftype
             );
             
-            GAGenome result  = portAlgorithm.optimize();
-            result.toString();
-            DecimalFormat df  = CoreFunctions.getDecimalFormat(2);
+            result  = portAlgorithm.optimize();
             
-            txtGenomeTotalDistanceTravel.setText(df.format(result.ship.DistanceTravel));
-            txtGenomeTotalOperationCost.setText(new BigDecimal(result.getFitness()).setScale(2,RoundingMode.HALF_UP).toString());
-            txtGenomeTotalTimeTaken.setText(df.format(result.getTotalTimeTaken()));
-            
-            taFinalPath.setText(result.Path);
-            System.out.println(result);
-            
-            long endTime = System.nanoTime();
-            System.out.println("TimeStart:"+startTime+" - TimeEnd:"+endTime);
-            
-            PortDTO tempPort = new PortDTO();
-            cboPortToSelected.removeAllItems();
-            
-            for(int i = 0 ; i<result.getGenome_FullCyclePath().size() ; i++){
+            setGUI_resultGenome();
                 
-                if(i == 0 ){
-                    tempPort = result.DataPorts.get(i);
-                    tempPort.PortName = tempPort.PortName+" ORIGIN";
-                    cboPortToSelected.addItem(tempPort);
-                }
-                else if( i == result.getGenome_FullCyclePath().size()-1){
-                    tempPort = result.DataPorts.get(i);
-                    tempPort.PortName = tempPort.PortName+" DESTINATION";
-                    cboPortToSelected.addItem(tempPort);
-                }else{
-                    cboPortToSelected.addItem(result.DataPorts.get(i));
-                }
-                
-            }
             
-            SetGUI_GenomeSelectedPortFrom(cboPortToSelected.getItemAt(0));
-
         }
         
        
@@ -1636,11 +1663,16 @@ public class frm_GASimulation extends javax.swing.JFrame {
         
     }//GEN-LAST:event_btnStartAlgoActionPerformed
 
-    private void cboSelectedAlgoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cboSelectedAlgoActionPerformed
+    private void cboSelectedFuelFunctionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cboSelectedFuelFunctionActionPerformed
         // TODO add your handling code here:
-        int selectedIndex = cboSelectedAlgo.getSelectedIndex();
+        int selectedIndex = cboSelectedFuelFunction.getSelectedIndex();
+        if(selectedIndex == 0){
+            Ftype = CoreEnum.FuelFunctionType.WEIGHTVARIABLE;
+        }else if(selectedIndex == 1){
+            Ftype = CoreEnum.FuelFunctionType.SPEEDONLY;
+        }
         System.out.println(selectedIndex);
-    }//GEN-LAST:event_cboSelectedAlgoActionPerformed
+    }//GEN-LAST:event_cboSelectedFuelFunctionActionPerformed
 
     private void sldGenerationSizeStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_sldGenerationSizeStateChanged
         // TODO add your handling code here:
@@ -1691,6 +1723,11 @@ public class frm_GASimulation extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_txtGenomeTotalDistanceTravelActionPerformed
 
+    private void btnAlterFuelFunctionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAlterFuelFunctionActionPerformed
+        // TODO add your handling code here:
+       setGUI_resultGenome();
+    }//GEN-LAST:event_btnAlterFuelFunctionActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -1730,11 +1767,12 @@ public class frm_GASimulation extends javax.swing.JFrame {
     private javax.swing.JPanel OutputPanel;
     private javax.swing.JLabel TitlePortSelection;
     private javax.swing.JButton btnAddPort;
+    private javax.swing.JButton btnAlterFuelFunction;
     private javax.swing.JButton btnClearPort;
     private javax.swing.JButton btnStartAlgo;
     private javax.swing.JComboBox<String> cboMapType;
     private javax.swing.JComboBox<PortDTO> cboPortToSelected;
-    private javax.swing.JComboBox<String> cboSelectedAlgo;
+    private javax.swing.JComboBox<String> cboSelectedFuelFunction;
     private javax.swing.JComboBox<String> cboSelectionType;
     private javax.swing.JComboBox<ShipCategoryDTO> cboShipCode;
     private javax.swing.JComboBox<PortDTO> cboStartingPort;

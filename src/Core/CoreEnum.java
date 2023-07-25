@@ -19,4 +19,8 @@ public class CoreEnum {
     public static enum SelectionType{
         TOURNAMENT,ROULETTE
     }
+    
+    public static enum FuelFunctionType{
+        SPEEDONLY,WEIGHTVARIABLE
+    }
 }

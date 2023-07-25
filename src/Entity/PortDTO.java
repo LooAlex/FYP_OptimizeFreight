@@ -343,6 +343,7 @@ public class PortDTO extends DefaultWaypoint {
         IsActive = CoreFunctions.convertStringToBoolean(rs.getString("IsActive"));
         CreatedBy = rs.getInt("CreatedBy");
        
+        currentShip = new ShipCategoryDTO();
           
     }
     
@@ -365,12 +366,25 @@ public class PortDTO extends DefaultWaypoint {
         
         Port_CostPerFullContainer = port.Port_CostPerFullContainer;
         Penalty_LateArrival = port.Penalty_LateArrival;
+       
+        demands = port.demands;
         
+        //--Ship
+        currentShip = new ShipCategoryDTO(port.currentShip);
+    
+        shp_timeTaken = port.shp_timeTaken;
+        shp_choseSpeed = port.shp_choseSpeed;
+
+        //ObjetiveFunction var
+        TotalHandlingCost  = port.TotalHandlingCost;        //CHdl :: $ |(DemandAmt+SupplyAmnt)*Port_CostPerFullContainer
+        TotalFuelTravelCost = port.TotalFuelTravelCost;      //Ctravel :: $ |previous port i to this port j
+        TotalFuelIdleCost  = port.TotalFuelIdleCost;        //CFIdle :: $ |for this port i, for duration of operation
+        TotalPenaltyCost = port.TotalPenaltyCost;         //CPnt :: $ |
+        TotalOperationalCost = port.TotalOperationalCost;
+    
         Remarks = port.Remarks;
         IsActive = port.IsActive;
         CreatedBy = port.CreatedBy;
-       
-        demands = port.demands;
 
     }
     public PortDTO (String[]arrCSVLine,IEventPortWaypoint IPortEvent){

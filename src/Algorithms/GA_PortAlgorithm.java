@@ -24,6 +24,7 @@ public class GA_PortAlgorithm {
     public double TargetOperationCostFitness;   //GUI
     public int tournamentSize;              //GUI
     public CoreEnum.SelectionType selectionType;     //GUI
+    public CoreEnum.FuelFunctionType FuelFunctionType;  //GUI
     
     public ShipCategoryDTO SelectedShipCategory;    //GUI
     public HashMap<Integer,PortDTO> IndexToPortMatrix;//GUI
@@ -37,7 +38,8 @@ public class GA_PortAlgorithm {
         HashMap<Integer,PortDTO> IndexToPortMatrix, double [][]TravelDistances,
         double TargetOperationCostFitness,
         int generationSize,int reproductionSize,float mutationRate,
-        CoreEnum.SelectionType type,int tournamentSize
+        CoreEnum.SelectionType type,int tournamentSize,
+        CoreEnum.FuelFunctionType Ftype
     ){
         this.SelectedShipCategory = SelectedShipCategory;
         this.numberOfPorts = numberOfPorts;
@@ -50,7 +52,11 @@ public class GA_PortAlgorithm {
         this.mutationRate = mutationRate;
         this.selectionType= type;
         this.tournamentSize= tournamentSize;
+        this.FuelFunctionType = Ftype;
         
+        if(FuelFunctionType == null){
+            System.out.println("Heloooo?");
+        }
         this.MaxIterations = 1000;
         this.genomeSize = numberOfPorts-1;
         
@@ -60,7 +66,10 @@ public class GA_PortAlgorithm {
         List<GAGenome> population  = new ArrayList<>();
         for(int i = 0 ;i<generationSize ; i++){
             //random GAGenome constructor
-            population.add(new GAGenome(numberOfPorts,IndexSelectedStartPort,IndexToPortMatrix,SelectedShipCategory,TravelDistances));
+        if(FuelFunctionType == null){
+            System.out.println("Heloooo?");
+        }
+            population.add(new GAGenome(numberOfPorts,IndexSelectedStartPort,IndexToPortMatrix,SelectedShipCategory,TravelDistances,FuelFunctionType));
             System.out.println("First Pop: Genene "+i);
         }
         
@@ -138,8 +147,10 @@ public class GA_PortAlgorithm {
             //essenstial, saying: get value, newVal from index i = 0 from parent2, get *index of that newVal from parent1Genome and swap those 2
             //if P2 index:0 has val: 1 and in P1 val:1 is at index 3, then we swap in P1 val at #3, j with val at #0, i 
         }
-        
-        children.add(new GAGenome(parent1Genome,numberOfPorts,IndexSelectedStartPort,IndexToPortMatrix,SelectedShipCategory,TravelDistances));
+        if(FuelFunctionType == null){
+            System.out.println("Heloooo?");
+        }
+        children.add(new GAGenome(parent1Genome,numberOfPorts,IndexSelectedStartPort,IndexToPortMatrix,SelectedShipCategory,TravelDistances,FuelFunctionType));
         
         //reset to modified parent back 
         parent1Genome = parents.get(0).getGenome();
@@ -148,7 +159,7 @@ public class GA_PortAlgorithm {
             int newVal = parent1Genome.get(i);
             Collections.swap(parent2Genome, parent2Genome.indexOf(newVal), i);
         }
-        children.add(new GAGenome(parent2Genome,numberOfPorts,IndexSelectedStartPort,IndexToPortMatrix,SelectedShipCategory,TravelDistances));
+        children.add(new GAGenome(parent2Genome,numberOfPorts,IndexSelectedStartPort,IndexToPortMatrix,SelectedShipCategory,TravelDistances,FuelFunctionType));
         
         return children;
     }
@@ -160,7 +171,7 @@ public class GA_PortAlgorithm {
             //if it mutate, return a new GAGenome
             List<Integer> genome = salesman.getGenome();
             Collections.swap(genome, random.nextInt(genomeSize), random.nextInt(genomeSize));
-            return new GAGenome (genome,numberOfPorts,IndexSelectedStartPort,IndexToPortMatrix,SelectedShipCategory,TravelDistances);
+            return new GAGenome (genome,numberOfPorts,IndexSelectedStartPort,IndexToPortMatrix,SelectedShipCategory,TravelDistances,FuelFunctionType);
         
         }
         
