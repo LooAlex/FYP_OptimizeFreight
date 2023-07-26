@@ -60,7 +60,7 @@ public class PortDTO extends DefaultWaypoint {
     // <editor-fold defaultstate="collapsed" desc="Simulation variable">
     
     //--Time
-    public float ETA; //Estimate Time Arrival.
+    public double ETA; //Estimate Time Arrival.
 
     //--Ship
     public ShipCategoryDTO currentShip;
@@ -76,6 +76,7 @@ public class PortDTO extends DefaultWaypoint {
     public double TotalFuelTravelCost;      //Ctravel :: $ |previous port i to this port j
     public double TotalFuelIdleCost;        //CFIdle :: $ |for this port i, for duration of operation
     public double TotalPenaltyCost;         //CPnt :: $ |
+    public double TotalValueFuelLeft_FinalHvi;
     public double TotalOperationalCost;
     // </editor-fold>
     

@@ -3,6 +3,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package Core;
+import java.awt.Component;
 import java.util.Random;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -15,6 +16,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JTable;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumnModel;
 import testArena.tuto_csv.CSV_Reader;
 
 /**
@@ -110,5 +114,22 @@ public final class  CoreFunctions  {
         df.setMaximumFractionDigits(decimalPoint);
             
         return df;
+    }
+    
+    public static void resizeColumnWidth(JTable table,int minWidth) {
+        final TableColumnModel columnModel = table.getColumnModel();
+        for (int column = 0; column < table.getColumnCount(); column++) {
+            for (int row = 0; row < table.getRowCount(); row++) {
+                TableCellRenderer renderer = table.getCellRenderer(row, column);
+                Component comp = table.prepareRenderer(renderer, row, column);
+                minWidth = Math.max(comp.getPreferredSize().width +1 , minWidth);
+            }
+            if(minWidth > 300){
+                minWidth = 300;
+                minWidth = Math.max(minWidth, table.getColumnModel().getColumn(column).getPreferredWidth());
+            }
+            columnModel.getColumn(column).setPreferredWidth(minWidth);
+        }
+        
     }
 }   

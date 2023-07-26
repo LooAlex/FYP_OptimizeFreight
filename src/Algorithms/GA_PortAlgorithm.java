@@ -29,6 +29,7 @@ public class GA_PortAlgorithm {
     public ShipCategoryDTO SelectedShipCategory;    //GUI
     public HashMap<Integer,PortDTO> IndexToPortMatrix;//GUI
     
+
     public int genomeSize;                  //HERE
     public int MaxIterations;                //HERE
     
@@ -93,7 +94,9 @@ public class GA_PortAlgorithm {
     public GAGenome rouletteSelection(List<GAGenome>population){
         double totalFitness = population.stream().map(GAGenome::getFitness).mapToDouble(Double::doubleValue).sum();
         //vatList.stream().map(T :: functioninT).mapToInt(
-        
+        if(totalFitness == Double.NaN || totalFitness < 0) {
+            System.out.println("");
+        }
         //pick random value
         Random random = new Random();
         int selectedValue = random.nextInt((int)totalFitness); //totalFitness = popFitness, using this to see which people are feed using random value 

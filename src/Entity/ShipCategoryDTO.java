@@ -63,7 +63,9 @@ public class ShipCategoryDTO extends BaseDTO{
     
     public double timeArrival;                      //tA :: Hour
     public double timeLeave;                        //tE :: Hour 
+    
     public double timeLate;                         //TLate :: Hour
+    public boolean isLate;
     
     public double TimeStartOper;                    //TS :: Hour | tA+0.5
     public double TotalOperationTime;               //ti ::HOUR
@@ -74,18 +76,22 @@ public class ShipCategoryDTO extends BaseDTO{
     public double CurrentBunkerAmount;              //bvi ::TON
     public double CurrentTotalBunkerHoldingCost;    //Hvi ::TON
     public double AvgCurrentBunkerHoldingCost;      //hvi ::TON
+    
     public double Dept_Bunker;                      //dvi ::TON
+    public boolean hasNoFuel;
    
     public double minAmountToBunkerUp;                //Yv ::TON
     public double minBunkerAmt;                      //yvi ::TON
+    
     public double AmountBunkered;                   //Bvi ::TON, total fuel bunkered , random value between 20% and bunkerCapacity
     public boolean hasBunkered;                     // true false
-    public int binaryBunkered;                      //Nvi {0,1} only.
     
     public double FuelConsumedIdle;                 //FIdle ::TON
     public double FuelConsumedTraveled;              //FTravel ::TON
     
     public int TotalAmountContainerCarried;         //Lvig = (Lvi +TotalDemands) ::number
+    public double AmountLoaded;
+    public double AmountUnloaded;
     public double CurrentShipPayload;               //Wij ::Ton  NoContainers*weight_Coeff + CurrentBunkerAmount(cuz in ton)
     public double totalLoadUnLoad;
     
@@ -167,6 +173,7 @@ public class ShipCategoryDTO extends BaseDTO{
         this.timeArrival = ship.timeArrival;                      //tA :: Hour
         this.timeLeave = ship.timeLeave;                        //tE :: Hour 
         this.timeLate = ship.timeLate;                         //TLate :: Hour
+        this.isLate = ship.isLate;
 
         this.TimeStartOper = ship.TimeStartOper;                    //TS :: Hour | tA+0.5
         this.TotalOperationTime = ship.TotalOperationTime;               //ti ::HOUR
@@ -178,15 +185,17 @@ public class ShipCategoryDTO extends BaseDTO{
         this.CurrentTotalBunkerHoldingCost = ship.CurrentTotalBunkerHoldingCost;    //Hvi ::TON
         this.AvgCurrentBunkerHoldingCost = ship.AvgCurrentBunkerHoldingCost;      //hvi ::TON
         this.Dept_Bunker = ship.Dept_Bunker;                      //dvi ::TON
-
+        this.hasNoFuel = ship.hasNoFuel;
         this.AmountBunkered = ship.AmountBunkered;                   //Bvi ::TON, total fuel bunkered , random value between 20% and bunkerCapacity
-
+        this.hasBunkered = ship.hasBunkered;
         this.FuelConsumedIdle = ship.FuelConsumedIdle;                 //FIdle ::TON
         this.FuelConsumedTraveled = ship.FuelConsumedTraveled;              //FTravel ::TON
 
         this.TotalAmountContainerCarried = ship.TotalAmountContainerCarried;         //Lvig = (Lvi +TotalDemands) ::number
         this.CurrentShipPayload = ship.CurrentShipPayload;               //Wij ::Ton  NoContainers*weight_Coeff + CurrentBunkerAmount(cuz in ton)
         this.totalLoadUnLoad = ship.totalLoadUnLoad;
+        this.AmountLoaded = ship.AmountLoaded;
+        this.AmountUnloaded = ship.AmountUnloaded;
         this.previousPortName = ship.previousPortName;
         
     }

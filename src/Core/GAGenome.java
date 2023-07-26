@@ -11,6 +11,7 @@ import DLL.*;
 import Entity.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.text.DecimalFormat;
 /**
  *
 * @author Loo Alex
@@ -192,12 +193,6 @@ public class GAGenome implements Comparable<GAGenome>{
     //how to calculate this fitness path?
     
     public double calculateFitness(CoreEnum.FuelFunctionType cal_FType){
-        
-        if(cal_FType == null){
-            System.out.println("YOO");
-        }
-        
-        
         double fitnessOper = 0;
         int IndexPreviousPort  = this.IndexStartingPort; //use this for matrix
         
@@ -221,7 +216,7 @@ public class GAGenome implements Comparable<GAGenome>{
  //current gene  = already traveled to port j
             resetShip_Port_DependentVariable();
             //getDistance From_PreviousPort To_CurrentPort
-            ship.DistanceTravel = travelDistances[IndexPreviousPort][IndexCurrentPort];
+            ship.DistanceTravel = (travelDistances[IndexPreviousPort][IndexCurrentPort] < 0 ? Integer.MAX_VALUE :travelDistances[IndexPreviousPort][IndexCurrentPort] );
             
             //getTimeTravel
             ship.timeTravel = ((ship.SelectedSpeed < 1.00d) ? 0.00d : ship.DistanceTravel /ship.SelectedSpeed);
@@ -230,9 +225,6 @@ public class GAGenome implements Comparable<GAGenome>{
             ship.BunkerLevelAtArrival = cal_uvi(ship.BunkerLevelAfterOper,cal_FType,this.ship);
             double travel = ship.FuelConsumedTraveled;
             double hvi = ship.AvgCurrentBunkerHoldingCost;
-            if( i!=0 && (travel == 0 || hvi == 0) ){
-                System.out.println("Something fishy First");
-            }
 //-------//cal CTrv
             
             currentPort.TotalFuelTravelCost = cal_CTrv(travel,hvi);
@@ -242,26 +234,35 @@ public class GAGenome implements Comparable<GAGenome>{
   //-------//CPnt
             //check penaltyLateArrival
             if(ship.timeArrival > ship.ETA && i != 0){
+                ship.isLate = true;
                 ship.timeLate = ship.timeArrival - ship.ETA;
-                currentPort.TotalPenaltyCost = currentPort.Penalty_LateArrival * ship.timeLate ;   
+                currentPort.TotalPenaltyCost = currentPort.Penalty_LateArrival * ship.timeLate *9999999;   
             }
             //check penaltyZeroBunker if <0.05*BunkerCap
             if(ship.BunkerLevelAtArrival < ship.CriticalBunkerLevelNew && i != 0){
                 if(ship.BunkerLevelAtArrival <= 0){
+                    ship.hasNoFuel = true;
                     //normalize and discourage negative or zero bunker
-                    ship.Dept_Bunker = (ship.BunkerLevelAtArrival *-1) + ship.CriticalBunkerLevelNew*1000.00;
+                    ship.Dept_Bunker = (ship.BunkerLevelAtArrival *-1) + ship.CriticalBunkerLevelNew*9999999;
+                    
                 }else{
-                    ship.Dept_Bunker = (ship.BunkerLevelAtArrival) + ship.CriticalBunkerLevelNew*10;
+                    ship.Dept_Bunker = (ship.BunkerLevelAtArrival) + ship.CriticalBunkerLevelNew*10000;
                 }
                 
                 currentPort.TotalPenaltyCost += ship.Dept_Bunker * ship.Penalty_ZeroBunker;
             }
             //check if need Bunkering
             //cal Bvi //rework when i add starting port again
-            if(ship.BunkerLevelAtArrival <= ship.minBunkerAmt && i != i_LastPort){
+            if(ship.BunkerLevelAtArrival <= ship.minBunkerAmt ){
                 //must not be origin and IndexLastPort = other port that need bunkering
-                randomBunkerAmount(this.ship);
-                
+                if(i !=i_LastPort){
+                    randomBunkerAmount(ship);
+                }
+                else{
+                    //handle non negative a last port
+                    ship.AmountBunkered = 1;
+                }
+                ship.hasBunkered = true;
             }else{
                 //i not origin and CurrentBunkerLevel is high or indexLastPort
                 ship.AmountBunkered  = 0;
@@ -301,13 +302,18 @@ public class GAGenome implements Comparable<GAGenome>{
                 //Choose a speed
                 randomSpeed();
                 //set TEst, Estimate Time of Arival
-                setShipETA();
+                setPortETA(i);
             }else{
                 ship.timeLeave = ship.TimeEndOper;
                 //finalHvi after all operations
                 final_Hvi = cal_FinalHvi(ship.AvgCurrentBunkerHoldingCost, ship.BunkerLevelAfterOper);
+                currentPort.TotalValueFuelLeft_FinalHvi = ( final_Hvi <0 ? final_Hvi*-1 : final_Hvi );
+                if(final_Hvi<0){
+                    final_Hvi=9999999;
+                    currentPort.TotalPenaltyCost = final_Hvi;
+                }
             }
-            
+    
             currentPort.shp_timeTaken = ship.timeLeave - ship.timeArrival ;
  //--CalOper + PortCall
             currentPort.TotalOperationalCost = currentPort.TotalFuelTravelCost + currentPort.PortCall_Cost +  currentPort.TotalPenaltyCost + currentPort.TotalHandlingCost + currentPort.TotalFuelIdleCost + final_Hvi;
@@ -341,7 +347,7 @@ public class GAGenome implements Comparable<GAGenome>{
         double SpeedToThisPort = 0.00d;
         double SpeedToNextPort = 0.00d;
         //DataPort Should be like the reusable history
-        
+        double previousBunkerAfterOper_Avi = 0.00d;
         for(int i = 0 ; i <DataPortsAlter.size(); i++){
             PortDTO currentPort  = DataPortsAlter.get(i);
             ShipCategoryDTO shipLeavingCurrentPort = currentPort.currentShip;
@@ -356,16 +362,47 @@ public class GAGenome implements Comparable<GAGenome>{
                 shipLeavingCurrentPort.BunkerLevelAtArrival = 0;
                 shipLeavingCurrentPort.CurrentBunkerAmount  = 0;
                 shipLeavingCurrentPort.CurrentTotalBunkerHoldingCost = 0;
-                shipLeavingCurrentPort.BunkerLevelAfterOper   = 0;     
+                shipLeavingCurrentPort.BunkerLevelAfterOper   = 0;    
+                shipLeavingCurrentPort.AvgCurrentBunkerHoldingCost = 0;
             }
             
-            shipLeavingCurrentPort.BunkerLevelAtArrival = cal_uvi(shipLeavingCurrentPort.BunkerLevelAfterOper,cal_FType,shipLeavingCurrentPort);
+            
+            shipLeavingCurrentPort.BunkerLevelAtArrival = cal_uvi(previousBunkerAfterOper_Avi,cal_FType,shipLeavingCurrentPort);
+//            if(shipLeavingCurrentPort.BunkerLevelAtArrival <= shipLeavingCurrentPort.CriticalBunkerLevelNew && i != 0 ){
+//                shipLeavingCurrentPort.hasNoFuel = true;
+//                currentPort.TotalPenaltyCost = Double.MAX_VALUE;
+//            }
             double travel = shipLeavingCurrentPort.FuelConsumedTraveled;
             double hvi = shipLeavingCurrentPort.AvgCurrentBunkerHoldingCost;
 //-------//cal CTrv
             currentPort.TotalFuelTravelCost = cal_CTrv(travel,hvi);
             
-            //dont bunker, asumed it was same
+            //check if need Bunkering
+            //cal Bvi //rework when i add starting port again
+            if(shipLeavingCurrentPort.BunkerLevelAtArrival <= shipLeavingCurrentPort.minBunkerAmt ){
+                if(shipLeavingCurrentPort.BunkerLevelAtArrival < 0){
+                    shipLeavingCurrentPort.hasNoFuel = true;
+                    
+                    currentPort.TotalPenaltyCost = Double.MAX_VALUE;
+                }
+                
+                if( shipLeavingCurrentPort.AmountBunkered <=0){
+                     //must not be origin and IndexLastPort = other port that need bunkering
+                    //the data have is considered the past, we are only reevaluating and if in the past it did not bunkr, but new formula recommend it , then it does
+                    //in case the new algo need to bunker and it did not bunker previously
+                    if(i !=i_LastPort){
+                        randomBunkerAmount(shipLeavingCurrentPort);
+                    }
+                    else{
+                        //handle non negative at last port
+                        shipLeavingCurrentPort.AmountBunkered = 1;
+                    }
+                    shipLeavingCurrentPort.hasBunkered = true;
+                }
+               
+                
+                
+            }//else keep amount bunkered same 
             //set bvi
             set_bvi_CurrentBunkerAmount(shipLeavingCurrentPort);
             
@@ -379,13 +416,22 @@ public class GAGenome implements Comparable<GAGenome>{
             if(i != i_LastPort){
                 final_Hvi = 0;
             }else{
+                
                 final_Hvi = cal_FinalHvi(shipLeavingCurrentPort.AvgCurrentBunkerHoldingCost, shipLeavingCurrentPort.BunkerLevelAfterOper);
+                currentPort.TotalValueFuelLeft_FinalHvi  = final_Hvi;
+                
+                if(final_Hvi<0){
+                    final_Hvi=9999999;
+                    currentPort.TotalPenaltyCost = final_Hvi;
+                }
+               
             }
             
  //--CalOper + PortCall
             currentPort.TotalOperationalCost = currentPort.TotalFuelTravelCost + currentPort.PortCall_Cost +  currentPort.TotalPenaltyCost + currentPort.TotalHandlingCost + currentPort.TotalFuelIdleCost + final_Hvi;
             fitnessOperNew += currentPort.TotalOperationalCost;
             SpeedToThisPort = SpeedToNextPort;
+            previousBunkerAfterOper_Avi = shipLeavingCurrentPort.BunkerLevelAfterOper;
         }
         
         toPath();
@@ -399,8 +445,9 @@ public class GAGenome implements Comparable<GAGenome>{
             DataPortsAlter.add(new PortDTO(DataPortHistory.get(i)));
         }
     }
-    public void setShipETA(){
-        ship.ETA = ship.timeLeave+ship.weeklyFrequencyHour;
+    public void setPortETA(int i){
+        //visiting a port each 2 weeks
+        ship.ETA =ship.weeklyFrequencyHour*(i+1);
     }
     public void setShipTimeArrivalAtPort(){
         ship.timeArrival = ship.timeLeave+ship.timeTravel;
@@ -431,11 +478,17 @@ public class GAGenome implements Comparable<GAGenome>{
     }
     public void set_bvi_CurrentBunkerAmount(ShipCategoryDTO ship){
         double excessBunker = 0;
-        if(ship.AmountBunkered > ship.BunkerCapacity){
-            //remove excess, now BunkerLevel  is max
-            excessBunker = ship.AmountBunkered - ship.BunkerCapacity; 
-            ship.AmountBunkered -= excessBunker;
+        
+        //if negative, we already settle the dept, reset it to zero here.
+        if(ship.BunkerLevelAtArrival<0){
+            ship.BunkerLevelAtArrival = 0;   
         }
+        
+        if((ship.AmountBunkered+ship.BunkerLevelAtArrival) >= ship.BunkerCapacity){
+            //remove excess, now BunkerLevel  is max
+            excessBunker = ship.AmountBunkered+ship.BunkerLevelAtArrival - ship.BunkerCapacity; 
+            ship.AmountBunkered  = ship.AmountBunkered- excessBunker;
+        } 
         ship.CurrentBunkerAmount = ship.BunkerLevelAtArrival + ship.AmountBunkered;   
         
     }
@@ -446,6 +499,8 @@ public class GAGenome implements Comparable<GAGenome>{
         ship.AvgCurrentBunkerHoldingCost= ship.CurrentTotalBunkerHoldingCost/ship.CurrentBunkerAmount;   
     }
     public double cal_ti(int AmtSupply,int AmtDemand,double timeShipToLoadUnloadContainer){
+        ship.AmountLoaded = AmtDemand;
+        ship.AmountUnloaded = AmtSupply;
         ship.totalLoadUnLoad = (AmtDemand+AmtSupply);
         return ship.totalLoadUnLoad*timeShipToLoadUnloadContainer;
     }
@@ -471,13 +526,16 @@ public class GAGenome implements Comparable<GAGenome>{
     
     public void resetShip_Port_DependentVariable(){
         
-        
+        ship.isLate = false;
+        ship.hasBunkered = false;
+        ship.hasNoFuel = false;
         ship.TimeStartOper = 0;
         ship.TimeEndOper = 0;
         ship.TotalOperationTime = 0;
         ship.timeLate = 0;
         ship.DistanceTravel = 0;
         ship.AmountBunkered = 0;
+        ship.Dept_Bunker = 0;
         //1.00 or 1.00d java see as double
         //1.00f java see as float
     }
@@ -513,6 +571,65 @@ public class GAGenome implements Comparable<GAGenome>{
         }
         Path = sb.toString();
     }
+    
+    public LinkedList<Object[]> convertDataPortToStringArray(ArrayList<PortDTO> DataPort){
+        LinkedList<Object[]> converted = new LinkedList<>();
+        
+        if(DataPort!= null && DataPort.size()>2){
+            for(int i =0; i<DataPort.size(); i++){
+                DecimalFormat df = CoreFunctions.getDecimalFormat(2);
+                
+                String sequenceNo       = i+1+"";
+                String PortFromName     = (i == 0 ? "-" : DataPort.get(i).currentShip.previousPortName);
+                String PortToName       = DataPort.get(i).PortName;
+                String Distance         = df.format(DataPort.get(i).currentShip.DistanceTravel);
+                String Speed            = df.format(DataPort.get(i).shp_choseSpeed  );
+                String Time             = df.format(DataPort.get(i).shp_timeTaken  );
+                String FuelConsumedTravel   = df.format(DataPort.get(i).currentShip.FuelConsumedTraveled  );
+                
+                String TimeArrival      = df.format(DataPort.get(i).currentShip.timeArrival  );
+                String TimeLeft         = df.format(DataPort.get(i).currentShip.timeLeave  );
+                
+                String FuelArrival      = df.format(DataPort.get(i).currentShip.BunkerLevelAtArrival  );
+                String FuelAtLeave      = df.format(DataPort.get(i).currentShip.BunkerLevelAfterOper  );
+                
+                String PortSupply       = df.format(DataPort.get(i).currentShip.AmountUnloaded  );
+                String PortDemand       = df.format(DataPort.get(i).currentShip.AmountLoaded   );
+                String CostPerContainer = df.format(DataPort.get(i).Port_CostPerFullContainer  );
+                String OperTime         = df.format(DataPort.get(i).shp_timeTaken  );
+                String OperFuelConsumed = df.format(DataPort.get(i).currentShip.FuelConsumedIdle  );
+                
+                boolean HasBunker       = DataPort.get(i).currentShip.hasBunkered  ;
+                String AmountBunkered   = df.format(DataPort.get(i).currentShip.AmountBunkered  );
+                String PortFuelPrice    =  df.format(DataPort.get(i).Port_FuelPrice ); 
+                boolean IsLate          = DataPort.get(i).currentShip.isLate  ;
+                String TimeLate         = df.format(DataPort.get(i).currentShip.timeLate  );
+                
+                boolean HasNoFuel       = DataPort.get(i).currentShip.hasNoFuel  ;
+                String DeptBunker       = df.format(DataPort.get(i).currentShip.Dept_Bunker  );
+               
+                String PortCall         = df.format(DataPort.get(i).PortCall_Cost  );
+                String TotalTravelCost  = df.format(DataPort.get(i).TotalFuelTravelCost  );
+                String TotalIdleFuelCost   = df.format(DataPort.get(i).TotalFuelIdleCost  );
+                String TotalHandlingCost    = df.format(DataPort.get(i).TotalHandlingCost  );
+                String TotalPenaltyCost     = df.format(DataPort.get(i).TotalPenaltyCost  );
+                String TotalValueFuelLeft   = df.format(DataPort.get(i).TotalValueFuelLeft_FinalHvi  );
+                String TotalOperatingCost   = df.format(DataPort.get(i).TotalOperationalCost  );
+
+                converted.add(new Object[]{
+                    sequenceNo,PortFromName,PortToName,Distance,Speed,Time,FuelConsumedTravel,
+                    TimeArrival,TimeLeft,
+                    FuelArrival,FuelAtLeave,
+                    PortSupply,PortDemand,CostPerContainer,OperTime,OperFuelConsumed,
+                    HasBunker,AmountBunkered,PortFuelPrice,
+                    IsLate,TimeLate,
+                    HasNoFuel,DeptBunker,
+                    PortCall,TotalTravelCost,TotalIdleFuelCost,TotalHandlingCost,TotalPenaltyCost,TotalValueFuelLeft,
+                    TotalOperatingCost});
+            }
+        }
+        return converted;
+    }
     @Override
     public int compareTo(GAGenome genome) {
         if(this.fitness > genome.getFitness())
@@ -533,5 +650,6 @@ public class GAGenome implements Comparable<GAGenome>{
         
         return sb.toString();
     }
+    
     
 }
