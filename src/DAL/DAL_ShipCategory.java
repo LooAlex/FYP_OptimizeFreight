@@ -37,21 +37,14 @@ public class DAL_ShipCategory {
         try
         {
             Connection conn = _DBHelper.createConnection();
-        
             CallableStatement statement = conn.prepareCall("{call ShipCategory_GetAll()}");
-
             ResultSet rs = statement.executeQuery();//use this to execute the current SP or query inside that stm
-           
-            
             while(rs.next()){
                 lst.add(new ShipCategoryDTO(rs));
             }
-            
             statement.close();
             conn.close();
- 
             System.out.println("Stored procedure called successfully!  ShipCategory_GetAll");
-            
             
         }catch(Exception ex){
            ex.printStackTrace();

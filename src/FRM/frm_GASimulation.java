@@ -333,14 +333,12 @@ public class frm_GASimulation extends javax.swing.JFrame {
     }
     
     public void getShipCategorys(){
-        DAL_ShipCategory ddlShipCategory  = new DAL_ShipCategory();
-        var result  = ddlShipCategory.getShipCategorys();
+        DAL_ShipCategory dalShipCategory  = new DAL_ShipCategory();
+        var result  = dalShipCategory.getShipCategorys();
         if(result.Data.size()>0){
             myShipCats = result.Data;  
             initCboShipCategory();
-        }
-        
-        
+        } 
         
     }
     public void setShipCategoryToGUIDisplay(ShipCategoryDTO s){
