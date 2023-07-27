@@ -10,6 +10,7 @@ import java.lang.constant.DirectMethodHandleDesc;
 import java.math.BigDecimal;
 import java.util.List;
 import java.sql.*;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.stream.DoubleStream;
@@ -206,5 +207,49 @@ public class ShipCategoryDTO extends BaseDTO{
     
     }
     
-    
+        public Object[] convertListShipToStringArray(){
+        //use this.ship
+            
+//                DecimalFormat df = CoreFunctions.getDecimalFormat(2);
+//                
+//                String sequenceNo       = 
+//                String PortFromName     = ( == 0 ? "-" : DataPort.get(i).currentShip.previousPortName);
+//                String PortToName       = DataPort.get(i).PortName;
+//                String Distance         = df.format(DataPort.get(i).currentShip.DistanceTravel);
+//                String Speed            = df.format(DataPort.get(i).shp_choseSpeed  );
+//                String Time             = df.format(DataPort.get(i).shp_timeTaken  );
+//                String FuelConsumedTravel   = df.format(DataPort.get(i).currentShip.FuelConsumedTraveled  );
+//                
+//                String TimeArrival      = df.format(DataPort.get(i).currentShip.timeArrival  );
+//                String TimeLeft         = df.format(DataPort.get(i).currentShip.timeLeave  );
+//                
+//                String FuelArrival      = df.format(DataPort.get(i).currentShip.BunkerLevelAtArrival  );
+//                String FuelAtLeave      = df.format(DataPort.get(i).currentShip.BunkerLevelAfterOper  );
+//                
+//                String PortSupply       = df.format(DataPort.get(i).currentShip.AmountUnloaded  );
+//                String PortDemand       = df.format(DataPort.get(i).currentShip.AmountLoaded   );
+//                String CostPerContainer = df.format(DataPort.get(i).Port_CostPerFullContainer  );
+//                String OperTime         = df.format(DataPort.get(i).shp_timeTaken  );
+//                String OperFuelConsumed = df.format(DataPort.get(i).currentShip.FuelConsumedIdle  );
+//                
+//                boolean HasBunker       = DataPort.get(i).currentShip.hasBunkered  ;
+//                String AmountBunkered   = df.format(DataPort.get(i).currentShip.AmountBunkered  );
+//                String PortFuelPrice    =  df.format(DataPort.get(i).Port_FuelPrice ); 
+//                boolean IsLate          = DataPort.get(i).currentShip.isLate  ;
+//                String TimeLate         = df.format(DataPort.get(i).currentShip.timeLate  );
+//                
+//                boolean HasNoFuel       = DataPort.get(i).currentShip.hasNoFuel  ;
+//                String DeptBunker       = df.format(DataPort.get(i).currentShip.Dept_Bunker  );
+//               
+//                String PortCall         = df.format(DataPort.get(i).PortCall_Cost  );
+//                String TotalTravelCost  = df.format(DataPort.get(i).TotalFuelTravelCost  );
+//                String TotalIdleFuelCost   = df.format(DataPort.get(i).TotalFuelIdleCost  );
+//                String TotalHandlingCost    = df.format(DataPort.get(i).TotalHandlingCost  );
+//                String TotalPenaltyCost     = df.format(DataPort.get(i).TotalPenaltyCost  );
+//                String TotalValueFuelLeft   = df.format(DataPort.get(i).TotalValueFuelLeft_FinalHvi  );
+//                String TotalOperatingCost   = df.format(DataPort.get(i).TotalOperationalCost  );
+
+
+        return new Object[]{};
+    }
 }

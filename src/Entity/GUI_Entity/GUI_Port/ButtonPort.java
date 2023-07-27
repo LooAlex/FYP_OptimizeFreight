@@ -15,14 +15,16 @@ import javax.swing.border.Border;
 public class ButtonPort extends JButton{
 
     public ButtonPort (){
-        setContentAreaFilled(false); //<<setContentAreaFilled(false) will make button fill area blank aka empty/transparent>>
+        setContentAreaFilled(false); 
         
-        ImageIcon newImageIcon = new ImageIcon(new ImageIcon(getClass().getResource("/Icons/myPin.png")).getImage().getScaledInstance(24, 24, Image.SCALE_SMOOTH));
+        ImageIcon newImageIcon = new ImageIcon(new ImageIcon(
+                getClass().getResource("/Icons/myPin.png")
+        ).getImage().getScaledInstance(24, 24, Image.SCALE_SMOOTH));
         
         setIcon(newImageIcon);
         
-        setCursor(new Cursor(Cursor.HAND_CURSOR));//this change the cursor from arrow to hand cursor when on top of a waypoint>>
-        setSize(24, 24);//set the size of this button waypoint, it tuto it was 24,24
+        setCursor(new Cursor(Cursor.HAND_CURSOR));
+        setSize(24, 24);
         
         //remove border
         Border emptyBorder = BorderFactory.createEmptyBorder();

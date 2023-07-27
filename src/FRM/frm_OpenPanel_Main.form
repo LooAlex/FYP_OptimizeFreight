@@ -24,18 +24,13 @@
             <Property name="text" type="java.lang.String" value="Ship"/>
           </Properties>
           <SubComponents>
-            <MenuItem class="javax.swing.JMenuItem" name="miCreateShip">
+            <MenuItem class="javax.swing.JMenuItem" name="miViewShip">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Create Ship"/>
+                <Property name="text" type="java.lang.String" value="View Ship Categories"/>
               </Properties>
               <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="miCreateShipActionPerformed"/>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="miViewShipActionPerformed"/>
               </Events>
-            </MenuItem>
-            <MenuItem class="javax.swing.JMenuItem" name="miEditShip">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Edit Ship"/>
-              </Properties>
             </MenuItem>
           </SubComponents>
         </Menu>
@@ -44,15 +39,13 @@
             <Property name="text" type="java.lang.String" value="Port"/>
           </Properties>
           <SubComponents>
-            <MenuItem class="javax.swing.JMenuItem" name="miCreatePort">
+            <MenuItem class="javax.swing.JMenuItem" name="miViewPorts">
               <Properties>
-                <Property name="text" type="java.lang.String" value="CreatePort"/>
+                <Property name="text" type="java.lang.String" value="View Ports"/>
               </Properties>
-            </MenuItem>
-            <MenuItem class="javax.swing.JMenuItem" name="miEditPort">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Edit Port"/>
-              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="miViewPortsActionPerformed"/>
+              </Events>
             </MenuItem>
           </SubComponents>
         </Menu>

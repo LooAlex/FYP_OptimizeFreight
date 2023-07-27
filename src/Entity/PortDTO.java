@@ -11,7 +11,10 @@ import com.fasterxml.jackson.databind.ser.PropertyBuilder;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.LinkedList;
 
 import javax.swing.JButton;
 import jdk.jfr.Description;
@@ -481,7 +484,38 @@ public class PortDTO extends DefaultWaypoint {
         return this.getPortName();
     }
     
-    
+        public Object[] convertListPortToStringArray(){
+        
+        
+        
+//
+//                DecimalFormat df = CoreFunctions.getDecimalFormat(2);
+//                
+//                String PortID       = 
+//                String PortName       = DataPort.get(i).PortName;
+//               
+//                String PortDemand       = df.format(DataPort.get(i).currentShip.AmountLoaded   );
+//                String CostPerContainer = df.format(DataPort.get(i).Port_CostPerFullContainer  );
+//                
+//                String PortFuelPrice    =  df.format(DataPort.get(i).Port_FuelPrice ); 
+//               
+//               
+//                String PortCall         = df.format(DataPort.get(i).PortCall_Cost  );
+//                
+//                converted.add(new Object[]{
+//                    sequenceNo,PortFromName,PortToName,Distance,Speed,Time,FuelConsumedTravel,
+//                    TimeArrival,TimeLeft,
+//                    FuelArrival,FuelAtLeave,
+//                    PortSupply,PortDemand,CostPerContainer,OperTime,OperFuelConsumed,
+//                    HasBunker,AmountBunkered,PortFuelPrice,
+//                    IsLate,TimeLate,
+//                    HasNoFuel,DeptBunker,
+//                    PortCall,TotalTravelCost,TotalIdleFuelCost,TotalHandlingCost,TotalPenaltyCost,TotalValueFuelLeft,
+//                    TotalOperatingCost});
+//            
+        
+        return new Object[]{};
+    }
     
 }
 

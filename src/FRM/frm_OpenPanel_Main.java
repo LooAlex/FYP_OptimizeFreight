@@ -31,11 +31,9 @@ public class frm_OpenPanel_Main extends javax.swing.JFrame {
         mnSimulationMenu = new javax.swing.JMenu();
         miGASimulation = new javax.swing.JMenuItem();
         mnShip = new javax.swing.JMenu();
-        miCreateShip = new javax.swing.JMenuItem();
-        miEditShip = new javax.swing.JMenuItem();
+        miViewShip = new javax.swing.JMenuItem();
         jMenu3 = new javax.swing.JMenu();
-        miCreatePort = new javax.swing.JMenuItem();
-        miEditPort = new javax.swing.JMenuItem();
+        miViewPorts = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("MainFrame");
@@ -54,26 +52,25 @@ public class frm_OpenPanel_Main extends javax.swing.JFrame {
 
         mnShip.setText("Ship");
 
-        miCreateShip.setText("Create Ship");
-        miCreateShip.addActionListener(new java.awt.event.ActionListener() {
+        miViewShip.setText("View Ship Categories");
+        miViewShip.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                miCreateShipActionPerformed(evt);
+                miViewShipActionPerformed(evt);
             }
         });
-        mnShip.add(miCreateShip);
-
-        miEditShip.setText("Edit Ship");
-        mnShip.add(miEditShip);
+        mnShip.add(miViewShip);
 
         MainMenuBar.add(mnShip);
 
         jMenu3.setText("Port");
 
-        miCreatePort.setText("CreatePort");
-        jMenu3.add(miCreatePort);
-
-        miEditPort.setText("Edit Port");
-        jMenu3.add(miEditPort);
+        miViewPorts.setText("View Ports");
+        miViewPorts.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                miViewPortsActionPerformed(evt);
+            }
+        });
+        jMenu3.add(miViewPorts);
 
         MainMenuBar.add(jMenu3);
 
@@ -99,9 +96,15 @@ public class frm_OpenPanel_Main extends javax.swing.JFrame {
         
     }//GEN-LAST:event_miGASimulationActionPerformed
 
-    private void miCreateShipActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miCreateShipActionPerformed
+    private void miViewShipActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miViewShipActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_miCreateShipActionPerformed
+        new frm_ViewShipCategory().setVisible(true);
+    }//GEN-LAST:event_miViewShipActionPerformed
+
+    private void miViewPortsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miViewPortsActionPerformed
+        // TODO add your handling code here:
+        new frm_ViewPort().setVisible(true);
+    }//GEN-LAST:event_miViewPortsActionPerformed
 
     /**
      * @param args the command line arguments
@@ -142,11 +145,9 @@ public class frm_OpenPanel_Main extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuBar MainMenuBar;
     private javax.swing.JMenu jMenu3;
-    private javax.swing.JMenuItem miCreatePort;
-    private javax.swing.JMenuItem miCreateShip;
-    private javax.swing.JMenuItem miEditPort;
-    private javax.swing.JMenuItem miEditShip;
     private javax.swing.JMenuItem miGASimulation;
+    private javax.swing.JMenuItem miViewPorts;
+    private javax.swing.JMenuItem miViewShip;
     private javax.swing.JMenu mnShip;
     private javax.swing.JMenu mnSimulationMenu;
     // End of variables declaration//GEN-END:variables

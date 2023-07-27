@@ -5,9 +5,8 @@
 package FRM;
 
 import Algorithms.GA_PortAlgorithm;
-import Algorithms.RouteGenome;
 import BLL.RoutingService;
-import DLL.*;
+import DAL.*;
 import BLL.*;
 import Core.*;
 import Core.CoreData;
@@ -334,7 +333,7 @@ public class frm_GASimulation extends javax.swing.JFrame {
     }
     
     public void getShipCategorys(){
-        DLL_ShipCategory ddlShipCategory  = new DLL_ShipCategory();
+        DAL_ShipCategory ddlShipCategory  = new DAL_ShipCategory();
         var result  = ddlShipCategory.getShipCategorys();
         if(result.Data.size()>0){
             myShipCats = result.Data;  
@@ -369,7 +368,7 @@ public class frm_GASimulation extends javax.swing.JFrame {
     }
     
     public void getContainerTypes(){
-        DLL_ContainerType dllContainerType = new DLL_ContainerType();
+        DAL_ContainerType dllContainerType = new DAL_ContainerType();
         var result = dllContainerType.getContainerType_ListByRow(1);
         if(result.Data != null && result.Data.size() > 0){
             SelectedContainerType = result.Data.get(0);
@@ -385,38 +384,30 @@ public class frm_GASimulation extends javax.swing.JFrame {
         }
     }
     public void getPorts(){
-
-        
-        DLL_Port dllport = new DLL_Port();
+        DAL_Port dllport = new DAL_Port();
         var result = dllport.getPorts(IPEvent);
-        
-       // var result = dllport.getPort_ListByRow(1, IPEvent);
-       
+
          if (result.errors.hasErrors){
             System.out.println("ErrorsMessage:" + result.errors.errorMessages.toString());
         }else{
-             lstPorts = result.Data; //expecting List<String[]>
+            lstPorts = result.Data;
              
-             int length = lstPorts.size();
-             var PortNames = new ArrayList<String>();
-            
+            int length = lstPorts.size();
+            var PortNames = new ArrayList<String>();  
             int displayRow =0;
             int displayCol = 2;
             int divide=(PortNames.size()%displayCol);
              //incase "divide" is not a factor of col, 3, it means we will have 1 extra row to display
-             if(divide>0)
+            if(divide>0)
                  divide+=1;
 
              //increment the number of rows
-             for(int i=0;i<divide;i++)
+            for(int i=0;i<divide;i++)
                  displayRow++;
 
-             arrCheckBoxPort = new JCheckBox[length];
-            
-
-           
-            jpCheckBoxContainer.setLayout(new GridLayout(displayRow,displayCol,6,6));
-           
+            //Creating CheckBox
+            arrCheckBoxPort = new JCheckBox[length];
+            jpCheckBoxContainer.setLayout(new GridLayout(displayRow,displayCol,6,6));  
             for(int i = 0; i<length; i++){
                
                //SelectedPorts.add(lstPorts.get(i));
@@ -432,14 +423,15 @@ public class frm_GASimulation extends javax.swing.JFrame {
     public void setSelectedPortsToDisplay(){
         clearUIwithPort(); //clear set and lst, cbo port selected
         SelectedStartPort = null;
+        
         //getNewSelected
         for(int i = 0 ; i<lstPorts.size();i++){
             if(arrCheckBoxPort[i].isSelected()){
-                setSelectedPorts.add(lstPorts.get(i)); //used only for waypoints rendering 
+                setSelectedPorts.add(lstPorts.get(i)); //selected waypoints  
             }
         }
         
-        lstSelectedPorts.addAll(setSelectedPorts); //fix the index, in whatever way set decided to store its data.
+        lstSelectedPorts.addAll(setSelectedPorts); //fix new starting port
         
         initUIPort();//render new ports selected
         
@@ -1780,10 +1772,7 @@ public class frm_GASimulation extends javax.swing.JFrame {
 
     private void btnAddPortActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddPortActionPerformed
         // TODO add your handling code here:
-        // addPort(new PortDTO("P001","Test before Lorete",PortDTO.PointType.START,IPEvent,new GeoPosition(-20.16366002209838, 57.50698320195978)));
-        // addPort(new PortDTO("P002","Test before Citadel",PortDTO.PointType.END,IPEvent,new GeoPosition(-20.162778782150987, 57.507959525974705)));//change this from on top f citadele to the road before citadelle
         setSelectedPortsToDisplay();
-
     }//GEN-LAST:event_btnAddPortActionPerformed
 
     private void btnAlterFuelFunctionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAlterFuelFunctionActionPerformed
@@ -1832,7 +1821,7 @@ public class frm_GASimulation extends javax.swing.JFrame {
                 //2 Create IndexOrder:PortIDMatrix
                 HashMap<Integer,PortDTO> IndexToPortMatrix = new HashMap<>();
 
-                DLL_PortPair dllPortPair = new DLL_PortPair();
+                DAL_PortPair dllPortPair = new DAL_PortPair();
 
                 int numberOfPorts = lstSelectedPorts.size();
 

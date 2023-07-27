@@ -37,21 +37,7 @@ public class FYP_OptimizationInFreightTransportation {
     public static void main(String[] args) {    
         init();
         
-        Scanner sc = new Scanner(System.in);
         new frm_OpenPanel_Main().setVisible(true);//main work             
-        
-        // <editor-fold defaultstate="collapsed" desc="TestArena">
-       
-        String codeActi = "";
-        //System.out.println("Enter activationCode, it work once");
-        //codeActi = sc.nextLine();
-        codeActi  = "";
-        
-        callingTestArena(codeActi.toLowerCase());
-        // </editor-fold> 
-        
-
-        
         
     }
     
@@ -69,30 +55,5 @@ public class FYP_OptimizationInFreightTransportation {
         
     }
     
-   
-    
-    public static void callingTestArena(String codeActivation){
-       switch(codeActivation){
-            case "map":        
-               new frm_tst_Map().setVisible(true);
-               break;
-               
-            case "csv":
-               new CSV_Reader().readCSV();
-               break;   
-               
-            case "ga":
-                tst_GA ga = new tst_GA();
-             
-               break;
-               
-            case "abc":
-               break;
-               
-           default:
-               break;   
-       }
-    }
-
     
 }

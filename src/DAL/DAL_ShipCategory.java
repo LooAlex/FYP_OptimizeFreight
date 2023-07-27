@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package DLL;
+package DAL;
 import java.sql.*;
 import Core.*;
 import Entity.*;
@@ -13,18 +13,18 @@ import java.util.logging.Logger;
  *
  * @author Loo Alex
  */
-public class DLL_ShipCategory {
+public class DAL_ShipCategory {
      private DBHelper _DBHelper;
      
      
-    public DLL_ShipCategory() {
+    public DAL_ShipCategory() {
         try {
             _DBHelper = new DBHelper();
             
         } catch (SQLException ex) {
-            Logger.getLogger(DLL_InitAll.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(DAL_ShipCategory.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ClassNotFoundException ex) {
-            Logger.getLogger(DLL_InitAll.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(DAL_ShipCategory.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
         
