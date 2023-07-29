@@ -14,6 +14,9 @@ import javax.swing.text.DocumentFilter;
  * @author Loo Alex
  */
  public class MyIntFilter extends DocumentFilter {
+     public MyIntFilter(){
+         
+     }
         @Override
         public void insertString(DocumentFilter.FilterBypass fb, int offset, String string,
               AttributeSet attr) throws BadLocationException {

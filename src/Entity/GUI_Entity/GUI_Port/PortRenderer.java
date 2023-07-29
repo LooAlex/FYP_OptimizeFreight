@@ -19,6 +19,9 @@ import org.jxmapviewer.viewer.WaypointPainter;
  */
 public class PortRenderer extends WaypointPainter<PortDTO>{
 
+    public PortRenderer() {
+    }
+    
     @Override
     protected void doPaint(Graphics2D g, JXMapViewer map, int width, int height) {
         for(PortDTO prt : getWaypoints()){

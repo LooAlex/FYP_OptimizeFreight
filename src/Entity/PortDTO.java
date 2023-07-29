@@ -25,277 +25,340 @@ import org.jxmapviewer.viewer.GeoPosition;
  *
  * @author Loo Alex
  //PortDTO extends DefaultWaypoint
- //UnLoCode,PortName,IsActive,CreatedBy,CreatedDate,ModifiedBy,ModifiedDate inherited from BaseDTO
+ //unLoCode,portName,isActive,createdBy,createdDate,modifiedBy,modifiedDate inherited from BaseDTO
  */
 public class PortDTO extends DefaultWaypoint {
-    
-    public int PortID;
 
-    public int CountryID;                   //Country
-    public String CountryName; 
-    
-    public int CabotageRegionID;         //CabotageRegion
-    public String CabotageRegionName;
-    
-    public int RegionID;                    //D_region
-    public String RegionName;               
+    public int portID;
 
-    public String UnLoCode = "";            //ex: P001 //UnLocode
-    public String PortName = "";         //PortName -> PortDTO-Louis
+    public int countryID;                   //Country
+    public String countryName; 
+    
+    public int cabotageRegionID;         //CabotageRegion
+    public String cabotageRegionName;
+    
+    public int regionID;                    //D_region
+    public String regionName;               
 
-    public double PortLat;                  //Latitude
-    public double PortLon;                  //Longitude
+    public String unLoCode = "";            //ex: P001 //UnLocode
+    public String portName = "";         //PortName -> PortDTO-Louis
+
+    public double portLat;                  //Latitude
+    public double portLon;                  //Longitude
     
     //--PortCall
-    public double PortCall_Cost ;        //Both BunkerPrice and DockingCost
+    public double portCall_Cost ;        //Both BunkerPrice and DockingCost
     
     //--Fuel
-    public double Port_FuelPrice ;
-    public boolean CanBunker;
+    public double port_FuelPrice ;
+    public boolean canBunker;
     
     //--Containters
-    public double Port_CostPerFullContainer;   
+    public double port_CostPerFullContainer;   
     
     //--Penalty
-    public double Penalty_LateArrival;
+    public double penalty_LateArrival;
     
-    
-    // <editor-fold defaultstate="collapsed" desc="Simulation variable">
-    
-    //--Time
-    public double ETA; //Estimate Time Arrival.
 
     //--Ship
     public ShipCategoryDTO currentShip;
     
-    public double shp_timeTaken;
-    public double shp_choseSpeed;
+    public double shp_PortTimeTaken;
+    public double shp_chosenSpeed;
  
     public DemandDTO demands;
- 
     
     //ObjetiveFunction var
-    public double TotalHandlingCost;        //CHdl :: $ |(DemandAmt+SupplyAmnt)*Port_CostPerFullContainer
-    public double TotalFuelTravelCost;      //Ctravel :: $ |previous port i to this port j
-    public double TotalFuelIdleCost;        //CFIdle :: $ |for this port i, for duration of operation
-    public double TotalPenaltyCost;         //CPnt :: $ |
-    public double TotalValueFuelLeft_FinalHvi;
-    public double TotalOperationalCost;
-    // </editor-fold>
+    public double totalHandlingCost;        //CHdl :: $ |(DemandAmt+SupplyAmnt)*port_CostPerFullContainer
+    public double totalFuelTravelCost;      //Ctravel :: $ |previous port i to this port j
+    public double totalFuelIdleCost;        //CFIdle :: $ |for this port i, for duration of operation
+    public double totalPenaltyCost;         //CPnt :: $ |
+    public double totalValueFuelLeft_FinalHvi;
+    public double totalOperationalCost;
     
     //--
-    public  String Remarks = "";
-    public boolean IsActive;
+    public  String remarks = "";
+    public boolean isActive;
 
-    public int CreatedBy;
-    public OffsetDateTime CreatedDate;
-    public int ModifiedBy;
-    public OffsetDateTime ModifiedDate;
-    public int RecordID;//general ID incase we need a general ID to use across tables.
+    public int createdBy;
+    public OffsetDateTime createdDate;
+    public int modifiedBy;
+    public OffsetDateTime modifiedDate;
+    public int recordID;//general ID incase we need a general ID to use across tables.
     
     //Waypoint
     private JButton button;
     private PointType pointType;
-    
-    // <editor-fold defaultstate="collapsed" desc="Get Set PortDTO">
+
+    public int getPortID() {
+        return portID;
+    }
+
+    public void setPortID(int portID) {
+        this.portID = portID;
+    }
+
+    public int getCountryID() {
+        return countryID;
+    }
+
+    public void setCountryID(int countryID) {
+        this.countryID = countryID;
+    }
+
+    public String getCountryName() {
+        return countryName;
+    }
+
+    public void setCountryName(String countryName) {
+        this.countryName = countryName;
+    }
+
+    public int getCabotageRegionID() {
+        return cabotageRegionID;
+    }
+
+    public void setCabotageRegionID(int cabotageRegionID) {
+        this.cabotageRegionID = cabotageRegionID;
+    }
+
+    public String getCabotageRegionName() {
+        return cabotageRegionName;
+    }
+
+    public void setCabotageRegionName(String cabotageRegionName) {
+        this.cabotageRegionName = cabotageRegionName;
+    }
+
+    public int getRegionID() {
+        return regionID;
+    }
+
+    public void setRegionID(int regionID) {
+        this.regionID = regionID;
+    }
+
+    public String getRegionName() {
+        return regionName;
+    }
+
+    public void setRegionName(String regionName) {
+        this.regionName = regionName;
+    }
+
+    public String getUnLoCode() {
+        return unLoCode;
+    }
+
+    public void setUnLoCode(String unLoCode) {
+        this.unLoCode = unLoCode;
+    }
+
+    public String getPortName() {
+        return portName;
+    }
+
+    public void setPortName(String portName) {
+        this.portName = portName;
+    }
+
+    public double getPortLat() {
+        return portLat;
+    }
+
+    public void setPortLat(double portLat) {
+        this.portLat = portLat;
+    }
+
+    public double getPortLon() {
+        return portLon;
+    }
+
+    public void setPortLon(double portLon) {
+        this.portLon = portLon;
+    }
+
+    public double getPortCall_Cost() {
+        return portCall_Cost;
+    }
+
+    public void setPortCall_Cost(double portCall_Cost) {
+        this.portCall_Cost = portCall_Cost;
+    }
+
+    public double getPort_FuelPrice() {
+        return port_FuelPrice;
+    }
+
+    public void setPort_FuelPrice(double port_FuelPrice) {
+        this.port_FuelPrice = port_FuelPrice;
+    }
+
+    public boolean isCanBunker() {
+        return canBunker;
+    }
+
+    public void setCanBunker(boolean canBunker) {
+        this.canBunker = canBunker;
+    }
+
+    public double getPort_CostPerFullContainer() {
+        return port_CostPerFullContainer;
+    }
+
+    public void setPort_CostPerFullContainer(double port_CostPerFullContainer) {
+        this.port_CostPerFullContainer = port_CostPerFullContainer;
+    }
+
+    public double getPenalty_LateArrival() {
+        return penalty_LateArrival;
+    }
+
+    public void setPenalty_LateArrival(double penalty_LateArrival) {
+        this.penalty_LateArrival = penalty_LateArrival;
+    }
+
+    public ShipCategoryDTO getCurrentShip() {
+        return currentShip;
+    }
+
+    public void setCurrentShip(ShipCategoryDTO currentShip) {
+        this.currentShip = currentShip;
+    }
+
+    public double getShp_PortTimeTaken() {
+        return shp_PortTimeTaken;
+    }
+
+    public void setShp_PortTimeTaken(double shp_PortTimeTaken) {
+        this.shp_PortTimeTaken = shp_PortTimeTaken;
+    }
+
+    public double getShp_chosenSpeed() {
+        return shp_chosenSpeed;
+    }
+
+    public void setShp_chosenSpeed(double shp_chosenSpeed) {
+        this.shp_chosenSpeed = shp_chosenSpeed;
+    }
+
     public DemandDTO getDemands() {
         return demands;
     }
 
-    //container
-    public void setDemands(int ShipCapacity) {
-        this.demands = new DemandDTO(100,ShipCapacity);
-    }
-    
-    public int getPortID() {
-        return PortID;
+    public void setDemands(DemandDTO demands) {
+        this.demands = demands;
     }
 
-    public void setPortID(int PortID) {
-        this.PortID = PortID;
+    public double getTotalHandlingCost() {
+        return totalHandlingCost;
     }
 
-    public int getRegionID() {
-        return RegionID;
+    public void setTotalHandlingCost(double totalHandlingCost) {
+        this.totalHandlingCost = totalHandlingCost;
     }
 
-    public void setRegionID(int RegionID) {
-        this.RegionID = RegionID;
+    public double getTotalFuelTravelCost() {
+        return totalFuelTravelCost;
     }
 
-    public String getRegionName() {
-        return RegionName;
+    public void setTotalFuelTravelCost(double totalFuelTravelCost) {
+        this.totalFuelTravelCost = totalFuelTravelCost;
     }
 
-    public void setRegionName(String RegionName) {
-        this.RegionName = RegionName;
+    public double getTotalFuelIdleCost() {
+        return totalFuelIdleCost;
     }
 
-    public int getCountryID() {
-        return CountryID;
+    public void setTotalFuelIdleCost(double totalFuelIdleCost) {
+        this.totalFuelIdleCost = totalFuelIdleCost;
     }
 
-    public void setCountryID(int CountryID) {
-        this.CountryID = CountryID;
+    public double getTotalPenaltyCost() {
+        return totalPenaltyCost;
     }
 
-    public String getCountryName() {
-        return CountryName;
+    public void setTotalPenaltyCost(double totalPenaltyCost) {
+        this.totalPenaltyCost = totalPenaltyCost;
     }
 
-    public void setCountryName(String CountryName) {
-        this.CountryName = CountryName;
+    public double getTotalValueFuelLeft_FinalHvi() {
+        return totalValueFuelLeft_FinalHvi;
     }
 
-    public int getCabotageRegionID() {
-        return CabotageRegionID;
+    public void setTotalValueFuelLeft_FinalHvi(double totalValueFuelLeft_FinalHvi) {
+        this.totalValueFuelLeft_FinalHvi = totalValueFuelLeft_FinalHvi;
     }
 
-    public void setCabotageRegionID(int CabotageRegionID) {
-        this.CabotageRegionID = CabotageRegionID;
+    public double getTotalOperationalCost() {
+        return totalOperationalCost;
     }
 
-    public String getCabotageRegionName() {
-        return CabotageRegionName;
-    }
-
-    public void setCabotageRegionName(String CabotageRegionName) {
-        this.CabotageRegionName = CabotageRegionName;
-    }
-
-    public String getUnLoCode() {
-        return UnLoCode;
-    }
-
-    public void setUnLoCode(String UnLoCode) {
-        this.UnLoCode = UnLoCode;
-    }
-
-    public String getPortName() {
-        return PortName;
-    }
-
-    public void setPortName(String PortName) {
-        this.PortName = PortName;
-    }
-
-    public double getPortLat() {
-        return PortLat;
-    }
-
-    public void setPortLat(double PortLat) {
-        this.PortLat = PortLat;
-    }
-
-    public double getPortLon() {
-        return PortLon;
-    }
-
-    public void setPortLon(double PortLon) {
-        this.PortLon = PortLon;
-    }
-
-    public double getPort_FuelPrice() {
-        return Port_FuelPrice;
-    }
-
-    public void setPort_FuelPrice(double Port_FuelPrice) {
-        this.Port_FuelPrice = Port_FuelPrice;
-    }
-
-    public double getPortCall_Cost() {
-        return PortCall_Cost;
-    }
-
-    public void setPortCall_Cost(double PortCall_Cost) {
-        this.PortCall_Cost = PortCall_Cost;
-    }
-
-    public boolean isCanBunker() {
-        return CanBunker;
-    }
-
-    public void setCanBunker(boolean CanBunker) {
-        this.CanBunker = CanBunker;
-    }
-
-    public double getPort_CostPerFullContainer() {
-        return Port_CostPerFullContainer;
-    }
-
-    public void setPort_CostPerFullContainer(double Port_CostPerFullContainer) {
-        this.Port_CostPerFullContainer = Port_CostPerFullContainer;
-    }
-
-    public double getPenalty_LateArrival() {
-        return Penalty_LateArrival;
-    }
-
-    public void setPenalty_LateArrival(double Penalty_LateArrival) {
-        this.Penalty_LateArrival = Penalty_LateArrival;
+    public void setTotalOperationalCost(double totalOperationalCost) {
+        this.totalOperationalCost = totalOperationalCost;
     }
 
     public String getRemarks() {
-        return Remarks;
+        return remarks;
     }
 
-    public void setRemarks(String Remarks) {
-        this.Remarks = Remarks;
+    public void setRemarks(String remarks) {
+        this.remarks = remarks;
     }
 
     public boolean isIsActive() {
-        return IsActive;
+        return isActive;
     }
 
-    public void setIsActive(boolean IsActive) {
-        this.IsActive = IsActive;
+    public void setIsActive(boolean isActive) {
+        this.isActive = isActive;
     }
 
     public int getCreatedBy() {
-        return CreatedBy;
+        return createdBy;
     }
 
-    public void setCreatedBy(int CreatedBy) {
-        this.CreatedBy = CreatedBy;
+    public void setCreatedBy(int createdBy) {
+        this.createdBy = createdBy;
     }
 
     public OffsetDateTime getCreatedDate() {
-        return CreatedDate;
+        return createdDate;
     }
 
-    public void setCreatedDate(OffsetDateTime CreatedDate) {
-        this.CreatedDate = CreatedDate;
+    public void setCreatedDate(OffsetDateTime createdDate) {
+        this.createdDate = createdDate;
     }
 
     public int getModifiedBy() {
-        return ModifiedBy;
+        return modifiedBy;
     }
 
-    public void setModifiedBy(int ModifiedBy) {
-        this.ModifiedBy = ModifiedBy;
+    public void setModifiedBy(int modifiedBy) {
+        this.modifiedBy = modifiedBy;
     }
 
     public OffsetDateTime getModifiedDate() {
-        return ModifiedDate;
+        return modifiedDate;
     }
 
-    public void setModifiedDate(OffsetDateTime ModifiedDate) {
-        this.ModifiedDate = ModifiedDate;
+    public void setModifiedDate(OffsetDateTime modifiedDate) {
+        this.modifiedDate = modifiedDate;
     }
 
     public int getRecordID() {
-        return RecordID;
+        return recordID;
     }
 
-    public void setRecordID(int RecordID) {
-        this.RecordID = RecordID;
+    public void setRecordID(int recordID) {
+        this.recordID = recordID;
     }
-    
+
     public JButton getButton() {
         return button;
     }
 
-    public void setButton(JButton button) { //
+    public void setButton(JButton button) {
         this.button = button;
     }
 
@@ -306,15 +369,15 @@ public class PortDTO extends DefaultWaypoint {
     public void setPointType(PointType pointType) {
         this.pointType = pointType;
     }
-    // </editor-fold>
-
+    
+    
         
     public PortDTO(){};
     
     public PortDTO (String UnLoCode, String Description,PointType pointType,IEventPortWaypoint IPortevent, GeoPosition coord){
         super(coord);
-        this.UnLoCode = UnLoCode;
-        this.PortName = Description;   
+        this.unLoCode = UnLoCode;
+        this.portName = Description;   
         this.pointType = pointType;
         initButton(IPortevent);  //did not have this code before<-- 29/06/23
         demands = new DemandDTO();
@@ -325,27 +388,27 @@ public class PortDTO extends DefaultWaypoint {
                 rs.getDouble("Longitude")));
         
         initButton(IPortEvent); //mantatody in all PortDTO events
-        PortID = rs.getInt("Port_ID");
-        CountryID = rs.getInt("CountryID");
-        CabotageRegionID = rs.getInt("CabotageRegionID");
-        RegionID = rs.getInt("RegionID");
+        portID = rs.getInt("Port_ID");
+        countryID = rs.getInt("CountryID");
+        cabotageRegionID = rs.getInt("CabotageRegionID");
+        regionID = rs.getInt("RegionID");
         
-        UnLoCode = rs.getString("UNLocode");
-        PortName = rs.getString("PortName");
-        PortLat = rs.getDouble("Latitude");
-        PortLon = rs.getDouble("Longitude");
+        unLoCode = rs.getString("UNLocode");
+        portName = rs.getString("PortName");
+        portLat = rs.getDouble("Latitude");
+        portLon = rs.getDouble("Longitude");
         
-        PortCall_Cost = rs.getDouble("PortCallCost");
+        portCall_Cost = rs.getDouble("PortCallCost");
         
-        Port_FuelPrice = rs.getDouble("PortFuelPrice");
-        CanBunker = CoreFunctions.convertStringToBoolean(rs.getString("CanBunker"));
+        port_FuelPrice = rs.getDouble("PortFuelPrice");
+        canBunker = CoreFunctions.convertStringToBoolean(rs.getString("CanBunker"));
         
-        Port_CostPerFullContainer = rs.getDouble("CostPerFullContainerLoadUnLoad");
-        Penalty_LateArrival = rs.getDouble("PenaltyLateArrival");
+        port_CostPerFullContainer = rs.getDouble("CostPerFullContainerLoadUnLoad");
+        penalty_LateArrival = rs.getDouble("PenaltyLateArrival");
         
-        Remarks = rs.getString("Remarks");
-        IsActive = CoreFunctions.convertStringToBoolean(rs.getString("IsActive"));
-        CreatedBy = rs.getInt("CreatedBy");
+        remarks = rs.getString("Remarks");
+        isActive = CoreFunctions.convertStringToBoolean(rs.getString("IsActive"));
+        createdBy = rs.getInt("CreatedBy");
        
         currentShip = new ShipCategoryDTO();
           
@@ -353,44 +416,45 @@ public class PortDTO extends DefaultWaypoint {
     
     public PortDTO(PortDTO port) {
 
-        PortID = port.PortID;
-        CountryID = port.CountryID;
-        CabotageRegionID = port.CabotageRegionID;
-        RegionID = port.RegionID;
+        portID = port.portID;
+        countryID = port.countryID;
+        cabotageRegionID = port.cabotageRegionID;
+        regionID = port.regionID;
         
-        UnLoCode = port.UnLoCode;
-        PortName = port.PortName;
-        PortLat = port.PortLat;
-        PortLon = port.PortLon;
+        unLoCode = port.unLoCode;
+        portName = port.portName;
+        portLat = port.portLat;
+        portLon = port.portLon;
         
-        PortCall_Cost = port.PortCall_Cost;
+        portCall_Cost = port.portCall_Cost;
         
-        Port_FuelPrice = port.Port_FuelPrice;
-        CanBunker = port.CanBunker;
+        port_FuelPrice = port.port_FuelPrice;
+        canBunker = port.canBunker;
         
-        Port_CostPerFullContainer = port.Port_CostPerFullContainer;
-        Penalty_LateArrival = port.Penalty_LateArrival;
+        port_CostPerFullContainer = port.port_CostPerFullContainer;
+        penalty_LateArrival = port.penalty_LateArrival;
        
         demands = port.demands;
         
         //--Ship
         currentShip = new ShipCategoryDTO(port.currentShip);
     
-        shp_timeTaken = port.shp_timeTaken;
-        shp_choseSpeed = port.shp_choseSpeed;
+        shp_PortTimeTaken = port.shp_PortTimeTaken;
+        shp_chosenSpeed = port.shp_chosenSpeed;
 
         //ObjetiveFunction var
-        TotalHandlingCost  = port.TotalHandlingCost;        //CHdl :: $ |(DemandAmt+SupplyAmnt)*Port_CostPerFullContainer
-        TotalFuelTravelCost = port.TotalFuelTravelCost;      //Ctravel :: $ |previous port i to this port j
-        TotalFuelIdleCost  = port.TotalFuelIdleCost;        //CFIdle :: $ |for this port i, for duration of operation
-        TotalPenaltyCost = port.TotalPenaltyCost;         //CPnt :: $ |
-        TotalOperationalCost = port.TotalOperationalCost;
+        totalHandlingCost  = port.totalHandlingCost;        //CHdl :: $ |(DemandAmt+SupplyAmnt)*port_CostPerFullContainer
+        totalFuelTravelCost = port.totalFuelTravelCost;      //Ctravel :: $ |previous port i to this port j
+        totalFuelIdleCost  = port.totalFuelIdleCost;        //CFIdle :: $ |for this port i, for duration of operation
+        totalPenaltyCost = port.totalPenaltyCost;         //CPnt :: $ |
+        totalOperationalCost = port.totalOperationalCost;
     
-        Remarks = port.Remarks;
-        IsActive = port.IsActive;
-        CreatedBy = port.CreatedBy;
+        remarks = port.remarks;
+        isActive = port.isActive;
+        createdBy = port.createdBy;
 
     }
+    
     public PortDTO (String[]arrCSVLine,IEventPortWaypoint IPortEvent){
         //super(coords)
         super(new GeoPosition( 
@@ -399,38 +463,38 @@ public class PortDTO extends DefaultWaypoint {
         ));
         
         initButton(IPortEvent); //mantatody in all PortDTO events
-        PortID = ((arrCSVLine.length < ColumnIndexCSV.PORTID+1 || arrCSVLine[ColumnIndexCSV.PORTID]== null || arrCSVLine[ColumnIndexCSV.PORTID].isBlank() ) ? 0 : Integer.parseInt(arrCSVLine[ColumnIndexCSV.PORTID]));
+        portID = ((arrCSVLine.length < ColumnIndexCSV.PORTID+1 || arrCSVLine[ColumnIndexCSV.PORTID]== null || arrCSVLine[ColumnIndexCSV.PORTID].isBlank() ) ? 0 : Integer.parseInt(arrCSVLine[ColumnIndexCSV.PORTID]));
          //0 UnLocode
-        UnLoCode = ((arrCSVLine.length < ColumnIndexCSV.UNLOCODE+1 || arrCSVLine[ColumnIndexCSV.UNLOCODE]== null || arrCSVLine[ColumnIndexCSV.UNLOCODE].isBlank() ) ? "" : arrCSVLine[ColumnIndexCSV.UNLOCODE]);
+        unLoCode = ((arrCSVLine.length < ColumnIndexCSV.UNLOCODE+1 || arrCSVLine[ColumnIndexCSV.UNLOCODE]== null || arrCSVLine[ColumnIndexCSV.UNLOCODE].isBlank() ) ? "" : arrCSVLine[ColumnIndexCSV.UNLOCODE]);
         //1 name
-        PortName = ((arrCSVLine.length < ColumnIndexCSV.PORTNAME+1 || arrCSVLine[ColumnIndexCSV.PORTNAME]== null || arrCSVLine[ColumnIndexCSV.PORTNAME].isBlank() ) ? "" : arrCSVLine[ColumnIndexCSV.PORTNAME]);
-        //2 CountryID     
-        CountryID = ((arrCSVLine.length < ColumnIndexCSV.COUNTRY_ID+1 || arrCSVLine[ColumnIndexCSV.COUNTRY_ID]== null || arrCSVLine[ColumnIndexCSV.COUNTRY_ID].isBlank() ) ? 0 : Integer.parseInt(arrCSVLine[ColumnIndexCSV.COUNTRY_ID]));
-        //3 CabotageRegionID
-        CabotageRegionID = ((arrCSVLine.length < ColumnIndexCSV.CABOTAGE_REGION_ID+1 || arrCSVLine[ColumnIndexCSV.CABOTAGE_REGION_ID]== null || arrCSVLine[ColumnIndexCSV.CABOTAGE_REGION_ID].isBlank() ) ? 0 : Integer.parseInt(arrCSVLine[ColumnIndexCSV.CABOTAGE_REGION_ID]));        
+        portName = ((arrCSVLine.length < ColumnIndexCSV.PORTNAME+1 || arrCSVLine[ColumnIndexCSV.PORTNAME]== null || arrCSVLine[ColumnIndexCSV.PORTNAME].isBlank() ) ? "" : arrCSVLine[ColumnIndexCSV.PORTNAME]);
+        //2 countryID     
+        countryID = ((arrCSVLine.length < ColumnIndexCSV.COUNTRY_ID+1 || arrCSVLine[ColumnIndexCSV.COUNTRY_ID]== null || arrCSVLine[ColumnIndexCSV.COUNTRY_ID].isBlank() ) ? 0 : Integer.parseInt(arrCSVLine[ColumnIndexCSV.COUNTRY_ID]));
+        //3 cabotageRegionID
+        cabotageRegionID = ((arrCSVLine.length < ColumnIndexCSV.CABOTAGE_REGION_ID+1 || arrCSVLine[ColumnIndexCSV.CABOTAGE_REGION_ID]== null || arrCSVLine[ColumnIndexCSV.CABOTAGE_REGION_ID].isBlank() ) ? 0 : Integer.parseInt(arrCSVLine[ColumnIndexCSV.CABOTAGE_REGION_ID]));        
         //4 D_RegionID
-        RegionID = ((arrCSVLine.length < ColumnIndexCSV.REGION_ID+1 || arrCSVLine[ColumnIndexCSV.REGION_ID]== null || arrCSVLine[ColumnIndexCSV.REGION_ID].isBlank() ) ? 0 : Integer.parseInt(arrCSVLine[ColumnIndexCSV.REGION_ID]));
+        regionID = ((arrCSVLine.length < ColumnIndexCSV.REGION_ID+1 || arrCSVLine[ColumnIndexCSV.REGION_ID]== null || arrCSVLine[ColumnIndexCSV.REGION_ID].isBlank() ) ? 0 : Integer.parseInt(arrCSVLine[ColumnIndexCSV.REGION_ID]));
         //5 Latitude
-        PortLat  = ((arrCSVLine.length < ColumnIndexCSV.PORT_LAT+1 || arrCSVLine[ColumnIndexCSV.PORT_LAT]== null || arrCSVLine[ColumnIndexCSV.PORT_LAT].isBlank() ) ? 0.00d : Double.parseDouble(arrCSVLine[ColumnIndexCSV.PORT_LAT])); 
+        portLat  = ((arrCSVLine.length < ColumnIndexCSV.PORT_LAT+1 || arrCSVLine[ColumnIndexCSV.PORT_LAT]== null || arrCSVLine[ColumnIndexCSV.PORT_LAT].isBlank() ) ? 0.00d : Double.parseDouble(arrCSVLine[ColumnIndexCSV.PORT_LAT])); 
         //6 Longitude
-        PortLon  = ((arrCSVLine.length < ColumnIndexCSV.PORT_LON+1|| arrCSVLine[ColumnIndexCSV.PORT_LON]== null || arrCSVLine[ColumnIndexCSV.PORT_LON].isBlank() ) ? 0.00d :Double.parseDouble( arrCSVLine[ColumnIndexCSV.PORT_LON]));        
+        portLon  = ((arrCSVLine.length < ColumnIndexCSV.PORT_LON+1|| arrCSVLine[ColumnIndexCSV.PORT_LON]== null || arrCSVLine[ColumnIndexCSV.PORT_LON].isBlank() ) ? 0.00d :Double.parseDouble( arrCSVLine[ColumnIndexCSV.PORT_LON]));        
         //10 CostPerFULL   Container Moved
-        Port_CostPerFullContainer = ((arrCSVLine.length < ColumnIndexCSV.COST_PER_FULL_CONTAINER_LOAD_UNLOAD+1 || arrCSVLine[ColumnIndexCSV.COST_PER_FULL_CONTAINER_LOAD_UNLOAD]== null || arrCSVLine[ColumnIndexCSV.COST_PER_FULL_CONTAINER_LOAD_UNLOAD].isBlank() ) ? 0.00d : Double.parseDouble(arrCSVLine[ColumnIndexCSV.COST_PER_FULL_CONTAINER_LOAD_UNLOAD]));
+        port_CostPerFullContainer = ((arrCSVLine.length < ColumnIndexCSV.COST_PER_FULL_CONTAINER_LOAD_UNLOAD+1 || arrCSVLine[ColumnIndexCSV.COST_PER_FULL_CONTAINER_LOAD_UNLOAD]== null || arrCSVLine[ColumnIndexCSV.COST_PER_FULL_CONTAINER_LOAD_UNLOAD].isBlank() ) ? 0.00d : Double.parseDouble(arrCSVLine[ColumnIndexCSV.COST_PER_FULL_CONTAINER_LOAD_UNLOAD]));
         //7 PortCallCost <-- BunnkerCost and Docking Charges
-        PortCall_Cost = ((arrCSVLine.length < ColumnIndexCSV.PORTCALL_COSTFIX+1 || arrCSVLine[ColumnIndexCSV.PORTCALL_COSTFIX]== null || arrCSVLine[ColumnIndexCSV.PORTCALL_COSTFIX].isBlank() ) ? 0.00d : Double.parseDouble(arrCSVLine[ColumnIndexCSV.PORTCALL_COSTFIX]));
+        portCall_Cost = ((arrCSVLine.length < ColumnIndexCSV.PORTCALL_COSTFIX+1 || arrCSVLine[ColumnIndexCSV.PORTCALL_COSTFIX]== null || arrCSVLine[ColumnIndexCSV.PORTCALL_COSTFIX].isBlank() ) ? 0.00d : Double.parseDouble(arrCSVLine[ColumnIndexCSV.PORTCALL_COSTFIX]));
         
-        //8 Port_FuelPrice;
-        Port_FuelPrice = ((arrCSVLine.length < ColumnIndexCSV.PORT_FUEL_PRICE+1 || arrCSVLine[ColumnIndexCSV.PORT_FUEL_PRICE]== null || arrCSVLine[ColumnIndexCSV.PORT_FUEL_PRICE].isBlank() ) ? 0.00d : Double.parseDouble(arrCSVLine[ColumnIndexCSV.PORT_FUEL_PRICE]));
-        //9 CanBunker  
-        CanBunker = ((arrCSVLine.length < ColumnIndexCSV.CAN_BUNKER+1 || arrCSVLine[ColumnIndexCSV.CAN_BUNKER]== null || arrCSVLine[ColumnIndexCSV.CAN_BUNKER].isBlank() ) ? false : CoreFunctions.convertStringToBoolean(arrCSVLine[ColumnIndexCSV.CAN_BUNKER]));
+        //8 port_FuelPrice;
+        port_FuelPrice = ((arrCSVLine.length < ColumnIndexCSV.PORT_FUEL_PRICE+1 || arrCSVLine[ColumnIndexCSV.PORT_FUEL_PRICE]== null || arrCSVLine[ColumnIndexCSV.PORT_FUEL_PRICE].isBlank() ) ? 0.00d : Double.parseDouble(arrCSVLine[ColumnIndexCSV.PORT_FUEL_PRICE]));
+        //9 canBunker  
+        canBunker = ((arrCSVLine.length < ColumnIndexCSV.CAN_BUNKER+1 || arrCSVLine[ColumnIndexCSV.CAN_BUNKER]== null || arrCSVLine[ColumnIndexCSV.CAN_BUNKER].isBlank() ) ? false : CoreFunctions.convertStringToBoolean(arrCSVLine[ColumnIndexCSV.CAN_BUNKER]));
         
-        Penalty_LateArrival = ((arrCSVLine.length < ColumnIndexCSV.PENALTY_LATE_ARRIVAL_PER_HOUR+1 || arrCSVLine[ColumnIndexCSV.PENALTY_LATE_ARRIVAL_PER_HOUR]== null || arrCSVLine[ColumnIndexCSV.PENALTY_LATE_ARRIVAL_PER_HOUR].isBlank() ) ? 0.00d : Double.parseDouble(arrCSVLine[ColumnIndexCSV.PENALTY_LATE_ARRIVAL_PER_HOUR]));;
+        penalty_LateArrival = ((arrCSVLine.length < ColumnIndexCSV.PENALTY_LATE_ARRIVAL_PER_HOUR+1 || arrCSVLine[ColumnIndexCSV.PENALTY_LATE_ARRIVAL_PER_HOUR]== null || arrCSVLine[ColumnIndexCSV.PENALTY_LATE_ARRIVAL_PER_HOUR].isBlank() ) ? 0.00d : Double.parseDouble(arrCSVLine[ColumnIndexCSV.PENALTY_LATE_ARRIVAL_PER_HOUR]));;
         
-        Remarks = ((arrCSVLine.length < ColumnIndexCSV.REMARKS+1 || arrCSVLine[ColumnIndexCSV.REMARKS]== null || arrCSVLine[ColumnIndexCSV.REMARKS].isBlank() ) ? "" : arrCSVLine[ColumnIndexCSV.REMARKS]);;
+        remarks = ((arrCSVLine.length < ColumnIndexCSV.REMARKS+1 || arrCSVLine[ColumnIndexCSV.REMARKS]== null || arrCSVLine[ColumnIndexCSV.REMARKS].isBlank() ) ? "" : arrCSVLine[ColumnIndexCSV.REMARKS]);;
         
-        IsActive =  ((arrCSVLine.length < ColumnIndexCSV.ISACTIVE+1 || arrCSVLine[ColumnIndexCSV.ISACTIVE]== null || arrCSVLine[ColumnIndexCSV.ISACTIVE].isBlank() ) ? false : CoreFunctions.convertStringToBoolean(arrCSVLine[ColumnIndexCSV.ISACTIVE]));
+        isActive =  ((arrCSVLine.length < ColumnIndexCSV.ISACTIVE+1 || arrCSVLine[ColumnIndexCSV.ISACTIVE]== null || arrCSVLine[ColumnIndexCSV.ISACTIVE].isBlank() ) ? false : CoreFunctions.convertStringToBoolean(arrCSVLine[ColumnIndexCSV.ISACTIVE]));
         
-        CreatedBy = ((arrCSVLine.length < ColumnIndexCSV.CREATEDBY+1 || arrCSVLine[ColumnIndexCSV.CREATEDBY]== null || arrCSVLine[ColumnIndexCSV.CREATEDBY].isBlank() ) ? 0 : Integer.parseInt(arrCSVLine[ColumnIndexCSV.CREATEDBY]));
+        createdBy = ((arrCSVLine.length < ColumnIndexCSV.CREATEDBY+1 || arrCSVLine[ColumnIndexCSV.CREATEDBY]== null || arrCSVLine[ColumnIndexCSV.CREATEDBY].isBlank() ) ? 0 : Integer.parseInt(arrCSVLine[ColumnIndexCSV.CREATEDBY]));
              
         }
     
@@ -484,23 +548,23 @@ public class PortDTO extends DefaultWaypoint {
         return this.getPortName();
     }
     
-        public Object[] convertListPortToStringArray(){
+    public Object[] convertListPortToStringArray(){
         
         
         
-//
+
 //                DecimalFormat df = CoreFunctions.getDecimalFormat(2);
 //                
-//                String PortID       = 
-//                String PortName       = DataPort.get(i).PortName;
+//                String PortID       =  this.PortID;
+//                String portName       = this.portName;
 //               
 //                String PortDemand       = df.format(DataPort.get(i).currentShip.AmountLoaded   );
-//                String CostPerContainer = df.format(DataPort.get(i).Port_CostPerFullContainer  );
+//                String CostPerContainer = df.format(DataPort.get(i).port_CostPerFullContainer  );
 //                
-//                String PortFuelPrice    =  df.format(DataPort.get(i).Port_FuelPrice ); 
+//                String PortFuelPrice    =  df.format(DataPort.get(i).port_FuelPrice ); 
 //               
 //               
-//                String PortCall         = df.format(DataPort.get(i).PortCall_Cost  );
+//                String PortCall         = df.format(DataPort.get(i).portCall_Cost  );
 //                
 //                converted.add(new Object[]{
 //                    sequenceNo,PortFromName,PortToName,Distance,Speed,Time,FuelConsumedTravel,
@@ -510,7 +574,7 @@ public class PortDTO extends DefaultWaypoint {
 //                    HasBunker,AmountBunkered,PortFuelPrice,
 //                    IsLate,TimeLate,
 //                    HasNoFuel,DeptBunker,
-//                    PortCall,TotalTravelCost,TotalIdleFuelCost,TotalHandlingCost,TotalPenaltyCost,TotalValueFuelLeft,
+//                    PortCall,TotalTravelCost,TotalIdleFuelCost,totalHandlingCost,totalPenaltyCost,TotalValueFuelLeft,
 //                    TotalOperatingCost});
 //            
         

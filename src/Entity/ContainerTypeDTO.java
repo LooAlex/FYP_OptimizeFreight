@@ -10,45 +10,44 @@ import Core.*;
  * @author Loo Alex
  */
 public class ContainerTypeDTO extends BaseDTO {
+    private int containerTypeID;
+    private String code;
+    private String description;
+    private Double avgUtilizeWeight; //TON
+            
 
     public int getContainerTypeID() {
-        return ContainerTypeID;
+        return containerTypeID;
     }
 
-    public void setContainerTypeID(int ContainerTypeID) {
-        this.ContainerTypeID = ContainerTypeID;
+    public void setContainerTypeID(int containerTypeID) {
+        this.containerTypeID = containerTypeID;
     }
 
     public String getCode() {
-        return Code;
+        return code;
     }
 
-    public void setCode(String Code) {
-        this.Code = Code;
+    public void setCode(String code) {
+        this.code = code;
     }
 
     public String getDescription() {
-        return Description;
+        return description;
     }
 
-    public void setDescription(String Description) {
-        this.Description = Description;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public Double getAvgUtilizeWeight() {
-        return AvgUtilizeWeight;
+        return avgUtilizeWeight;
     }
 
-    public void setAvgUtilizeWeight(Double AvgUtilizeWeight) {
-        this.AvgUtilizeWeight = AvgUtilizeWeight;
+    public void setAvgUtilizeWeight(Double avgUtilizeWeight) {
+        this.avgUtilizeWeight = avgUtilizeWeight;
     }
-    
-    public int ContainerTypeID;
-    public String Code;
-    public String Description;
-    public Double AvgUtilizeWeight; //TON
-            
-    
+
     public ContainerTypeDTO(){
         
     }
@@ -59,10 +58,10 @@ public class ContainerTypeDTO extends BaseDTO {
      */
     public ContainerTypeDTO(ResultSet rs) throws SQLException{
         super(rs.getString("Remarks"), CoreFunctions.convertStringToBoolean(rs.getString("IsActive")),rs.getInt("CreatedBy"));
-        ContainerTypeID = rs.getInt("ContainerType_ID");
-        Code = rs.getString("Code");
-        Description = rs.getString("Description");
-        AvgUtilizeWeight = rs.getDouble("AvgUtilizeWeight");
+        containerTypeID = rs.getInt("ContainerType_ID");
+        code = rs.getString("Code");
+        description = rs.getString("Description");
+        avgUtilizeWeight = rs.getDouble("AvgUtilizeWeight");
         
     }
     

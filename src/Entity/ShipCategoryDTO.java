@@ -21,15 +21,15 @@ import java.util.stream.DoubleStream;
  */
 public class ShipCategoryDTO extends BaseDTO{
     //DB
-    public int ShipCategory_ID; 
+    public int shipCategory_ID; 
     //Code 
     //Description in Super
     
-    public int CapacityTEU;     //Wg ::TEU
-    public int CapacityFEU;     //Wg ::FEU
-    public double TimeLoadUnLoadPerFullContainerTEU;    //ρvig :: Hour | 
-    public double TimeLoadUnLoadPerFullContainerFEU;
-    public double AvgWeightUtilizeContainer;            //Wg :: TON | should be 7.7f ->Wang2019
+    public int capacityTEU;     //Wg ::TEU
+    public int capacityFEU;     //Wg ::FEU
+    public double timeLoadUnLoadPerFullContainerTEU;    //ρvig :: Hour | 
+    public double timeLoadUnLoadPerFullContainerFEU;
+    public double avgWeightUtilizeContainer;            //Wg :: TON | should be 7.7f ->Wang2019
     
     public double DesignSpeed;     
     public double MinSpeed;
@@ -41,8 +41,8 @@ public class ShipCategoryDTO extends BaseDTO{
     public double Coeff_Beta;                       //β
     public double Coeff_FuelTravel;                 //Fe 
     
-    public double Coeff_k_speed;                    //Coeff k1 from Yao
-    public double Coeff_k_weight;                   //Coef k2 from Yao  F = Dij/24*k1V^2+k2
+    public double Coeff_c_speed;                    //Coeff k1 from Yao
+    public double Coeff_c_weight;                   //Coef k2 from Yao  F = Dij/24*k1V^2+k2
     
     public double BunkerCapacity;                   //Wv ::TON
     public double CriticalBunkerLevel;              //DB preset CriticalBunkerLevel
@@ -94,7 +94,7 @@ public class ShipCategoryDTO extends BaseDTO{
     public double AmountLoaded;
     public double AmountUnloaded;
     public double CurrentShipPayload;               //Wij ::Ton  NoContainers*weight_Coeff + CurrentBunkerAmount(cuz in ton)
-    public double totalLoadUnLoad;
+    public double totalLoadUnload;
     
   
     
@@ -106,9 +106,9 @@ public class ShipCategoryDTO extends BaseDTO{
     
     public ShipCategoryDTO(ResultSet rs)throws SQLException{
         super(rs);
-        ShipCategory_ID = rs.getInt("ShipCategory_ID");
-        CapacityTEU = rs.getInt("CapacityTEU");
-        CapacityFEU = rs.getInt("CapacityFEU");
+        shipCategory_ID = rs.getInt("ShipCategory_ID");
+        capacityTEU = rs.getInt("CapacityTEU");
+        capacityFEU = rs.getInt("CapacityFEU");
         MinSpeed = rs.getDouble("MinSpeed");
         MaxSpeed = rs.getDouble("MaxSpeed");
         DesignSpeed = rs.getDouble("DesignSpeed");
@@ -117,13 +117,13 @@ public class ShipCategoryDTO extends BaseDTO{
         Coeff_Beta = rs.getDouble("Coeff_Beta");
         Coeff_FuelTravel= rs.getDouble("Coeff_FuelTravel");
         
-        Coeff_k_speed= rs.getDouble("Coeff_k_speed");
-        Coeff_k_weight= rs.getDouble("Coeff_k_weight");
+        Coeff_c_speed= rs.getDouble("Coeff_k_speed");
+        Coeff_c_weight= rs.getDouble("Coeff_k_weight");
         
         BunkerCapacity = rs.getDouble("BunkerCapacity");	
         CriticalBunkerLevel = rs.getDouble("CriticalBunkerLevel");
-        TimeLoadUnLoadPerFullContainerTEU = rs.getDouble("TimeLoadUnLoadPerFullContainerTEU");
-        TimeLoadUnLoadPerFullContainerFEU = rs.getDouble("TimeLoadUnLoadPerFullContainerFEU");
+        timeLoadUnLoadPerFullContainerTEU = rs.getDouble("TimeLoadUnLoadPerFullContainerTEU");
+        timeLoadUnLoadPerFullContainerFEU = rs.getDouble("TimeLoadUnLoadPerFullContainerFEU");
         Penalty_ZeroBunker = rs.getDouble("Penalty_ZeroBunker");
        
         SpeedOptions = new ArrayList<>(Arrays.asList(new Double[]{DesignSpeed,MinSpeed,MaxSpeed}));
@@ -137,9 +137,9 @@ public class ShipCategoryDTO extends BaseDTO{
     //deep copy
     public ShipCategoryDTO(ShipCategoryDTO ship){
         super(ship.Code,ship.Description,ship.Remarks,ship.IsActive,ship.CreatedBy);
-        ShipCategory_ID = ship.ShipCategory_ID;
-        CapacityTEU = ship.CapacityTEU;
-        CapacityFEU = ship.CapacityFEU;
+        shipCategory_ID = ship.shipCategory_ID;
+        capacityTEU = ship.capacityTEU;
+        capacityFEU = ship.capacityFEU;
         MinSpeed = ship.MinSpeed;
         MaxSpeed =ship.MaxSpeed;
         DesignSpeed = ship.DesignSpeed;
@@ -147,17 +147,17 @@ public class ShipCategoryDTO extends BaseDTO{
         Coeff_Alpha = ship.Coeff_Alpha;
         Coeff_Beta = ship.Coeff_Beta;
                 
-        Coeff_k_speed= ship.Coeff_k_speed;
-        Coeff_k_weight= ship.Coeff_k_weight;
+        Coeff_c_speed= ship.Coeff_c_speed;
+        Coeff_c_weight= ship.Coeff_c_weight;
         
         Coeff_FuelTravel= ship.Coeff_FuelTravel;
         BunkerCapacity = ship.BunkerCapacity;	
         CriticalBunkerLevel = ship.CriticalBunkerLevel;
-        TimeLoadUnLoadPerFullContainerTEU = ship.TimeLoadUnLoadPerFullContainerTEU;
-        TimeLoadUnLoadPerFullContainerFEU = ship.TimeLoadUnLoadPerFullContainerFEU;
+        timeLoadUnLoadPerFullContainerTEU = ship.timeLoadUnLoadPerFullContainerTEU;
+        timeLoadUnLoadPerFullContainerFEU = ship.timeLoadUnLoadPerFullContainerFEU;
         Penalty_ZeroBunker = ship.Penalty_ZeroBunker;
         weeklyFrequencyHour = ship.weeklyFrequencyHour;
-        AvgWeightUtilizeContainer = ship.AvgWeightUtilizeContainer;
+        avgWeightUtilizeContainer = ship.avgWeightUtilizeContainer;
         SpeedOptions = new ArrayList<>(Arrays.asList(new Double[]{DesignSpeed,MinSpeed,MaxSpeed}));
         TimeHorizon = ship.TimeHorizon;
         CriticalBunkerLevelNew = this.BunkerCapacity * 0.05;
@@ -194,7 +194,7 @@ public class ShipCategoryDTO extends BaseDTO{
 
         this.TotalAmountContainerCarried = ship.TotalAmountContainerCarried;         //Lvig = (Lvi +TotalDemands) ::number
         this.CurrentShipPayload = ship.CurrentShipPayload;               //Wij ::Ton  NoContainers*weight_Coeff + CurrentBunkerAmount(cuz in ton)
-        this.totalLoadUnLoad = ship.totalLoadUnLoad;
+        this.totalLoadUnload = ship.totalLoadUnload;
         this.AmountLoaded = ship.AmountLoaded;
         this.AmountUnloaded = ship.AmountUnloaded;
         this.previousPortName = ship.previousPortName;

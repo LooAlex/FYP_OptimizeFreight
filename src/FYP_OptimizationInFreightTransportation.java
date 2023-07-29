@@ -35,25 +35,9 @@ public class FYP_OptimizationInFreightTransportation {
     
     
     public static void main(String[] args) {    
-        init();
         
         new frm_OpenPanel_Main().setVisible(true);//main work             
         
     }
-    
-    //init anything needed here
-    public static void init (){
-        try {
-            DBHelper DBHelper = new DBHelper(); //RegisterDriver
-            
-        } catch (SQLException ex) {
-            Logger.getLogger(FYP_OptimizationInFreightTransportation.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(FYP_OptimizationInFreightTransportation.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        FYP_OptimizationInFreightTransportation FYP_Main = new FYP_OptimizationInFreightTransportation();
-        
-    }
-    
-    
+  
 }
