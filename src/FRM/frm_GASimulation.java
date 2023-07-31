@@ -90,7 +90,7 @@ public class frm_GASimulation extends javax.swing.JFrame {
     public ContainerTypeDTO SelectedContainerType;
     public PortDTO SelectedStartPort;
     public int indexSelectedOriginPort;
-    
+    public int f_AfterOpt_SelectedPortID;
     public GAGenome result;
     public int ShipContainerCapacity;
     public double FrequencyCycle = 2.00; //number of weeks
@@ -267,6 +267,7 @@ public class frm_GASimulation extends javax.swing.JFrame {
         myRoutingData.clear();
         clearUIwithPort();
         SelectedStartPort= null;
+        f_AfterOpt_SelectedPortID = Integer.MAX_VALUE;
         initUIPort();
     }
     
@@ -478,70 +479,7 @@ public class frm_GASimulation extends javax.swing.JFrame {
                 
         }
     }
-    public frm_GASimulation(IEventPortWaypoint IPEvent, Point mousePosition, JPanel OutputPanel, JLabel TitlePortSelection, JButton btnAddPort, JButton btnClearPort, JComboBox<String> cboMapType, JComboBox<PortDTO> cboPortFromSelected, JComboBox<ShipCategoryDTO> cboShipCode, JLabel jLabel10, JTabbedPane jTabbedPane1, JPanel jpDisplayStatus, JPanel jpPortComboArea, JPanel jpPortSelection, JPanel jpRouteDisplay, JPanel jpShipSelection, JXMapViewerCustom jxMapViewer_Simulation, JLabel lblChosenSpeed, JLabel lblDisplayStatus, JLabel lblDistance, JLabel lblFuelBunkerCost, JLabel lblFuelBunkered, JLabel lblIdealSpeed, JLabel lblLoadedCapacity, JLabel lblMaxSpeed, JLabel lblMinSpeed, JLabel lblOperationalCost, JLabel lblPortFromSelected, JLabel lblPortTo, JLabel lblShipBunkerCapacity, JLabel lblShipBunkerLevel, JLabel lblShipCapacity, JLabel lblShipCategory, JLabel lblShipCode, JLabel lblShipDescription, JLabel lblTimeTaken, JLabel lblTravelFuelCost, JMenuItem mnEnd, JMenuItem mnStart, JPopupMenu pmnChoosePointType, JPanel tabMap, JTabbedPane tabOutputDetail, JPanel tabPortOutputDetail, JPanel tabShipRouteDetail, JTextField txtChosenSpeed, JTextField txtDistance, JTextField txtFuelBunkerCost, JTextField txtFuelBunkered, JTextField txtIdealSpeed, JTextField txtLoadedCapacity, JTextField txtMaxSpeed, JTextField txtMinSpeed, JTextField txtOperationalCost, JTextField txtPortTo, JTextField txtShipBunkerCapacity, JTextField txtShipBunkerLevel, JTextField txtShipCapacity, JTextField txtShipCategory, JTextField txtShipDescription, JTextField txtTimeTaken3, JTextField txtTravelFuelCost) throws HeadlessException {
-        this.IPEvent = IPEvent;
-        this.mousePosition = mousePosition;
-        this.ResultPanel = OutputPanel;
-        this.TitlePortSelection = TitlePortSelection;
-        this.btnAddPort = btnAddPort;
-        this.btnClearPort = btnClearPort;
-        this.cboMapType = cboMapType;
-        this.cboPortToSelected = cboPortFromSelected;
-        this.cboShipCode = cboShipCode;
-        this.jLabel10 = jLabel10;
-        this.jtInputs = jTabbedPane1;
-        this.jpDisplayStatus = jpDisplayStatus;
-        this.jpPortSelection = jpPortSelection;
-        this.jpRouteDisplay = jpRouteDisplay;
-        this.jpShipSelection = jpShipSelection;
-        this.jxMapViewer_Simulation = jxMapViewer_Simulation;
-        this.lblChosenSpeed = lblChosenSpeed;
-        this.lblDisplayStatus = lblDisplayStatus;
-        this.lblDistance = lblDistance;
-        this.lblFuelBunkerCost = lblFuelBunkerCost;
-        this.lblFuelBunkered = lblFuelBunkered;
-        this.lblIdealSpeed = lblIdealSpeed;
-        this.lblLoadedDemand = lblLoadedCapacity;
-        this.lblMaxSpeed = lblMaxSpeed;
-        this.lblMinSpeed = lblMinSpeed;
-        this.lblOperationalCost = lblOperationalCost;
-        this.lblPortToSelected = lblPortFromSelected;
-        this.lblPortFrom = lblPortTo;
-        this.lblShipBunkerCapacity = lblShipBunkerCapacity;
-        this.lblShipBunkerLevel = lblShipBunkerLevel;
-        this.lblShipCapacity = lblShipCapacity;
-        this.lblShipLoadUnloadTimePerContainer = lblShipCategory;
-        this.lblShipCode = lblShipCode;
-        this.lblShipDescription = lblShipDescription;
-        this.lblTimeTaken = lblTimeTaken;
-        this.lblTravelFuelCost = lblTravelFuelCost;
-        this.mnEnd = mnEnd;
-        this.mnStart = mnStart;
-        this.pmnChoosePointType = pmnChoosePointType;
-        this.tabMap = tabMap;
-        this.tabDisplayDetail = tabOutputDetail;
-        this.tabPortOutputDetail = tabPortOutputDetail;
-        this.txtSelectedSpeed = txtChosenSpeed;
-        this.txtDistance = txtDistance;
-        this.txtFuelBunkerCost = txtFuelBunkerCost;
-        this.txtFuelBunkered = txtFuelBunkered;
-        this.txtDesignSpeed = txtIdealSpeed;
-        this.txtLoadedDemand = txtLoadedCapacity;
-        this.txtMaxSpeed = txtMaxSpeed;
-        this.txtMinSpeed = txtMinSpeed;
-        this.txtOperationalCost = txtOperationalCost;
-        this.txtPortTo = txtPortTo;
-        this.txtShipBunkerCapacity = txtShipBunkerCapacity;
-        this.txtShipBunkerLevel = txtShipBunkerLevel;
-        this.txtShipCapacity = txtShipCapacity;
-        this.txtShipLoadUnloadTimePerContainer = txtShipCategory;
-        this.txtShipDescription = txtShipDescription;
-        this.txtTimeTaken = txtTimeTaken3;
-        this.txtTravelFuelCost = txtTravelFuelCost;
-        
-        
-    }
-    public void setGUI_resultGenome(){
+         public void setGUI_resultGenome(){
         
          if(result != null && Ftype != null && result.dataPortHistory != null){
              functionTypeUsed = Ftype;
@@ -607,7 +545,7 @@ public class frm_GASimulation extends javax.swing.JFrame {
                     cboPortToSelected.addItem(result.dataPortsAlter.get(i));
                 }
             }
-            SetGUI_GenomeSelectedPortFrom(cboPortToSelected.getItemAt(0));
+            SetGUI_GenomeSelectedPortFrom(cboPortToSelected.getItemAt(0),false);
         }else{
             JOptionPane.showMessageDialog(null, "No define Optimize Path found. Try to Start the Algorithm","Warning",JOptionPane.WARNING_MESSAGE);
         }
@@ -627,7 +565,7 @@ public class frm_GASimulation extends javax.swing.JFrame {
         }
         
     }
-    public void SetGUI_GenomeSelectedPortFrom(PortDTO pt){
+    public void SetGUI_GenomeSelectedPortFrom(PortDTO pt,boolean isFromAlgoParameter){
         DecimalFormat df = CoreFunctions.getDecimalFormat(2);
         
         if(pt != null){
@@ -646,18 +584,95 @@ public class frm_GASimulation extends javax.swing.JFrame {
             txtDistance.setText(df.format(pt.currentShip.DistanceTravel));
             
             for(var dto: setSelectedPorts){
-                if(dto.portID == pt.portID){
-                    ImageIcon newImageIcon = new ImageIcon(new ImageIcon(getClass().getResource("/Icons/myPinOrigin.png")).getImage().getScaledInstance(24, 24, Image.SCALE_SMOOTH));
-                    dto.getButton().setIcon(newImageIcon);
-                }else{
-                    ImageIcon newImageIcon = new ImageIcon(new ImageIcon(getClass().getResource("/Icons/myPin.png")).getImage().getScaledInstance(24, 24, Image.SCALE_SMOOTH));
-                    dto.getButton().setIcon(newImageIcon);
+                ImageIcon newImageIcon = new ImageIcon();
+                
+                if(dto.portID == f_AfterOpt_SelectedPortID){
+                    newImageIcon = new ImageIcon(new ImageIcon(getClass().getResource("/Icons/selectedOriginPin.png")).getImage().getScaledInstance(24, 24, Image.SCALE_SMOOTH));     
                 }
+                else if(dto.portID == pt.portID ){
+                    if( isFromAlgoParameter==true){
+                        newImageIcon = new ImageIcon(new ImageIcon(getClass().getResource("/Icons/myPinOrigin.png")).getImage().getScaledInstance(24   , 24, Image.SCALE_SMOOTH));
+                    
+                    }else{
+                        newImageIcon = new ImageIcon(new ImageIcon(getClass().getResource("/Icons/myPin.png")).getImage().getScaledInstance(32, 32, Image.SCALE_SMOOTH));
+                    }
+                    
+                }else{
+                    newImageIcon = new ImageIcon(new ImageIcon(getClass().getResource("/Icons/myPin.png")).getImage().getScaledInstance(24, 24, Image.SCALE_SMOOTH));
+                }
+                
+                 dto.getButton().setIcon(newImageIcon);
             }
             initUIPort();
         }
         
     }
+    
+    
+    public frm_GASimulation(IEventPortWaypoint IPEvent, Point mousePosition, JPanel OutputPanel, JLabel TitlePortSelection, JButton btnAddPort, JButton btnClearPort, JComboBox<String> cboMapType, JComboBox<PortDTO> cboPortFromSelected, JComboBox<ShipCategoryDTO> cboShipCode, JLabel jLabel10, JTabbedPane jTabbedPane1, JPanel jpDisplayStatus, JPanel jpPortComboArea, JPanel jpPortSelection, JPanel jpRouteDisplay, JPanel jpShipSelection, JXMapViewerCustom jxMapViewer_Simulation, JLabel lblChosenSpeed, JLabel lblDisplayStatus, JLabel lblDistance, JLabel lblFuelBunkerCost, JLabel lblFuelBunkered, JLabel lblIdealSpeed, JLabel lblLoadedCapacity, JLabel lblMaxSpeed, JLabel lblMinSpeed, JLabel lblOperationalCost, JLabel lblPortFromSelected, JLabel lblPortTo, JLabel lblShipBunkerCapacity, JLabel lblShipBunkerLevel, JLabel lblShipCapacity, JLabel lblShipCategory, JLabel lblShipCode, JLabel lblShipDescription, JLabel lblTimeTaken, JLabel lblTravelFuelCost, JMenuItem mnEnd, JMenuItem mnStart, JPopupMenu pmnChoosePointType, JPanel tabMap, JTabbedPane tabOutputDetail, JPanel tabPortOutputDetail, JPanel tabShipRouteDetail, JTextField txtChosenSpeed, JTextField txtDistance, JTextField txtFuelBunkerCost, JTextField txtFuelBunkered, JTextField txtIdealSpeed, JTextField txtLoadedCapacity, JTextField txtMaxSpeed, JTextField txtMinSpeed, JTextField txtOperationalCost, JTextField txtPortTo, JTextField txtShipBunkerCapacity, JTextField txtShipBunkerLevel, JTextField txtShipCapacity, JTextField txtShipCategory, JTextField txtShipDescription, JTextField txtTimeTaken3, JTextField txtTravelFuelCost) throws HeadlessException {
+        this.IPEvent = IPEvent;
+        this.mousePosition = mousePosition;
+        this.ResultPanel = OutputPanel;
+        this.TitlePortSelection = TitlePortSelection;
+        this.btnAddPort = btnAddPort;
+        this.btnClearPort = btnClearPort;
+        this.cboMapType = cboMapType;
+        this.cboPortToSelected = cboPortFromSelected;
+        this.cboShipCode = cboShipCode;
+        this.jLabel10 = jLabel10;
+        this.jtInputs = jTabbedPane1;
+        this.jpDisplayStatus = jpDisplayStatus;
+        this.jpPortSelection = jpPortSelection;
+        this.jpRouteDisplay = jpRouteDisplay;
+        this.jpShipSelection = jpShipSelection;
+        this.jxMapViewer_Simulation = jxMapViewer_Simulation;
+        this.lblChosenSpeed = lblChosenSpeed;
+        this.lblDisplayStatus = lblDisplayStatus;
+        this.lblDistance = lblDistance;
+        this.lblFuelBunkerCost = lblFuelBunkerCost;
+        this.lblFuelBunkered = lblFuelBunkered;
+        this.lblIdealSpeed = lblIdealSpeed;
+        this.lblLoadedDemand = lblLoadedCapacity;
+        this.lblMaxSpeed = lblMaxSpeed;
+        this.lblMinSpeed = lblMinSpeed;
+        this.lblOperationalCost = lblOperationalCost;
+        this.lblPortToSelected = lblPortFromSelected;
+        this.lblPortFrom = lblPortTo;
+        this.lblShipBunkerCapacity = lblShipBunkerCapacity;
+        this.lblShipBunkerLevel = lblShipBunkerLevel;
+        this.lblShipCapacity = lblShipCapacity;
+        this.lblShipLoadUnloadTimePerContainer = lblShipCategory;
+        this.lblShipCode = lblShipCode;
+        this.lblShipDescription = lblShipDescription;
+        this.lblTimeTaken = lblTimeTaken;
+        this.lblTravelFuelCost = lblTravelFuelCost;
+        this.mnEnd = mnEnd;
+        this.mnStart = mnStart;
+        this.pmnChoosePointType = pmnChoosePointType;
+        this.tabMap = tabMap;
+        this.tabDisplayDetail = tabOutputDetail;
+        this.tabPortOutputDetail = tabPortOutputDetail;
+        this.txtSelectedSpeed = txtChosenSpeed;
+        this.txtDistance = txtDistance;
+        this.txtFuelBunkerCost = txtFuelBunkerCost;
+        this.txtFuelBunkered = txtFuelBunkered;
+        this.txtDesignSpeed = txtIdealSpeed;
+        this.txtLoadedDemand = txtLoadedCapacity;
+        this.txtMaxSpeed = txtMaxSpeed;
+        this.txtMinSpeed = txtMinSpeed;
+        this.txtOperationalCost = txtOperationalCost;
+        this.txtPortTo = txtPortTo;
+        this.txtShipBunkerCapacity = txtShipBunkerCapacity;
+        this.txtShipBunkerLevel = txtShipBunkerLevel;
+        this.txtShipCapacity = txtShipCapacity;
+        this.txtShipLoadUnloadTimePerContainer = txtShipCategory;
+        this.txtShipDescription = txtShipDescription;
+        this.txtTimeTaken = txtTimeTaken3;
+        this.txtTravelFuelCost = txtTravelFuelCost;
+        
+        
+    }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -852,7 +867,7 @@ public class frm_GASimulation extends javax.swing.JFrame {
         tabMapLayout.setHorizontalGroup(
             tabMapLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(tabMapLayout.createSequentialGroup()
-                .addComponent(jxMapViewer_Simulation, javax.swing.GroupLayout.DEFAULT_SIZE, 871, Short.MAX_VALUE)
+                .addComponent(jxMapViewer_Simulation, javax.swing.GroupLayout.DEFAULT_SIZE, 872, Short.MAX_VALUE)
                 .addContainerGap())
         );
         tabMapLayout.setVerticalGroup(
@@ -1681,7 +1696,7 @@ public class frm_GASimulation extends javax.swing.JFrame {
 
     private void cboPortToSelectedActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cboPortToSelectedActionPerformed
         // TODO add your handling code here:
-        SetGUI_GenomeSelectedPortFrom((PortDTO)cboPortToSelected.getSelectedItem());
+        SetGUI_GenomeSelectedPortFrom((PortDTO)cboPortToSelected.getSelectedItem(),false);
     }//GEN-LAST:event_cboPortToSelectedActionPerformed
 
     private void txtFuelBunkerCostActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtFuelBunkerCostActionPerformed
@@ -1728,6 +1743,7 @@ public class frm_GASimulation extends javax.swing.JFrame {
     private void cboStartingPortActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cboStartingPortActionPerformed
         // TODO add your handling code here:
         SelectedStartPort = (PortDTO)cboStartingPort.getSelectedItem();
+        SetGUI_GenomeSelectedPortFrom(SelectedStartPort,true);
     }//GEN-LAST:event_cboStartingPortActionPerformed
 
     private void txtTargetOperationalCostFitnessActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtTargetOperationalCostFitnessActionPerformed
@@ -1832,6 +1848,7 @@ public class frm_GASimulation extends javax.swing.JFrame {
                     if(SelectedStartPort.portID == lstSelectedPorts.get(i).portID){
                         //init startingIndex
                         indexSelectedOriginPort = i;
+                        f_AfterOpt_SelectedPortID = SelectedStartPort.portID;
                     }
                     indexToPortMatrix.put(i,lstSelectedPorts.get(i));
                 }
