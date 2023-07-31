@@ -159,18 +159,18 @@ public class GA_PortAlgorithm {
         return children;
     }
     
-    public GAGenome mutate (GAGenome gaGenome){
+    public GAGenome mutate (GAGenome child){
         Random random = new Random();
         float mutate =  random.nextFloat();
         if(mutate < mutationRate){
             //mutate return a new GAGenome
-            List<Integer> genome = gaGenome.getGenome();
+            List<Integer> genome = child.getGenome();
             Collections.swap(genome, random.nextInt(genomeSize), random.nextInt(genomeSize));
             return new GAGenome (genome,numberOfPorts,IndexSelectedStartPort,
                     IndexToPortMatrix,SelectedShipCategory,TravelDistances,FuelFunctionType);
         }
         //else return same
-        return gaGenome;
+        return child;
     }
     
     public List<GAGenome> createGeneration(List<GAGenome> population){

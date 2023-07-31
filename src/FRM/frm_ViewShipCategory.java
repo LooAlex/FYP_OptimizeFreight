@@ -69,7 +69,7 @@ import javax.swing.table.TableColumnModel;
  * @author Loo Alex
  */
 public class frm_ViewShipCategory extends javax.swing.JFrame {
-    private List<ShipCategoryDTO> myShipCats;
+    private ArrayList<ShipCategoryDTO> lstShipCat;
     /**
      * Creates new form ViewShipCategory
      */
@@ -78,13 +78,33 @@ public class frm_ViewShipCategory extends javax.swing.JFrame {
         initAll();
     }
     public void initAll(){
+        CoreFunctions.resizeColumnWidth(dt_ViewShipCat, 120);
         getShipCategorys();
     }
     public void getShipCategorys(){
+        
         DAL_ShipCategory ddlShipCategory  = new DAL_ShipCategory();
         var result  = ddlShipCategory.getShipCategorys();
-        if(result.Data.size()>0){
-            myShipCats = result.Data;  
+        if (result.errors.hasErrors){
+            System.out.println("ErrorsMessage:" + result.errors.errorMessages.toString());
+        }else{
+            if(result.Data.size()>0){
+                 lstShipCat = result.Data;  
+                 initJtable_dt_ViewShipCat(lstShipCat);
+            }    
+        }
+    }
+    
+    public void initJtable_dt_ViewShipCat(ArrayList<ShipCategoryDTO> lstShipCat){
+        DefaultTableModel model = (DefaultTableModel)dt_ViewShipCat.getModel();
+        model.setRowCount(0);
+        if(lstShipCat!= null && lstShipCat.size()>0){
+            
+            for(var ship: lstShipCat){
+                model.addRow(ship.convertListShipToObjectgArray());
+            }
+            dt_ViewShipCat.setModel(model);
+            
         }
         
     }
@@ -99,31 +119,65 @@ public class frm_ViewShipCategory extends javax.swing.JFrame {
 
         jsViewShipCat = new javax.swing.JScrollPane();
         dt_ViewShipCat = new javax.swing.JTable();
+        filler1 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 0), new java.awt.Dimension(32767, 0));
+        jPanel1 = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setName("Ships"); // NOI18N
 
         dt_ViewShipCat.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
+                {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null}
             },
             new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
+                "Ship Category ID", "Code", "Description", "Capacity TEU", "Capacity FEU", "Min Speed", "Max Speed", "Design Speed", "Coeff_FuelIdle", "Coeff_Alpha", "Coeff_Beta", "Coeff_FuelTravel", "Coeff_Speed", "Coeff_Weight", "Bunker Capacity", "Critical Bunker Level", "Time To Load Unload", "Penalty Zero Bunker", "Remarks", "IsActive", "CreatedBy"
             }
-        ));
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        dt_ViewShipCat.setColumnSelectionAllowed(true);
         jsViewShipCat.setViewportView(dt_ViewShipCat);
+        dt_ViewShipCat.getColumnModel().getSelectionModel().setSelectionMode(javax.swing.ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+
+        jPanel1.setLayout(new java.awt.BorderLayout());
+
+        jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
+        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel1.setText("View Ship Category");
+        jPanel1.add(jLabel1, java.awt.BorderLayout.CENTER);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jsViewShipCat, javax.swing.GroupLayout.DEFAULT_SIZE, 1080, Short.MAX_VALUE)
+            .addComponent(jsViewShipCat, javax.swing.GroupLayout.DEFAULT_SIZE, 1119, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addGap(0, 0, Short.MAX_VALUE)
+                .addComponent(filler1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jsViewShipCat, javax.swing.GroupLayout.DEFAULT_SIZE, 720, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 74, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(filler1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jsViewShipCat, javax.swing.GroupLayout.PREFERRED_SIZE, 604, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
         pack();
@@ -167,6 +221,9 @@ public class frm_ViewShipCategory extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTable dt_ViewShipCat;
+    private javax.swing.Box.Filler filler1;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jsViewShipCat;
     // End of variables declaration//GEN-END:variables
 }

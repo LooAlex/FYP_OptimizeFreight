@@ -70,7 +70,7 @@ import javax.swing.table.TableColumnModel;
  */
 public class frm_ViewPort extends javax.swing.JFrame {
 
-    private List<PortDTO> lstPorts; //will not change
+    private ArrayList<PortDTO> lstPorts; //will not change
     private IEventPortWaypoint IPEvent;
     /**
      * Creates new form frm_ViewPort
@@ -78,6 +78,7 @@ public class frm_ViewPort extends javax.swing.JFrame {
     public frm_ViewPort() {
         initComponents();
         initAll();
+        this.setTitle("Ports");
     }
     public void initAll(){
         IPEvent = new IEventPortWaypoint() {
@@ -86,6 +87,8 @@ public class frm_ViewPort extends javax.swing.JFrame {
                 //empty IPEvent
             }
         };
+       
+        CoreFunctions.resizeColumnWidth(dt_ViewPorts, 120);
         getPorts();
 
     }
@@ -95,17 +98,30 @@ public class frm_ViewPort extends javax.swing.JFrame {
         DAL_Port dllport = new DAL_Port();
         var result = dllport.getPorts(IPEvent);
         
-       // var result = dllport.getPort_ListByRow(1, IPEvent);
        
-         if (result.errors.hasErrors){
+        if (result.errors.hasErrors){
             System.out.println("ErrorsMessage:" + result.errors.errorMessages.toString());
         }else{
              lstPorts = result.Data; //expecting List<String[]>
+             initJtable_dt_ViewPorts(lstPorts);
          
         }
          
     }
-    
+    public void initJtable_dt_ViewPorts(ArrayList<PortDTO> lstPorts){
+        DefaultTableModel model = (DefaultTableModel)dt_ViewPorts.getModel();
+        model.setRowCount(0);
+        if(lstPorts!= null && lstPorts.size() > 0){
+            
+           
+            for(var port: lstPorts){
+                model.addRow(port.convertListPortToObjectArray());
+            }
+            dt_ViewPorts.setModel(model);
+            
+        }
+        
+    }
    
     /**
      * This method is called from within the constructor to initialize the form.
@@ -118,34 +134,61 @@ public class frm_ViewPort extends javax.swing.JFrame {
 
         jsViewPort = new javax.swing.JScrollPane();
         dt_ViewPorts = new javax.swing.JTable();
+        jPanel1 = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setName("Ports"); // NOI18N
 
         dt_ViewPorts.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
+                {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null}
             },
             new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
+                "Port ID", "Country ID", "Cabotage Region ID", "Region ID", "UnLocode", "Port Name", "Latitude", "Longitude", "Port Call Cost", "Port Fuel Price", "CanBunker", "Cost Load Unload", "Penalty Late Arrival", "Remarks", "IsActive", "CreatedBy"
             }
-        ));
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        dt_ViewPorts.setColumnSelectionAllowed(true);
         jsViewPort.setViewportView(dt_ViewPorts);
+        dt_ViewPorts.getColumnModel().getSelectionModel().setSelectionMode(javax.swing.ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+
+        jPanel1.setLayout(new java.awt.BorderLayout());
+
+        jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
+        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel1.setText("View Port");
+        jPanel1.add(jLabel1, java.awt.BorderLayout.CENTER);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jsViewPort, javax.swing.GroupLayout.DEFAULT_SIZE, 1080, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jsViewPort, javax.swing.GroupLayout.DEFAULT_SIZE, 720, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 65, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jsViewPort, javax.swing.GroupLayout.PREFERRED_SIZE, 616, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
         pack();
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     /**
@@ -185,6 +228,8 @@ public class frm_ViewPort extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTable dt_ViewPorts;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jsViewPort;
     // End of variables declaration//GEN-END:variables
 }

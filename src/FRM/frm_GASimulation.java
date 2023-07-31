@@ -86,17 +86,17 @@ public class frm_GASimulation extends javax.swing.JFrame {
        
     public Set<PortDTO> setSelectedPorts = new HashSet<>();
     public ArrayList<PortDTO> lstSelectedPorts = new ArrayList<>();//used to bound index order as HashSet does not maintain order.
-    public ShipCategoryDTO SelectedShipCategory;
+    public ShipCategoryDTO selectedShipCategory;
     public ContainerTypeDTO SelectedContainerType;
     public PortDTO SelectedStartPort;
-    public int IndexSelectedStartPort;
+    public int indexSelectedOriginPort;
     
     public GAGenome result;
     public int ShipContainerCapacity;
     public double FrequencyCycle = 2.00; //number of weeks
     
     public String[] arrSelectedPortName;
-    public double TargetOrperatingCostFitness = 0;
+    public double targetOrperatingCostFitness = 0;
     public int generationSize   = 5000;
     public int reproductionSize = 200;
     public int tournamentSize   = 40;
@@ -105,7 +105,7 @@ public class frm_GASimulation extends javax.swing.JFrame {
     public CoreEnum.SelectionType type ;
     public String[] arrFuelFunctionTypes = new String[]{"Weight Variable","Speed Only"};
     public CoreEnum.FuelFunctionType Ftype;
-    public CoreEnum.FuelFunctionType FTypeUsed;
+    public CoreEnum.FuelFunctionType functionTypeUsed;
     public boolean FlipFunction;
     //private List<PortDTO> setSelectedPorts = new ArrayList<>();
     private List<RoutingData> myRoutingData = new ArrayList<>();
@@ -203,8 +203,8 @@ public class frm_GASimulation extends javax.swing.JFrame {
             cboShipCode.addItem(s);
         }
         cboShipCode.setSelectedIndex(0);
-        SelectedShipCategory = cboShipCode.getItemAt(0);
-        setShipCategoryToGUIDisplay(SelectedShipCategory);
+        selectedShipCategory = cboShipCode.getItemAt(0);
+        setShipCategoryToGUIDisplay(selectedShipCategory);
        
         
     }
@@ -344,12 +344,12 @@ public class frm_GASimulation extends javax.swing.JFrame {
     }
     public void setShipCategoryToGUIDisplay(ShipCategoryDTO s){
 
-        ShipContainerCapacity = SelectedShipCategory.capacityTEU;
+        ShipContainerCapacity = selectedShipCategory.capacityTEU;
         
         //refresh demands of all ports base on category
         for(int i = 0; i<lstPorts.size(); i++){
             PortDTO dto = lstPorts.get(i);
-            DemandDTO newDemands = new DemandDTO(ShipContainerCapacity);
+            DemandDTO newDemands = new DemandDTO(0,ShipContainerCapacity);
             dto.setDemands(newDemands);
             lstPorts.set(i, dto);
         }
@@ -543,28 +543,28 @@ public class frm_GASimulation extends javax.swing.JFrame {
     }
     public void setGUI_resultGenome(){
         
-         if(result != null && Ftype != null && result.DataPortHistory != null){
-             FTypeUsed = Ftype;
+         if(result != null && Ftype != null && result.dataPortHistory != null){
+             functionTypeUsed = Ftype;
              System.out.println(result.toString());
              String resultMessage = "";
-             if(FTypeUsed == CoreEnum.FuelFunctionType.WEIGHTVARIABLE){
+             if(functionTypeUsed == CoreEnum.FuelFunctionType.WEIGHTVARIABLE){
                  resultMessage+="Weight Variable Function\n";
-             }else if(FTypeUsed == CoreEnum.FuelFunctionType.SPEEDONLY){
+             }else if(functionTypeUsed == CoreEnum.FuelFunctionType.SPEEDONLY){
                  resultMessage+="Speed Only Variable Function\n";
              }
              
             double fitness = 0;
             result.toPath();
     //FinalResult
-            fitness = result.CalculateNewFitness(FTypeUsed);
+            fitness = result.calculateNewFitness(functionTypeUsed);
             
             initJtable_PortDetails();
             
             
             DecimalFormat df = CoreFunctions.getDecimalFormat(2);
             
-            taFinalPath.setText(resultMessage+result.Path);
-            txtGenomeTotalDistanceTravel.setText(df.format(result.TotalDistanceTravel));
+            taFinalPath.setText(resultMessage+result.path);
+            txtGenomeTotalDistanceTravel.setText(df.format(result.totalDistanceTravel));
             
             String fitnessDisplay  = "";
             String errorMsg ="";
@@ -572,7 +572,7 @@ public class frm_GASimulation extends javax.swing.JFrame {
             if(fitness < Integer.MAX_VALUE/10){
                 fitnessDisplay = df.format(fitness);
             }else{
-                if(result.TotalDistanceTravel>= Integer.MAX_VALUE/4){
+                if(result.totalDistanceTravel>= Integer.MAX_VALUE/4){
                     errorMsg = "Infeasable Distance. Some Ports cannot be used as pairs.";
                 }
                 else if (fitness > Integer.MAX_VALUE/10 && FlipFunction){
@@ -595,16 +595,16 @@ public class frm_GASimulation extends javax.swing.JFrame {
             for(int i = 0 ; i<result.getGenome_FullCyclePath().size() ; i++){
                 
                 if(i == 0 ){
-                    tempPort = result.DataPortsAlter.get(i);
+                    tempPort = result.dataPortsAlter.get(i);
                     tempPort.portName = tempPort.portName+" ORIGIN";
                     cboPortToSelected.addItem(tempPort);
                 }
                 else if( i == result.getGenome_FullCyclePath().size()-1){
-                    tempPort = result.DataPortsAlter.get(i);
+                    tempPort = result.dataPortsAlter.get(i);
                     tempPort.portName = tempPort.portName+" DESTINATION";
                     cboPortToSelected.addItem(tempPort);
                 }else{
-                    cboPortToSelected.addItem(result.DataPortsAlter.get(i));
+                    cboPortToSelected.addItem(result.dataPortsAlter.get(i));
                 }
             }
             SetGUI_GenomeSelectedPortFrom(cboPortToSelected.getItemAt(0));
@@ -616,9 +616,9 @@ public class frm_GASimulation extends javax.swing.JFrame {
     public void initJtable_PortDetails(){
         DefaultTableModel model = (DefaultTableModel)dt_PortDetails.getModel();
         model.setRowCount(0);
-        if(result!= null && result.DataPortsAlter !=null){
+        if(result!= null && result.dataPortsAlter !=null){
             
-            LinkedList<Object[]> lst = result.convertDataPortToStringArray(result.DataPortsAlter);
+            LinkedList<Object[]> lst = result.convertDataPortToStringArray(result.dataPortsAlter);
             for(var arr: lst){
                 model.addRow(arr);
             }
@@ -852,7 +852,7 @@ public class frm_GASimulation extends javax.swing.JFrame {
         tabMapLayout.setHorizontalGroup(
             tabMapLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(tabMapLayout.createSequentialGroup()
-                .addComponent(jxMapViewer_Simulation, javax.swing.GroupLayout.DEFAULT_SIZE, 872, Short.MAX_VALUE)
+                .addComponent(jxMapViewer_Simulation, javax.swing.GroupLayout.DEFAULT_SIZE, 871, Short.MAX_VALUE)
                 .addContainerGap())
         );
         tabMapLayout.setVerticalGroup(
@@ -874,7 +874,7 @@ public class frm_GASimulation extends javax.swing.JFrame {
                 {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null}
             },
             new String [] {
-                "SequenceNo", "Port From", "Port To", "Distance", "Speed", "Time", "Fuel Consumed Travel", "Time Arrival", "Time Left", "Fuel Arrival", "Port Time Taken", "Fuel At Leave", "Port Supply", "Port Demand", "Cost Per Container", "Oper Time", "Oper Fuel Consumed", "Has Bunker", "Amount Bunkered", "Port Fuel Price", "Is Late", "Time Late", "Has NoFuel", "Dept Bunker", "Port Call", "Total Travel Cost", "Total Idle Fuel Cost", "Total Handling Cost", "Total Penalty Cost", "Total Value Fuel Left", "Total Operating Cost"
+                "SequenceNo", "Port From", "Port To", "Distance", "Speed", "Time", "Fuel Consumed Travel", "Port Time Taken", "Time Arrival", "Time Left", "Fuel Arrival", "Fuel At Leave", "Port Supply", "Port Demand", "Cost Per Container", "Oper Time", "Oper Fuel Consumed", "Has Bunker", "Amount Bunkered", "Port Fuel Price", "Is Late", "Time Late", "Has NoFuel", "Dept Bunker", "Port Call", "Total Travel Cost", "Total Idle Fuel Cost", "Total Handling Cost", "Total Penalty Cost", "Total Value Fuel Left", "Total Operating Cost"
             }
         ) {
             boolean[] canEdit = new boolean [] {
@@ -886,7 +886,9 @@ public class frm_GASimulation extends javax.swing.JFrame {
             }
         });
         dt_PortDetails.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
+        dt_PortDetails.setColumnSelectionAllowed(true);
         jScrollPane6.setViewportView(dt_PortDetails);
+        dt_PortDetails.getColumnModel().getSelectionModel().setSelectionMode(javax.swing.ListSelectionModel.SINGLE_INTERVAL_SELECTION);
 
         javax.swing.GroupLayout tabPortOutputDetailLayout = new javax.swing.GroupLayout(tabPortOutputDetail);
         tabPortOutputDetail.setLayout(tabPortOutputDetailLayout);
@@ -1673,8 +1675,8 @@ public class frm_GASimulation extends javax.swing.JFrame {
     }//GEN-LAST:event_mnEndActionPerformed
 
     private void cboShipCodeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cboShipCodeActionPerformed
-        SelectedShipCategory = (ShipCategoryDTO)cboShipCode.getSelectedItem();
-        setShipCategoryToGUIDisplay(SelectedShipCategory);
+        selectedShipCategory = (ShipCategoryDTO)cboShipCode.getSelectedItem();
+        setShipCategoryToGUIDisplay(selectedShipCategory);
     }//GEN-LAST:event_cboShipCodeActionPerformed
 
     private void cboPortToSelectedActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cboPortToSelectedActionPerformed
@@ -1781,7 +1783,7 @@ public class frm_GASimulation extends javax.swing.JFrame {
     private void btnAlterFuelFunctionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAlterFuelFunctionActionPerformed
         // TODO add your handling code here:
 
-        if(Ftype == FTypeUsed){
+        if(Ftype == functionTypeUsed){
             FlipFunction = true;
             //reverse
             int index = cboSelectedFuelFunction.getSelectedIndex();
@@ -1804,7 +1806,7 @@ public class frm_GASimulation extends javax.swing.JFrame {
         String errorMsg = "";
         long startTime = System.nanoTime();
         if  (      (lstSelectedPorts !=null && lstSelectedPorts.size()>2)
-            && (SelectedContainerType != null) && (SelectedShipCategory != null)
+            && (SelectedContainerType != null) && (selectedShipCategory != null)
             && (Ftype != null)
             && (type !=null) && (SelectedStartPort !=null)
             && (generationSize >=2000 && reproductionSize >=200 && tournamentSize >= 10)
@@ -1815,60 +1817,60 @@ public class frm_GASimulation extends javax.swing.JFrame {
             int dailogResult = JOptionPane.showConfirmDialog(null, "Do you want to start algorithm?","Warning",dialogButton,JOptionPane.WARNING_MESSAGE);
             if(dailogResult == 0){
                 //1. prepare Fueltype function use
-                FTypeUsed = Ftype;
+                functionTypeUsed = Ftype;
                 FlipFunction = false;
-                TargetOrperatingCostFitness = Double.valueOf(txtTargetOperationalCostFitness.getText());
+                targetOrperatingCostFitness = Double.valueOf(txtTargetOperationalCostFitness.getText());
                 //Init Ship AverageWeightPerContainerUtilized and weeklyFrequency
-                SelectedShipCategory.avgWeightUtilizeContainer = SelectedContainerType.getAvgUtilizeWeight();
-                SelectedShipCategory.weeklyFrequencyHour = FrequencyCycle * (24.00*7.00); //in hours 2 week = 336hr
+                selectedShipCategory.avgWeightUtilizeContainer = SelectedContainerType.getAvgUtilizeWeight();
+                selectedShipCategory.weeklyFrequencyHour = FrequencyCycle * (24.00*7.00); //in hours 2 week = 336hr
                 
                 //2.Create IndexToPortDTOMatrix
-                HashMap<Integer,PortDTO> IndexToPortMatrix = new HashMap<>();
+                HashMap<Integer,PortDTO> indexToPortMatrix = new HashMap<>();
                 int numberOfPorts = lstSelectedPorts.size();
                 for(int i = 0; i<numberOfPorts;i++){
 
                     if(SelectedStartPort.portID == lstSelectedPorts.get(i).portID){
                         //init startingIndex
-                        IndexSelectedStartPort = i;
+                        indexSelectedOriginPort = i;
                     }
-                    IndexToPortMatrix.put(i,lstSelectedPorts.get(i));
+                    indexToPortMatrix.put(i,lstSelectedPorts.get(i));
                 }
                     
                 //3. Create TravelDistancesMatrix
-                double[][] TravelDistances = new double[numberOfPorts][numberOfPorts];
+                double[][] travelDistances = new double[numberOfPorts][numberOfPorts];
                 DAL_PortPair dllPortPair = new DAL_PortPair();
                 for(int i = 0; i<numberOfPorts;i++){
                     for(int j =0; j<numberOfPorts; j++){
                         if(i == j){
-                            TravelDistances[i][j] = 0;
+                            travelDistances[i][j] = 0;
                         }else{
-                            var data = dllPortPair.getPairPortDistance_ListByRow(IndexToPortMatrix.get(i).portID, 
-                                    IndexToPortMatrix.get(j).portID).Data;
+                            var data = dllPortPair.getPairPortDistance_ListByRow(indexToPortMatrix.get(i).portID, 
+                                    indexToPortMatrix.get(j).portID).Data;
                             
                             if(data != null && data.size() > 0){
                                 //we got the distance
-                                TravelDistances[i][j] = data.get(0).Distance;
-                                TravelDistances[j][i] = TravelDistances[i][j];
+                                travelDistances[i][j] = data.get(0).Distance;
+                                travelDistances[j][i] = travelDistances[i][j];
                             }
                         }
                     }
                 }
-                printTravelDistances(TravelDistances, numberOfPorts);
+                printTravelDistances(travelDistances, numberOfPorts);
                 
                 //4. Init GA Parameters
                 GA_PortAlgorithm portAlgorithm = new GA_PortAlgorithm(
-                    SelectedShipCategory,
-                    numberOfPorts,IndexSelectedStartPort,
-                    IndexToPortMatrix,TravelDistances,
-                    TargetOrperatingCostFitness,
+                    selectedShipCategory,
+                    numberOfPorts,indexSelectedOriginPort,
+                    indexToPortMatrix,travelDistances,
+                    targetOrperatingCostFitness,
                     generationSize,reproductionSize,mutationRate,
                     type,tournamentSize,
-                    FTypeUsed
+                    functionTypeUsed
                 );
                 
                 //5 Start Optimization
                 result  = portAlgorithm.optimize();
-                if(result != null && result.DataPortHistory != null){
+                if(result != null && result.dataPortHistory != null){
                     JOptionPane.showMessageDialog(null, "Finished!","Message", JOptionPane.INFORMATION_MESSAGE);
                 
                 //6 Display result in GUIs

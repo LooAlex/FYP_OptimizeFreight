@@ -27,27 +27,27 @@ public class GAGenome implements Comparable<GAGenome>{
     }
 
     public int getIndexStartingPort() {
-        return IndexStartingPort;
+        return indexOriginPort;
     }
 
     public void setIndexStartingPort(int IndexStartingPort) {
-        this.IndexStartingPort = IndexStartingPort;
+        this.indexOriginPort = IndexStartingPort;
     }
 
     public double getTotalDistanceTravel() {
-        return TotalDistanceTravel;
+        return totalDistanceTravel;
     }
 
     public void setTotalDistanceTravel(double TotalDistanceTravel) {
-        this.TotalDistanceTravel = TotalDistanceTravel;
+        this.totalDistanceTravel = TotalDistanceTravel;
     }
 
-    public float getTotalTimeTaken() {
-        return TotalTimeTaken;
+    public double getTotalTimeTaken() {
+        return totalTimeTaken;
     }
 
     public void setTotalTimeTaken(float TotalTimeTaken) {
-        this.TotalTimeTaken = TotalTimeTaken;
+        this.totalTimeTaken = TotalTimeTaken;
     }
 
     public ShipCategoryDTO getShip() {
@@ -59,28 +59,28 @@ public class GAGenome implements Comparable<GAGenome>{
     }
 
     public HashMap<Integer, PortDTO> getIndexToPortMatrix() {
-        return IndexToPortMatrix;
+        return indexToPortMatrix;
     }
 
     public void setIndexToPortMatrix(HashMap<Integer, PortDTO> IndexToPortMatrix) {
-        this.IndexToPortMatrix = IndexToPortMatrix;
+        this.indexToPortMatrix = IndexToPortMatrix;
     }
 
     List<Integer> genome;   //all ports except origin and destination for shuffle
     ArrayList<Integer> genome_FullCyclePath ;
-    public ArrayList<PortDTO> DataPortHistory;        //neutral first data
-    public ArrayList<PortDTO>DataPortsAlter;    //store altered data.
+    public ArrayList<PortDTO> dataPortHistory;        //neutral first data
+    public ArrayList<PortDTO>dataPortsAlter;    //store altered data.
     double[][] travelDistances;
-    int IndexStartingPort;  
+    int indexOriginPort;  
     int numberOfPorts;
     double fitness;         //totalOperatingCost for that portSequence including StartingPort
-    CoreEnum.FuelFunctionType FType;
+    CoreEnum.FuelFunctionType fuelType;
     
-    float TotalTimeTaken;
+    double totalTimeTaken;
     public ShipCategoryDTO ship;
-    public HashMap<Integer, PortDTO> IndexToPortMatrix;  //
-    public String Path ;
-    public double TotalDistanceTravel;
+    public HashMap<Integer, PortDTO> indexToPortMatrix;  //
+    public String path ;
+    public double totalDistanceTravel;
    
     
     public List<Integer> getGenome() {
@@ -92,11 +92,11 @@ public class GAGenome implements Comparable<GAGenome>{
     }
 
     public int getStatingPort() {
-        return IndexStartingPort;
+        return indexOriginPort;
     }
 
     public void setStatingPort(int statingPort) {
-        this.IndexStartingPort = statingPort;
+        this.indexOriginPort = statingPort;
     }
 
     public int getNumberOfPorts() {
@@ -133,7 +133,7 @@ public class GAGenome implements Comparable<GAGenome>{
             CoreEnum.FuelFunctionType selectedFtype
         ) {
         this.numberOfPorts  = numberOfPorts;//to make random int shuffle
-        this.IndexStartingPort = IndexSelectedStartingPort;//access indexMatrix and create genome
+        this.indexOriginPort = IndexSelectedStartingPort;//access indexMatrix and create genome
         
         createIndexToPortMatrix(IndexToPortMatrix);
         
@@ -144,15 +144,15 @@ public class GAGenome implements Comparable<GAGenome>{
         this.genome = randomPorts(); //all ports except orgin and destination
         //addFullPath
         createFullPath();
-        this.FType = selectedFtype;
-        this.fitness = this.calculateFitness(FType);
+        this.fuelType = selectedFtype;
+        this.fitness = this.calculateFitness(fuelType);
    
     }
     
      //userDefined genome //from mutation or permutation
     public GAGenome (List<Integer> permutationOfPorts, int numberOfPorts, int IndexSelectedStartingPort, HashMap<Integer,PortDTO> IndexToPortMatrix,ShipCategoryDTO SelectedShipCategory, double [][]travelDistances,CoreEnum.FuelFunctionType selectedFtype){
         this.numberOfPorts  = numberOfPorts;//to make random int shuffle
-        this.IndexStartingPort = IndexSelectedStartingPort;//access indexMatrix and create genome
+        this.indexOriginPort = IndexSelectedStartingPort;//access indexMatrix and create genome
         
         createIndexToPortMatrix(IndexToPortMatrix);
         
@@ -163,27 +163,27 @@ public class GAGenome implements Comparable<GAGenome>{
         //addFullPath
         createFullPath();
         
-        this.FType = selectedFtype;
-        this.fitness = this.calculateFitness(FType);
+        this.fuelType = selectedFtype;
+        this.fitness = this.calculateFitness(fuelType);
         
     }
     private void createIndexToPortMatrix(HashMap<Integer,PortDTO> IndexToPortMatrix){
-        this.IndexToPortMatrix = new HashMap<>();
-        this.IndexToPortMatrix.putAll(IndexToPortMatrix);
+        this.indexToPortMatrix = new HashMap<>();
+        this.indexToPortMatrix.putAll(IndexToPortMatrix);
     }
     private void createFullPath(){
         this.genome_FullCyclePath = new ArrayList<>();
-        this.genome_FullCyclePath.add(IndexStartingPort);//Start Origin Port
+        this.genome_FullCyclePath.add(indexOriginPort);//Start Origin Port
         for(int i = 0 ; i< genome.size() ; i++){
             this.genome_FullCyclePath.add(genome.get(i));
         }
-        this.genome_FullCyclePath.add(IndexStartingPort);//End Origin Port
+        this.genome_FullCyclePath.add(indexOriginPort);//End Origin Port
     }
     //we can use the randomPorts as it will always be 0-NPorts and IndexStartingPoint will be same
     private List<Integer> randomPorts(){
         List<Integer> result = new ArrayList<>();
         for(int i = 0; i<numberOfPorts; i++){
-            if(i != IndexStartingPort)
+            if(i != indexOriginPort)
                 result.add(i);
         }
         Collections.shuffle(result);
@@ -193,18 +193,18 @@ public class GAGenome implements Comparable<GAGenome>{
     
     public double calculateFitness(CoreEnum.FuelFunctionType cal_FType){
         double fitnessOper = 0;
-        int IndexPreviousPort  = this.IndexStartingPort; 
+        int IndexPreviousPort  = this.indexOriginPort; 
         
         int i_LastPort = genome_FullCyclePath.size()-1;
         int IndexCurrentPort = 0;   
         
         double final_Hvi;
-        this.DataPortHistory = new ArrayList<>();
+        this.dataPortHistory = new ArrayList<>();
         String previousPortName  ="";
        
        for(int i = 0; i < genome_FullCyclePath.size() ; i++){
             IndexCurrentPort = genome_FullCyclePath.get(i); 
-            PortDTO currentPort = new PortDTO(IndexToPortMatrix.get(IndexCurrentPort));
+            PortDTO currentPort = new PortDTO(indexToPortMatrix.get(IndexCurrentPort));
             currentPort.shp_chosenSpeed = ship.SelectedSpeed;
             
             if(i == i_LastPort){
@@ -319,7 +319,7 @@ public class GAGenome implements Comparable<GAGenome>{
                     currentPort.totalPenaltyCost + currentPort.totalHandlingCost + currentPort.totalFuelIdleCost + final_Hvi);
             
             fitnessOper += currentPort.totalOperationalCost;
-            TotalDistanceTravel += ship.DistanceTravel;
+            totalDistanceTravel += ship.DistanceTravel;
             
             ship.previousPortName = previousPortName;
             IndexPreviousPort = IndexCurrentPort;
@@ -327,9 +327,9 @@ public class GAGenome implements Comparable<GAGenome>{
             //copy
             ShipCategoryDTO currentShip = new ShipCategoryDTO(ship);
             currentPort.currentShip = currentShip;
-            this.DataPortHistory.add(currentPort);
+            this.dataPortHistory.add(currentPort);
         }
-        TotalTimeTaken = (float)ship.timeLeave/24;
+        totalTimeTaken = ship.timeLeave/24;
         toPath();
         
         Double check = fitnessOper;   
@@ -339,12 +339,12 @@ public class GAGenome implements Comparable<GAGenome>{
         return fitnessOper;
     }
     
-    public double CalculateNewFitness(CoreEnum.FuelFunctionType cal_FType){
+    public double calculateNewFitness(CoreEnum.FuelFunctionType cal_FType){
         //deep copy
         deepCopyPorts();
         double fitnessOperNew = 0;
         
-        int i_LastPort =DataPortsAlter.size()-1;
+        int i_LastPort =dataPortsAlter.size()-1;
         
         double final_Hvi;
         
@@ -352,8 +352,8 @@ public class GAGenome implements Comparable<GAGenome>{
         double SpeedToNextPort = 0.00d;
         //DataPort Should be like the reusable history
         double previousBunkerAfterOper_Avi = 0.00d;
-        for(int i = 0 ; i <DataPortsAlter.size(); i++){
-            PortDTO currentPort  = DataPortsAlter.get(i);
+        for(int i = 0 ; i <dataPortsAlter.size(); i++){
+            PortDTO currentPort  = dataPortsAlter.get(i);
             ShipCategoryDTO shipLeavingCurrentPort = currentPort.currentShip;
             
             //all ship store are stored after they have selected a speed for next port
@@ -444,9 +444,9 @@ public class GAGenome implements Comparable<GAGenome>{
     }
     
     public void deepCopyPorts(){
-        DataPortsAlter = new ArrayList<>();
-        for(int i = 0; i<DataPortHistory.size() ; i++){
-            DataPortsAlter.add(new PortDTO(DataPortHistory.get(i)));
+        dataPortsAlter = new ArrayList<>();
+        for(int i = 0; i<dataPortHistory.size() ; i++){
+            dataPortsAlter.add(new PortDTO(dataPortHistory.get(i)));
         }
     }
     public void setPortETA(int i){
@@ -460,7 +460,7 @@ public class GAGenome implements Comparable<GAGenome>{
         
         double FuelConsumedTraveled = 0.00d;
         if(Ftype == CoreEnum.FuelFunctionType.SPEEDONLY){
-            FuelConsumedTraveled = FuelFunctionSpeedOnly(FuelAmountAtLeave_PreviousPort, ship);
+            FuelConsumedTraveled = fuelFunctionSpeedOnly(FuelAmountAtLeave_PreviousPort, ship);
         }else if (Ftype == CoreEnum.FuelFunctionType.WEIGHTVARIABLE){
             FuelConsumedTraveled = FuelFunctionWeightVariable(FuelAmountAtLeave_PreviousPort, ship);
         }
@@ -469,7 +469,7 @@ public class GAGenome implements Comparable<GAGenome>{
         
         return (FuelAmountAtLeave_PreviousPort - ship.FuelConsumedTraveled);
     }
-    public double FuelFunctionSpeedOnly (double FuelAmountAtLeave_PreviousPost,  ShipCategoryDTO ship){
+    public double fuelFunctionSpeedOnly (double FuelAmountAtLeave_PreviousPost,  ShipCategoryDTO ship){
         
         return (ship.timeTravel/24.00) * (ship.Coeff_c_speed * Math.pow(ship.SelectedSpeed, 3) + ship.Coeff_c_weight); 
     }
@@ -562,18 +562,18 @@ public class GAGenome implements Comparable<GAGenome>{
         sb.append("PathID: ");
         
         for(int i = 0 ; i < genome_FullCyclePath.size(); i++){
-            sb.append(IndexToPortMatrix.get(genome_FullCyclePath.get(i)).getPortID());
+            sb.append(indexToPortMatrix.get(genome_FullCyclePath.get(i)).getPortID());
             sb.append(" ");
         }
         sb.append("\nPath: ");
         
         for(int i = 0 ; i < genome_FullCyclePath.size(); i++){
-            sb.append(IndexToPortMatrix.get(genome_FullCyclePath.get(i)).getPortName());
+            sb.append(indexToPortMatrix.get(genome_FullCyclePath.get(i)).getPortName());
             if(i != genome_FullCyclePath.size()-1){
                 sb.append(" -> ");
             }       
         }
-        Path = sb.toString();
+        path = sb.toString();
     }
     
     public LinkedList<Object[]> convertDataPortToStringArray(ArrayList<PortDTO> DataPort){
@@ -593,14 +593,14 @@ public class GAGenome implements Comparable<GAGenome>{
                 
                 String TimeArrival      = df.format(DataPort.get(i).currentShip.timeArrival  );
                 String TimeLeft         = df.format(DataPort.get(i).currentShip.timeLeave  );
-                String PortTimeTaken        = df.format(DataPort.get(i).shp_PortTimeTaken);
+                String PortTimeTaken    = df.format(DataPort.get(i).shp_PortTimeTaken);
                 String FuelArrival      = df.format(DataPort.get(i).currentShip.BunkerLevelAtArrival  );
                 String FuelAtLeave      = df.format(DataPort.get(i).currentShip.BunkerLevelAfterOper  );
                 
                 String PortSupply       = df.format(DataPort.get(i).currentShip.AmountUnloaded  );
                 String PortDemand       = df.format(DataPort.get(i).currentShip.AmountLoaded   );
                 String CostPerContainer = df.format(DataPort.get(i).port_CostPerFullContainer  );
-                String OperTime         = df.format(DataPort.get(i).shp_PortTimeTaken  );
+                String OperTime         = df.format(DataPort.get(i).currentShip.TotalOperationTime  );
                 String OperFuelConsumed = df.format(DataPort.get(i).currentShip.FuelConsumedIdle  );
                 
                 boolean HasBunker       = DataPort.get(i).currentShip.hasBunkered  ;
@@ -649,7 +649,7 @@ public class GAGenome implements Comparable<GAGenome>{
     public String toString(){
         StringBuilder sb = new StringBuilder();
         toPath();
-        sb.append(Path); 
+        sb.append(path); 
         sb.append("\nTotal Operation Cost: ");
         sb.append(new BigDecimal(getFitness()).setScale(2,RoundingMode.HALF_UP));
         

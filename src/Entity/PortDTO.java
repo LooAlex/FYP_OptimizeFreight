@@ -7,17 +7,13 @@ import java.sql.*;
 import Entity.GUI_Entity.GUI_Port.IEventPortWaypoint;
 import Core.*;
 import Entity.GUI_Entity.GUI_Port.ButtonPort;
-import com.fasterxml.jackson.databind.ser.PropertyBuilder;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.LinkedList;
-
 import javax.swing.JButton;
-import jdk.jfr.Description;
 import org.jxmapviewer.viewer.DefaultWaypoint;
 import org.jxmapviewer.viewer.GeoPosition;
 
@@ -488,9 +484,9 @@ public class PortDTO extends DefaultWaypoint {
         //9 canBunker  
         canBunker = ((arrCSVLine.length < ColumnIndexCSV.CAN_BUNKER+1 || arrCSVLine[ColumnIndexCSV.CAN_BUNKER]== null || arrCSVLine[ColumnIndexCSV.CAN_BUNKER].isBlank() ) ? false : CoreFunctions.convertStringToBoolean(arrCSVLine[ColumnIndexCSV.CAN_BUNKER]));
         
-        penalty_LateArrival = ((arrCSVLine.length < ColumnIndexCSV.PENALTY_LATE_ARRIVAL_PER_HOUR+1 || arrCSVLine[ColumnIndexCSV.PENALTY_LATE_ARRIVAL_PER_HOUR]== null || arrCSVLine[ColumnIndexCSV.PENALTY_LATE_ARRIVAL_PER_HOUR].isBlank() ) ? 0.00d : Double.parseDouble(arrCSVLine[ColumnIndexCSV.PENALTY_LATE_ARRIVAL_PER_HOUR]));;
+        penalty_LateArrival = ((arrCSVLine.length < ColumnIndexCSV.PENALTY_LATE_ARRIVAL_PER_HOUR+1 || arrCSVLine[ColumnIndexCSV.PENALTY_LATE_ARRIVAL_PER_HOUR]== null || arrCSVLine[ColumnIndexCSV.PENALTY_LATE_ARRIVAL_PER_HOUR].isBlank() ) ? 0.00d : Double.parseDouble(arrCSVLine[ColumnIndexCSV.PENALTY_LATE_ARRIVAL_PER_HOUR]));
         
-        remarks = ((arrCSVLine.length < ColumnIndexCSV.REMARKS+1 || arrCSVLine[ColumnIndexCSV.REMARKS]== null || arrCSVLine[ColumnIndexCSV.REMARKS].isBlank() ) ? "" : arrCSVLine[ColumnIndexCSV.REMARKS]);;
+        remarks = ((arrCSVLine.length < ColumnIndexCSV.REMARKS+1 || arrCSVLine[ColumnIndexCSV.REMARKS]== null || arrCSVLine[ColumnIndexCSV.REMARKS].isBlank() ) ? "" : arrCSVLine[ColumnIndexCSV.REMARKS]);
         
         isActive =  ((arrCSVLine.length < ColumnIndexCSV.ISACTIVE+1 || arrCSVLine[ColumnIndexCSV.ISACTIVE]== null || arrCSVLine[ColumnIndexCSV.ISACTIVE].isBlank() ) ? false : CoreFunctions.convertStringToBoolean(arrCSVLine[ColumnIndexCSV.ISACTIVE]));
         
@@ -548,38 +544,45 @@ public class PortDTO extends DefaultWaypoint {
         return this.getPortName();
     }
     
-    public Object[] convertListPortToStringArray(){
+    public Object[] convertListPortToObjectArray(){
         
         
         
 
-//                DecimalFormat df = CoreFunctions.getDecimalFormat(2);
-//                
-//                String PortID       =  this.PortID;
-//                String portName       = this.portName;
-//               
-//                String PortDemand       = df.format(DataPort.get(i).currentShip.AmountLoaded   );
-//                String CostPerContainer = df.format(DataPort.get(i).port_CostPerFullContainer  );
-//                
-//                String PortFuelPrice    =  df.format(DataPort.get(i).port_FuelPrice ); 
-//               
-//               
-//                String PortCall         = df.format(DataPort.get(i).portCall_Cost  );
-//                
-//                converted.add(new Object[]{
-//                    sequenceNo,PortFromName,PortToName,Distance,Speed,Time,FuelConsumedTravel,
-//                    TimeArrival,TimeLeft,
-//                    FuelArrival,FuelAtLeave,
-//                    PortSupply,PortDemand,CostPerContainer,OperTime,OperFuelConsumed,
-//                    HasBunker,AmountBunkered,PortFuelPrice,
-//                    IsLate,TimeLate,
-//                    HasNoFuel,DeptBunker,
-//                    PortCall,TotalTravelCost,TotalIdleFuelCost,totalHandlingCost,totalPenaltyCost,TotalValueFuelLeft,
-//                    TotalOperatingCost});
-//            
+        DecimalFormat df = CoreFunctions.getDecimalFormat(2);
+                
+        String PortID               = this.portID+"";
+        String countryID            = this.countryID+"";
+        String cabotageRegionID     = this.cabotageRegionID+"";
+        String regionID             = this.regionID+"";
+        String unLocode             = this.unLoCode ;
+        String portName             = this.portName ;
+
+        String portLat              = Double.toString(portLon);
+        String portLon              = Double.toString(this.portLon );
         
-        return new Object[]{};
+        String portCallCost         = Double.toString(this.portCall_Cost);
+       
+        String port_FuelPrice          = Double.toString(this.port_FuelPrice  );
+        boolean canBunker           = this.canBunker;
+        String port_CostPerFullContainer  = Double.toString(this.port_CostPerFullContainer );
+        String penalty_LateArrival  = Double.toString(this.penalty_LateArrival );
+
+        String Remarks              = this.remarks ;
+        boolean IsActive            = this.isActive  ;
+        String CreatedBy            = this.createdBy+"";
+                    
+        
+        return new Object[]{
+            PortID,
+            countryID,cabotageRegionID,regionID,
+            unLocode,portName,portLat,portLon,
+            portCallCost,
+            port_FuelPrice,canBunker,
+            port_CostPerFullContainer,
+            penalty_LateArrival,
+            Remarks,IsActive,CreatedBy
+        };
     }
-    
 }
 

@@ -117,8 +117,8 @@ public class ShipCategoryDTO extends BaseDTO{
         Coeff_Beta = rs.getDouble("Coeff_Beta");
         Coeff_FuelTravel= rs.getDouble("Coeff_FuelTravel");
         
-        Coeff_c_speed= rs.getDouble("Coeff_k_speed");
-        Coeff_c_weight= rs.getDouble("Coeff_k_weight");
+        Coeff_c_speed= rs.getDouble("Coeff_c_speed");
+        Coeff_c_weight= rs.getDouble("Coeff_c_weight");
         
         BunkerCapacity = rs.getDouble("BunkerCapacity");	
         CriticalBunkerLevel = rs.getDouble("CriticalBunkerLevel");
@@ -131,6 +131,7 @@ public class ShipCategoryDTO extends BaseDTO{
         CriticalBunkerLevelNew = this.BunkerCapacity * 0.05;
         minBunkerAmt =this.BunkerCapacity * 0.15;
         minAmountToBunkerUp = this.BunkerCapacity *0.20;
+        
         
     }
     
@@ -207,49 +208,51 @@ public class ShipCategoryDTO extends BaseDTO{
     
     }
     
-        public Object[] convertListShipToStringArray(){
+        public Object[] convertListShipToObjectgArray(){
         //use this.ship
             
-//                DecimalFormat df = CoreFunctions.getDecimalFormat(2);
-//                
-//                String sequenceNo       = 
-//                String PortFromName     = ( == 0 ? "-" : DataPort.get(i).currentShip.previousPortName);
-//                String PortToName       = DataPort.get(i).PortName;
-//                String Distance         = df.format(DataPort.get(i).currentShip.DistanceTravel);
-//                String Speed            = df.format(DataPort.get(i).shp_choseSpeed  );
-//                String Time             = df.format(DataPort.get(i).shp_timeTaken  );
-//                String FuelConsumedTravel   = df.format(DataPort.get(i).currentShip.FuelConsumedTraveled  );
-//                
-//                String TimeArrival      = df.format(DataPort.get(i).currentShip.timeArrival  );
-//                String TimeLeft         = df.format(DataPort.get(i).currentShip.timeLeave  );
-//                
-//                String FuelArrival      = df.format(DataPort.get(i).currentShip.BunkerLevelAtArrival  );
-//                String FuelAtLeave      = df.format(DataPort.get(i).currentShip.BunkerLevelAfterOper  );
-//                
-//                String PortSupply       = df.format(DataPort.get(i).currentShip.AmountUnloaded  );
-//                String PortDemand       = df.format(DataPort.get(i).currentShip.AmountLoaded   );
-//                String CostPerContainer = df.format(DataPort.get(i).Port_CostPerFullContainer  );
-//                String OperTime         = df.format(DataPort.get(i).shp_timeTaken  );
-//                String OperFuelConsumed = df.format(DataPort.get(i).currentShip.FuelConsumedIdle  );
-//                
-//                boolean HasBunker       = DataPort.get(i).currentShip.hasBunkered  ;
-//                String AmountBunkered   = df.format(DataPort.get(i).currentShip.AmountBunkered  );
-//                String PortFuelPrice    =  df.format(DataPort.get(i).Port_FuelPrice ); 
-//                boolean IsLate          = DataPort.get(i).currentShip.isLate  ;
-//                String TimeLate         = df.format(DataPort.get(i).currentShip.timeLate  );
-//                
-//                boolean HasNoFuel       = DataPort.get(i).currentShip.hasNoFuel  ;
-//                String DeptBunker       = df.format(DataPort.get(i).currentShip.Dept_Bunker  );
-//               
-//                String PortCall         = df.format(DataPort.get(i).PortCall_Cost  );
-//                String TotalTravelCost  = df.format(DataPort.get(i).TotalFuelTravelCost  );
-//                String TotalIdleFuelCost   = df.format(DataPort.get(i).TotalFuelIdleCost  );
-//                String TotalHandlingCost    = df.format(DataPort.get(i).TotalHandlingCost  );
-//                String TotalPenaltyCost     = df.format(DataPort.get(i).TotalPenaltyCost  );
-//                String TotalValueFuelLeft   = df.format(DataPort.get(i).TotalValueFuelLeft_FinalHvi  );
-//                String TotalOperatingCost   = df.format(DataPort.get(i).TotalOperationalCost  );
+            DecimalFormat df = CoreFunctions.getDecimalFormat(2);
+
+            String ShipCategoryID       = this.shipCategory_ID+"";
+            String Code                 = this.Code ;
+            String Description          =this.Description ;
+            String CapacityTEU          = df.format(this.capacityTEU );
+            String CapacityFFE          = df.format(this.capacityFEU  );
+
+            String MinSpeed             = df.format(this.MinSpeed );
+            String MaxSpeed             = df.format(this.MaxSpeed );
+
+            String DesignSpeed          = df.format(this.DesignSpeed  );
+            String Coeff_FuelIdle       = Double.toString(this.Coeff_FuelIdle  );
+
+            String Coeff_Alpha          = Double.toString(this.Coeff_Alpha );
+            String Coeff_Beta           = Double.toString(this.Coeff_Beta   );
+            String Coeff_FuelTravel     = Double.toString(this.Coeff_FuelTravel);
+            String Coeff_c_speed        = Double.toString(this.Coeff_c_speed );
+            String Coeff_c_weight       = Double.toString(this.Coeff_c_weight );
+            String BunkerCapacity       = Double.toString(this.BunkerCapacity );
+
+            String CriticalBunkerLevel       = df.format(this.CriticalBunkerLevel  );
+            String TimeLoadUnLoadPerFullContainerTEU   = Double.toString(this.timeLoadUnLoadPerFullContainerTEU  );
+            String Penalty_ZeroBunker   =  df.format(this.Penalty_ZeroBunker); 
+            String Remarks              =   this.Remarks ;
+
+            boolean IsActive            = this.IsActive  ;
+            String CreatedBy            = this.CreatedBy+"" ;
+              
 
 
-        return new Object[]{};
+        return new Object[]{ShipCategoryID,Code,Description,
+            CapacityTEU,CapacityFFE,
+            MinSpeed,MaxSpeed,DesignSpeed,
+            Coeff_FuelIdle,
+            Coeff_Alpha,Coeff_Beta,Coeff_FuelTravel,
+            Coeff_c_speed,Coeff_c_weight,
+            BunkerCapacity,
+            CriticalBunkerLevel,
+            TimeLoadUnLoadPerFullContainerTEU,
+            Penalty_ZeroBunker,
+            Remarks,IsActive,CreatedBy
+        };
     }
 }
